@@ -1,0 +1,118 @@
+import { t as T, a as B } from "../chunks/C3b73btl.js";
+import { p as Z, l as I, m as ee, o as D, s as i, t as E, v as r, a as ae, $ as te, c as e, w as d, r as a } from "../chunks/DvcnV1Iy.js";
+import { d as re, e as se, s as m } from "../chunks/DxMSxYl-.js";
+import { i as ne } from "../chunks/mt6aCfIN.js";
+import { h as ie } from "../chunks/CB6iZtqN.js";
+import { d as le, s as N, a as oe, r as ue, L as de } from "../chunks/C8BfhpKI.js";
+import { G as me, I as ve, b as fe, m as pe, C as ce, v as _e, a as he } from "../chunks/BPcNmqJU.js";
+import "../chunks/KzIwl7iM.js";
+import { a as S, b as be, c as xe, d as ge, e as ye, f as we, s as $e, h as ke, __tla as __tla_0 } from "../chunks/C-o1sGLL.js";
+import { g as je } from "../chunks/BJXYr9_A.js";
+import { b as R } from "../chunks/B7qIyRxi.js";
+let Fe;
+let __tla = Promise.all([
+  (() => {
+    try {
+      return __tla_0;
+    } catch {
+    }
+  })()
+]).then(async () => {
+  const Ce = () => me((u = {}, l) => {
+    l.length && (pe(l), ce("username", we(), () => {
+      _e(u.username).isNotBlank();
+    }));
+  });
+  function Ie(u, l, n) {
+    l.add(u.currentTarget.name), n();
+  }
+  var Se = T('<div class="mr-2 flex flex-row justify-center"><div class="inline-block h-6 w-6 animate-spin"><!></div></div>'), Ae = T('<div class="flex flex-grow flex-col justify-end p-4 sm:justify-start"><div class="card mx-auto my-10 flex w-full flex-shrink flex-col sm:w-72"><h1> </h1> <p><span> </span> <a class="text-blue-500 underline"> </a></p> <form><div class="mb-2"><label for="username"> </label> <input type="text" name="username" autocomplete="username"> <!></div> <div class="flex flex-row justify-end"><button type="submit" class="btn primary flex flex-shrink"><!> </button></div></form></div></div>');
+  Fe = function(u, l) {
+    Z(l, true);
+    let n = I(""), A = Ce(), v = I(ee(A.get())), f = I(false), V = D(() => r(f)), z = D(() => he(r(v), {
+      untested: "untested",
+      tested: "tested",
+      invalid: "invalid",
+      valid: "valid",
+      warning: "warning"
+    }));
+    const p = /* @__PURE__ */ new Set(), _ = le(() => {
+      A({
+        username: r(n)
+      }, Array.from(p)).done((t) => {
+        d(v, t, true);
+      }), p.clear();
+    }, 300);
+    function F() {
+      p.add("username"), _(), _.flush();
+    }
+    async function H(t) {
+      t.preventDefault();
+      try {
+        d(f, true), d(n, r(n).trim(), true), F(), r(v).isValid() && (await $e(r(n)), await je(`${R}/`));
+      } catch (s) {
+        ke(s);
+      } finally {
+        d(f, false);
+      }
+    }
+    var h = Ae();
+    ie((t) => {
+      E((s) => te.title = s, [
+        () => S()
+      ]);
+    });
+    var G = e(h), b = e(G), J = e(b, true);
+    a(b);
+    var x = i(b, 2), g = e(x), K = e(g, true);
+    a(g);
+    var y = i(g, 2);
+    N(y, "href", `${R}/signup`);
+    var M = e(y, true);
+    a(y), a(x);
+    var w = i(x, 2), $ = e(w), k = e($), O = e(k, true);
+    a(k);
+    var o = i(k, 2);
+    ue(o), o.__input = [
+      Ie,
+      p,
+      _
+    ];
+    var P = i(o, 2);
+    ve(P, {
+      name: "username",
+      get result() {
+        return r(v);
+      }
+    }), a($);
+    var L = i($, 2), j = e(L), q = e(j);
+    {
+      var Q = (t) => {
+        var s = Se(), c = e(s), C = e(c);
+        de(C, {}), a(c), a(s), B(t, s);
+      };
+      ne(q, (t) => {
+        r(f) && t(Q);
+      });
+    }
+    var U = i(q);
+    a(j), a(L), a(w), a(G), a(h), E((t, s, c, C, W, X, Y) => {
+      m(J, t), m(K, s), m(M, c), m(O, C), oe(o, 1, `w-full ${W ?? ""}`), N(o, "placeholder", X), j.disabled = r(V), m(U, ` ${Y ?? ""}`);
+    }, [
+      () => S(),
+      () => be(),
+      () => xe(),
+      () => ge(),
+      () => r(z)("username"),
+      () => ye(),
+      () => S()
+    ]), se("submit", w, H), fe(o, () => r(n), (t) => d(n, t)), B(u, h), ae();
+  };
+  re([
+    "input"
+  ]);
+});
+export {
+  __tla,
+  Fe as component
+};
