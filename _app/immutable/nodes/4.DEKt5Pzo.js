@@ -1,0 +1,17 @@
+import { t as p, a as i } from "../chunks/BZ0OIXfh.js";
+import { i as r } from "../chunks/C__qyGCH.js";
+import { p as m, a as s, t as f, i as n, $ as d } from "../chunks/Bvg94FyY.js";
+import { h as c } from "../chunks/CM8RGjgJ.js";
+import { a as l } from "../chunks/BGOAb-lb.js";
+import "../chunks/KzIwl7iM.js";
+var v = p('<div class="container mx-auto p-4"></div>');
+function b(a, t) {
+  m(t, false), r();
+  var o = v();
+  c((u) => {
+    f((e) => d.title = e, [() => l()], n);
+  }), i(a, o), s();
+}
+export {
+  b as component
+};
