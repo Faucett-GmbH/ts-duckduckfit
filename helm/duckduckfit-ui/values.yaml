@@ -1,0 +1,47 @@
+replicas:
+  min: 1
+  max: 8
+  resource:
+    cpu:
+      utilization: 90
+    memory:
+      utilization: 90
+  scaleDown:
+    stabilizationWindowSeconds: 30
+  scaleUp:
+    stabilizationWindowSeconds: 15
+
+env:
+  PUBLIC_URL: https://duckduckfit.com
+
+image:
+  repository: ghcr.io/faucett-gmbh/duckduckfit-ui
+  tag: latest
+  pullSecrets: github-registry
+  pullPolicy: Always
+  hash: sha256:13ba025b6c186da3fdce3db68f192721fef8300ae02f2ae76c953d771b7180e4
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+  hosts:
+    - host: duckduckfit.com
+      paths:
+        - /
+  tls:
+    - secretName: duckduckfit-com-tls
+      hosts:
+        - duckduckfit.com
+        - www.duckduckfit.com
+
+resources:
+  requests:
+    cpu: 80m
+    memory: 128M
+  limits:
+    cpu: 250m
+    memory: 512M

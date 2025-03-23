@@ -1,0 +1,26 @@
+name: Web
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_URL: https://faucett-gmbh.github.io/ts-duckduckfit
+      USE_BASE_PATH: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install -g pnpm@10
+      - run: pnpm install --no-frozen-lockfile
+      - run: NODE_ENV=production pnpm build
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build

@@ -1,0 +1,19 @@
+import type { AvailableLanguageTag } from './paraglide/runtime';
+
+// See https://svelte.dev/docs/kit/types#app.d.ts
+// for information about these interfaces
+declare global {
+	namespace App {
+		// interface Error {}
+		// interface Locals {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
+	}
+
+	declare const __VERSION__: string;
+	declare const __DEV_AUTH_API_URL__: string | undefined;
+	declare const __DEV_AUTH_URL__: string | undefined;
+}
+
+export { };
