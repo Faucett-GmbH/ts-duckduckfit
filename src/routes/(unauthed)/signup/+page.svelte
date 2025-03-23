@@ -97,7 +97,7 @@
 	<div class="card mx-auto my-10 flex w-full flex-shrink flex-col sm:w-72">
 		<h1>{m.auth_sign_up()}</h1>
 		<p>
-			<span>{m.auth_have_an_account()}</span>
+			<span>{m.auth_already_have_an_account()}</span>
 			<a href={`${base}/signin`} class="text-blue-500 underline">{m.auth_sign_in()}</a>
 		</p>
 		<form onsubmit={onSubmit}>
