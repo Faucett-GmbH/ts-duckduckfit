@@ -1,13 +1,17 @@
 export const USER_VERSION = 1;
 
 export interface UserWeight {
-  weight: number;
-  date: Date;
+  weightInKg: number;
+  createdAt: Date;
 }
 
 export interface User {
   version: number;
   birthdate: Date | null;
+  weightUnit: 'kg' | 'lbs' | null;
+  distanceUnits: 'km' | 'mi' | null;
+  bodyMeasurementUnit: 'cm' | 'in' | null;
+  heightInCm: number | null;
   weights: UserWeight[];
 }
 
