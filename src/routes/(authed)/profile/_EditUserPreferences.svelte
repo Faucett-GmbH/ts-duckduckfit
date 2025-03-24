@@ -111,7 +111,7 @@
 			bind:value={weightUnit}
 			oninput={onChange}
 		>
-			<option>{m.weight_units_placeholder()}</option>
+			<option value={null}>{m.weight_units_placeholder()}</option>
 			<option value="kg">{m.weight_units_kilograms_label()}</option>
 			<option value="lbs">{m.weight_units_pounds_label()}</option>
 		</select>
@@ -125,7 +125,7 @@
 			bind:value={distanceUnits}
 			oninput={onChange}
 		>
-			<option>{m.distance_units_placeholder()}</option>
+			<option value={null}>{m.distance_units_placeholder()}</option>
 			<option value="km">{m.distance_units_kilometers_label()}</option>
 			<option value="m">{m.distance_units_miles_label()}</option>
 		</select>
@@ -139,7 +139,7 @@
 			bind:value={bodyMeasurementUnit}
 			oninput={onChange}
 		>
-			<option>{m.body_measurement_units_placeholder()}</option>
+			<option value={null}>{m.body_measurement_units_placeholder()}</option>
 			<option value="cm">{m.body_measurement_units_centimeters_unit()}</option>
 			<option value="in">{m.body_measurement_units_inches_unit()}</option>
 		</select>

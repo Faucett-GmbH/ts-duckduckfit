@@ -88,13 +88,13 @@
 			onclick={createOnChangeTimeFrame('1y')}>{m.user_weights_1_year()}</button
 		>
 	</div>
-	<div class="flex flex-col flex-grow min-h-32">
+	<div class="flex flex-col flex-grow">
 		{#if timeFrame === '1d'}
 			<div class="flex flex-col flex-grow justify-center items-center">
 				{#if weight}
-					<p><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></p>
+					<p class="m-0 p-2"><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></p>
 				{:else}
-					<p>{m.user_weights_no_weight()}</p>
+					<p class="m-0 p-2">{m.user_weights_no_weight()}</p>
 				{/if}
 			</div>
 		{:else}
@@ -103,7 +103,10 @@
 	</div>
 	<div class="flex flex-col flex-grow">
 		{#if weight}
-			<p><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></p>
+			<p>
+				{m.user_weights_weight_label()}
+				<Measurement metricValue={weight.weightInKg} metricUnits="kg" />
+			</p>
 		{/if}
 	</div>
 </div>

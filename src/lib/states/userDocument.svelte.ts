@@ -10,11 +10,9 @@ export interface UserDocument {
 }
 
 export const userDocumentMigrations = {
-	1: async (userDocument: UserDocument) => {
+	1: (userDocument: UserDocument) => {
 		const repo = getRepo();
 		userDocument.version = 1;
-		const user = repo.create<User>();
-		userDocument.user = user.documentId as AutomergeDocumentId<User>;
-		await migrate(user, userMigrations);
+		userDocument.user = repo.create<User>().documentId as AutomergeDocumentId<User>;
 	}
 };

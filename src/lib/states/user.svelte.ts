@@ -18,6 +18,11 @@ export interface User {
 export const userMigrations = {
   1: (user: User) => {
     user.version = 1;
+    user.birthdate = null;
+    user.weightUnit = null;
+    user.distanceUnits = null;
+    user.bodyMeasurementUnit = null;
+    user.heightInCm = null;
     user.weights = [];
   }
 };

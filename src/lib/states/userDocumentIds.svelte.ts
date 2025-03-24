@@ -1,10 +1,10 @@
 import { InternalError } from '$lib/error';
 import { localStorageState } from '$lib/localStorageState.svelte';
 import { getRepo } from '$lib/repo';
-import type { DocumentId } from '@automerge/automerge-repo/slim';
+import type { DocHandle, DocumentId } from '@automerge/automerge-repo/slim';
 import { migrate, type AutomergeDocumentId } from '$lib/automergeState.svelte';
 import { userDocumentMigrations, type UserDocument } from './userDocument.svelte';
-import type { User } from './user.svelte';
+import { userMigrations, type User } from './user.svelte';
 
 export interface UserDocumentIds {
 	[username: string]: AutomergeDocumentId<UserDocument>;
@@ -34,7 +34,7 @@ export async function signUp(username: string) {
 	const repo = getRepo();
 	const userDocument = repo.create<UserDocument>();
 	await userDocument.whenReady();
-	await migrate(userDocument, userDocumentMigrations);
+	await runAllMigrations(userDocument);
 
 	const user = repo.find<User>(userDocument.docSync()!.user);
 	await user.whenReady();
@@ -54,7 +54,7 @@ export async function signIn(username: string) {
 	const repo = getRepo();
 	const userDocument = repo.find<UserDocument>(userDocumentId);
 	await userDocument.whenReady();
-	await migrate(userDocument, userDocumentMigrations);
+	await runAllMigrations(userDocument);
 	currentUsernameState.value = username;
 }
 
@@ -63,8 +63,18 @@ export async function signInWithDocumentId(username: string, userDocumentId: Aut
 	const repo = getRepo();
 	const userDocument = repo.find<UserDocument>(userDocumentId);
 	await userDocument.whenReady();
-	await migrate(userDocument, userDocumentMigrations);
+	await runAllMigrations(userDocument);
 
 	state[username] = userDocument.documentId as AutomergeDocumentId<UserDocument>;
 	currentUsernameState.value = username;
+}
+
+async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
+	await migrate(userDocumentHandle, userDocumentMigrations);
+	const userDocument = await userDocumentHandle.doc();
+	if (!userDocument) {
+		throw InternalError.from('errors_name_application', 'errors_message_application');
+	}
+	const repo = getRepo();
+	await migrate(repo.find<User>(userDocument.user), userMigrations);
 }
