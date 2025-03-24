@@ -101,6 +101,7 @@
 	}
 </script>
 
+<h3>{m.user_preferences_title()}</h3>
 <form class="flex flex-col" onsubmit={onSubmit}>
 	<div class="mb-2">
 		<label for="weightUnit">{m.weight_units_label()}</label>

@@ -38,5 +38,15 @@
 	"user_info_update": "Update",
 	"user_preferences_title": "User Preferences",
 	"user_preferences_update": "Update",
+	"user_weights_title": "Weight",
+	"user_weights_no_weight": "No Weight",
+	"user_weights_1_day": "Day",
+	"user_weights_1_week": "Week",
+	"user_weights_1_month": "Month",
+	"user_weights_1_year": "Year",
+	"user_weights_weigh_in_title": "Weigh in",
+	"user_weights_edit_weight_title": "Edit Weigh",
+	"user_weights_weight_label": "Weight",
+	"user_weights_weight_save": "Save",
 	"locales_en": "English"
 }

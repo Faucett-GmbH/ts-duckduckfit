@@ -58,7 +58,7 @@
 						href={`${base}/profile`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black bg-opacity-10': page.route.id === '/(authed)/signin'
+							'bg-black/10': page.route.id === '/(authed)/signin'
 						}}
 						class:active={page.route.id === '/(authed)/signin'}
 						onclick={onGoto}
@@ -76,7 +76,7 @@
 						href={`${base}/signin`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black bg-opacity-10': page.route.id === '/(authed)/signin'
+							'bg-black/10': page.route.id === '/(authed)/signin'
 						}}
 						class:active={page.route.id === '/(authed)/signin'}
 						onclick={onGoto}

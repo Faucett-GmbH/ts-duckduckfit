@@ -10,6 +10,7 @@
 	import type { PageData } from './$types';
 	import EditUserInfo, { type EditUserInfoForm } from './_EditUserInfo.svelte';
 	import EditUserPreferences, { type EditUserPreferencesForm } from './_EditUserPreferences.svelte';
+	import EditUserWeights from './_EditUserWeights.svelte';
 
 	let { data }: Props = $props();
 
@@ -33,6 +34,24 @@
 			return user;
 		});
 	}
+	function onEditUserWeight(index: number, weightInKg: number) {
+		userState.change((user) => {
+			user.weights[index].weightInKg = weightInKg;
+			return user;
+		});
+	}
+	function onAddUserWeight(weightInKg: number) {
+		userState.change((user) => {
+			user.weights.push({ weightInKg, createdAt: new Date() });
+			return user;
+		});
+	}
+	function onDeleteUserWeight(index: number) {
+		userState.change((user) => {
+			user.weights.splice(index, 1);
+			return user;
+		});
+	}
 </script>
 
 <svelte:head>
@@ -47,11 +66,17 @@
 		</div>
 		{#if userState.doc}
 			<div class="flex flex-col mb-2">
-				<h3>{m.user_info_title()}</h3>
+				<EditUserWeights
+					weights={userState.doc.weights}
+					onAdd={onAddUserWeight}
+					onEdit={onEditUserWeight}
+					onDelete={onDeleteUserWeight}
+				/>
+			</div>
+			<div class="flex flex-col mb-2">
 				<EditUserInfo birthdate={userState.doc.birthdate} onUpdate={onEditUserInfo} />
 			</div>
 			<div class="flex flex-col mb-2">
-				<h3>{m.user_preferences_title()}</h3>
 				<EditUserPreferences
 					weightUnit={userState.doc.weightUnit}
 					distanceUnits={userState.doc.distanceUnits}

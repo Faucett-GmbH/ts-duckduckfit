@@ -40,3 +40,40 @@ export function lazy<R>(init: () => R): () => R {
 		return value;
 	}
 }
+
+export function isVisible(element: HTMLElement) {
+	const rect = element.getBoundingClientRect(),
+		width = window.innerWidth || document.documentElement.clientWidth,
+		height = window.innerHeight || document.documentElement.clientHeight;
+
+	if (rect.right < 0 || rect.bottom < 0 || rect.left > width || rect.top > height) {
+		return false;
+	}
+
+	return (
+		element.contains(document.elementFromPoint(rect.left, rect.top)) ||
+		element.contains(document.elementFromPoint(rect.right, rect.top)) ||
+		element.contains(document.elementFromPoint(rect.right, rect.bottom)) ||
+		element.contains(document.elementFromPoint(rect.left, rect.bottom))
+	);
+}
+
+export function scrollIntoViewIfNeed(element: HTMLElement) {
+	if (!isVisible(element)) {
+		element.scrollIntoView({ behavior: 'smooth' });
+	}
+}
+
+export function waitMS(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function selectElementContents(el: HTMLElement) {
+	const range = document.createRange();
+	range.selectNodeContents(el);
+	const selection = window.getSelection();
+	if (selection) {
+		selection.removeAllRanges();
+		selection.addRange(range);
+	}
+}

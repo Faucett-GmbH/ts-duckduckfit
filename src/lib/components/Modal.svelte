@@ -50,7 +50,7 @@
 <div use:portal class="relative" role="dialog" aria-modal="true">
 	{#if open}
 		<div
-			class="fixed inset-0 bg-black bg-opacity-25"
+			class="fixed inset-0 bg-black/25"
 			class:hidden={backdrop ? !open : true}
 			transition:fade={{ duration: 150 }}
 		></div>
