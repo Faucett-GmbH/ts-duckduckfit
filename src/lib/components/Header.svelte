@@ -6,6 +6,7 @@
 	import LogOut from 'lucide-svelte/icons/log-out';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import User from 'lucide-svelte/icons/user';
+	import Dumbbell from 'lucide-svelte/icons/dumbbell';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
 	import { userDocumentId } from '$lib/states/userDocumentIds.svelte';
@@ -58,12 +59,23 @@
 						href={`${base}/profile`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(authed)/signin'
+							'bg-black/10': page.route.id === '/(authed)/profile'
 						}}
-						class:active={page.route.id === '/(authed)/signin'}
+						class:active={page.route.id === '/(authed)/profile'}
 						onclick={onGoto}
 					>
 						<User /><span class="ms-4">{m.profile_title()}</span>
+					</a>
+					<a
+						href={`${base}/routines`}
+						class={{
+							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+							'bg-black/10': page.route.id === '/(authed)/routines'
+						}}
+						class:active={page.route.id === '/(authed)/routines'}
+						onclick={onGoto}
+					>
+						<Dumbbell /><span class="ms-4">{m.routines_title()}</span>
 					</a>
 					<button
 						class="flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600"
