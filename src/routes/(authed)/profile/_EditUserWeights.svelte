@@ -3,6 +3,7 @@
 
 	export type EditUserWeightsProps = {
 		timeFrame?: TimeFrame;
+		heightInCm: number | null;
 		weights: UserWeight[];
 		onAdd(weightInKg: number): void;
 		onEdit(index: number, weightInKg: number): void;
@@ -18,8 +19,16 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import Measurement from '$lib/components/inputs/Measurement.svelte';
 	import UserWeightForm, { type UserWeightFormValid } from './_UserWeightForm.svelte';
+	import { language } from '$lib/states/language.svelte';
 
-	let { timeFrame = '1d', weights = [], onAdd, onEdit, onDelete }: EditUserWeightsProps = $props();
+	let {
+		timeFrame = '1d',
+		heightInCm,
+		weights = [],
+		onAdd,
+		onEdit,
+		onDelete
+	}: EditUserWeightsProps = $props();
 
 	function createOnChangeTimeFrame(tf: TimeFrame) {
 		return () => (timeFrame = tf);
@@ -30,6 +39,7 @@
 			? weight
 			: null
 	);
+	let bmi = $derived(weight && heightInCm ? weight.weightInKg / (heightInCm / 100) ** 2 : null);
 
 	let editWeightOpen = $state(false);
 	let editWeight = $state<UserWeight>();
@@ -101,14 +111,24 @@
 			<div class="flex flex-col flex-grow justify-center items-center"></div>
 		{/if}
 	</div>
+	<hr />
 	<div class="flex flex-col flex-grow">
 		{#if weight}
-			<p>
-				{m.user_weights_weight_label()}
+			<p class="m-0">
+				{m.user_weights_weight_label()}:
 				<Measurement metricValue={weight.weightInKg} metricUnits="kg" />
 			</p>
 		{/if}
+		{#if bmi}
+			<p class="m-0">
+				{m.user_weights_bmi_label()}:
+				{language.numbers.format(bmi, 1)}
+			</p>
+		{/if}
 	</div>
+	{#if weight && bmi}
+		<hr />
+	{/if}
 </div>
 
 <Modal bind:open={editWeightOpen}>

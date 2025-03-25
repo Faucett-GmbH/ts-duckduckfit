@@ -3,10 +3,12 @@
 
 	export type EditUserInfoProps = {
 		birthdate: Date | null;
+		heightInCm: number | null;
 		onUpdate(updates: EditUserInfoForm): void;
 	};
 
 	export type EditUserInfoForm = {
+		heightInCm: number | null;
 		birthdate: Date | null;
 	};
 
@@ -22,6 +24,11 @@
 					enforce(data.birthdate).isNotBlank();
 				});
 			});
+			omitWhen(!data.heightInCm, () => {
+				test('heightInCm', m.errors_message_required(), () => {
+					enforce(data.heightInCm).isNotBlank();
+				});
+			});
 		});
 </script>
 
@@ -32,10 +39,12 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
+	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
 
-	let { birthdate, onUpdate }: EditUserInfoProps = $props();
+	let { birthdate, heightInCm, onUpdate }: EditUserInfoProps = $props();
 
 	let birthdateString = $state(birthdate?.toISOString().substring(0, 10));
+	let heightInCmValue = $state(heightInCm || 0);
 	let suite = createSuite();
 	let result = $state(suite.get());
 	let loading = $state(false);
@@ -52,13 +61,14 @@
 
 	const fields = new Set<string>();
 	const validate = debounce(() => {
-		suite({ birthdate }, Array.from(fields)).done((r) => {
+		suite({ birthdate, heightInCm: heightInCmValue }, Array.from(fields)).done((r) => {
 			result = r;
 		});
 		fields.clear();
 	}, 300);
 	export function validateAll() {
 		fields.add('birthdate');
+		fields.add('heightInCm');
 		validate();
 		validate.flush();
 	}
@@ -77,7 +87,7 @@
 			loading = true;
 			validateAll();
 			if (result.isValid()) {
-				onUpdate({ birthdate } as never);
+				onUpdate({ birthdate, heightInCm: heightInCmValue });
 				suite.reset();
 				result = suite.get();
 			}
@@ -89,9 +99,20 @@
 	}
 </script>
 
-<h3>{m.user_info_title()}</h3>
-<form class="flex flex-row" onsubmit={onSubmit}>
-	<div class="flex flex-col flex-grow">
+<form class="flex flex-col" onsubmit={onSubmit}>
+	<div class="flex flex-col flex-grow mb-2">
+		<label for="heightInCm">{m.user_info_height_label()}</label>
+		<MeasurementInput
+			class={cn('heightInCm')}
+			name="heightInCm"
+			type="distance"
+			metricUnits={'cm'}
+			bind:metricValue={heightInCmValue}
+			oninput={onChange}
+		/>
+		<InputResults name="heightInCm" {result} />
+	</div>
+	<div class="flex flex-col flex-grow mb-2">
 		<label for="birthdate">{m.user_info_birthdate_label()}</label>
 		<input
 			class="w-full {cn('birthdate')}"
@@ -103,7 +124,7 @@
 		/>
 		<InputResults name="birthdate" {result} />
 	</div>
-	<div class="flex flex-col flex-shrink ms-2 justify-end">
+	<div class="flex flex-row flex-shrink justify-end">
 		<button type="submit" class="btn primary flex flex-shrink" {disabled}>
 			{#if loading}
 				<div class="mr-2 flex flex-row justify-center">

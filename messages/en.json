@@ -35,6 +35,7 @@
 	"user_info_name_label": "Name",
 	"user_info_name_placeholder": "Enter Name",
 	"user_info_birthdate_label": "Birthdate",
+	"user_info_height_label": "Height",
 	"user_info_update": "Update",
 	"user_preferences_title": "User Preferences",
 	"user_preferences_update": "Update",
@@ -47,6 +48,7 @@
 	"user_weights_weigh_in_title": "Weigh in",
 	"user_weights_edit_weight_title": "Edit Weight",
 	"user_weights_weight_label": "Weight",
+	"user_weights_bmi_label": "BMI",
 	"user_weights_weight_save": "Save",
 	"locales_en": "English"
 }

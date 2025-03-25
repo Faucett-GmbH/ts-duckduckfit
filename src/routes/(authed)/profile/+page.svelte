@@ -16,9 +16,14 @@
 
 	const userState = automergeState(data.userDocumentId);
 
-	function onEditUserInfo({ birthdate }: EditUserInfoForm) {
+	function onEditUserInfo({ birthdate, heightInCm }: EditUserInfoForm) {
 		userState.change((user) => {
-			user.birthdate = birthdate;
+			if (user.heightInCm !== heightInCm) {
+				user.heightInCm = heightInCm;
+			}
+			if (user.birthdate?.getTime() !== birthdate?.getTime()) {
+				user.birthdate = birthdate;
+			}
 			return user;
 		});
 	}
@@ -28,9 +33,15 @@
 		bodyMeasurementUnit
 	}: EditUserPreferencesForm) {
 		userState.change((user) => {
-			user.weightUnit = weightUnit;
-			user.distanceUnits = distanceUnits;
-			user.bodyMeasurementUnit = bodyMeasurementUnit;
+			if (user.weightUnit !== weightUnit) {
+				user.weightUnit = weightUnit;
+			}
+			if (user.distanceUnits !== distanceUnits) {
+				user.distanceUnits = distanceUnits;
+			}
+			if (user.bodyMeasurementUnit !== bodyMeasurementUnit) {
+				user.bodyMeasurementUnit = bodyMeasurementUnit;
+			}
 			return user;
 		});
 	}
@@ -67,6 +78,7 @@
 		{#if userState.doc}
 			<div class="flex flex-col mb-2">
 				<EditUserWeights
+					heightInCm={userState.doc.heightInCm}
 					weights={userState.doc.weights}
 					onAdd={onAddUserWeight}
 					onEdit={onEditUserWeight}
@@ -74,7 +86,11 @@
 				/>
 			</div>
 			<div class="flex flex-col mb-2">
-				<EditUserInfo birthdate={userState.doc.birthdate} onUpdate={onEditUserInfo} />
+				<EditUserInfo
+					birthdate={userState.doc.birthdate}
+					heightInCm={userState.doc.heightInCm}
+					onUpdate={onEditUserInfo}
+				/>
 			</div>
 			<div class="flex flex-col mb-2">
 				<EditUserPreferences

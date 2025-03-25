@@ -16,11 +16,13 @@
 	export const IMPERIAL_DISTANCE_OPTIONS: UnitOption[] = [
 		{ name: 'miles', units: 'm', type: 'distance' },
 		{ name: 'yards', units: 'yd', type: 'distance' },
-		{ name: 'feet', units: 'ft', type: 'distance' }
+		{ name: 'feet', units: 'ft', type: 'distance' },
+		{ name: 'inches', units: 'in', type: 'distance' }
 	];
 	export const DISTANCE_OPTIONS: UnitOption[] = [
 		{ name: 'kilometers', units: 'km', type: 'distance' },
-		{ name: 'meters', units: 'm', type: 'distance' }
+		{ name: 'meters', units: 'm', type: 'distance' },
+		{ name: 'centimeters', units: 'cm', type: 'distance' }
 	];
 
 	export const DURATION_OPTIONS: UnitOption[] = [
@@ -47,10 +49,10 @@
 	export const IMPERIAL_MASS_UNITS = ['lb'] as const;
 	export type ImperialWeightUnit = (typeof IMPERIAL_MASS_UNITS)[number];
 
-	export const DISTANCE_UNITS = ['km', 'm'] as const;
+	export const DISTANCE_UNITS = ['km', 'm', 'cm'] as const;
 	export type DistanceUnit = (typeof DISTANCE_UNITS)[number];
 
-	export const IMPERIAL_DISTANCE_UNITS = ['m', 'yd', 'ft'] as const;
+	export const IMPERIAL_DISTANCE_UNITS = ['m', 'yd', 'ft', 'in'] as const;
 	export type ImperialDistanceUnit = (typeof IMPERIAL_DISTANCE_UNITS)[number];
 
 	export const DURATION_UNITS = ['hr', 'm', 's'] as const;
@@ -78,14 +80,26 @@
 	export function metersToFeet(meters: number) {
 		return meters * 3.28084;
 	}
+	export function centimetersToInches(centimeters: number) {
+		return centimeters * 0.393701;
+	}
 	export function feetToMeters(feet: number) {
 		return feet * 0.3048;
+	}
+	export function inchesToCentimeters(inches: number) {
+		return inches * 2.54;
 	}
 	export function milesToFeet(miles: number) {
 		return miles * 5280;
 	}
 	export function feetToMiles(feet: number) {
 		return feet * 0.000189394;
+	}
+	export function feetToInches(feet: number) {
+		return feet * 0.08333333333333333;
+	}
+	export function inchesToFeet(inches: number) {
+		return inches * 12;
 	}
 	export function yardsInFeet(yards: number) {
 		return yards * 0.333333;
@@ -123,6 +137,8 @@
 							return [feetToMiles(metersToFeet(value)), 'm' as R];
 						}
 						return [metersToFeet(value), 'ft' as R];
+					case 'cm':
+						return [centimetersToInches(value), 'in' as R];
 				}
 				break;
 			case 'duration':
@@ -168,6 +184,8 @@
 						return [feetToMeters(yardsToFeet(value)), 'm' as R];
 					case 'ft':
 						return [feetToMeters(value), 'm' as R];
+					case 'in':
+						return [inchesToCentimeters(value), 'cm' as R];
 				}
 				break;
 		}
@@ -245,6 +263,8 @@
 								return [yardsInFeet(milesToFeet(value)), distanceNextUnits as R];
 							case 'ft':
 								return [milesToFeet(value), distanceNextUnits as R];
+							case 'in':
+								return [feetToInches(milesToFeet(value)), distanceNextUnits as R];
 						}
 					case 'yd': {
 						switch (distanceNextUnits) {
@@ -252,6 +272,8 @@
 								return [feetToMiles(yardsToFeet(value)), distanceNextUnits as R];
 							case 'ft':
 								return [yardsToFeet(value), distanceNextUnits as R];
+							case 'in':
+								return [feetToInches(yardsToFeet(value)), distanceNextUnits as R];
 						}
 					}
 					case 'ft': {
@@ -260,6 +282,18 @@
 								return [feetToMiles(value), distanceNextUnits as R];
 							case 'yd':
 								return [yardsInFeet(value), distanceNextUnits as R];
+							case 'in':
+								return [feetToInches(value), distanceNextUnits as R];
+						}
+					}
+					case 'in': {
+						switch (distanceNextUnits) {
+							case 'm':
+								return [feetToMiles(inchesToFeet(value)), distanceNextUnits as R];
+							case 'yd':
+								return [yardsInFeet(inchesToFeet(value)), distanceNextUnits as R];
+							case 'ft':
+								return [inchesToFeet(value), distanceNextUnits as R];
 						}
 					}
 				}
@@ -290,11 +324,22 @@
 						switch (distanceNextUnits) {
 							case 'm':
 								return [value * 1000, distanceNextUnits as R];
+							case 'cm':
+								return [value * 100000, distanceNextUnits as R];
 						}
 					case 'm':
 						switch (distanceNextUnits) {
 							case 'km':
 								return [value / 1000, distanceNextUnits as R];
+							case 'cm':
+								return [value * 100, distanceNextUnits as R];
+						}
+					case 'cm':
+						switch (distanceNextUnits) {
+							case 'km':
+								return [value / 100000, distanceNextUnits as R];
+							case 'm':
+								return [value / 100, distanceNextUnits as R];
 						}
 				}
 				break;
