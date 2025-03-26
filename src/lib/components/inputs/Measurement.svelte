@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts" generics="S extends MeasurementSystem, T extends MeasurementType">
-	import { language } from '$lib/states/language.svelte';
+	import { language } from '$lib/state/language.svelte';
 	import {
 		initialFractionDigits,
 		metricToReadable,

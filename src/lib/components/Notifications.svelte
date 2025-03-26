@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-	import { notifications } from '$lib/states/notifications.svelte';
+	import { notifications } from '$lib/state/notifications.svelte';
 	import Notification from './Notification.svelte';
 </script>
 

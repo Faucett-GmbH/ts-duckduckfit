@@ -9,7 +9,7 @@
 	import Dumbbell from 'lucide-svelte/icons/dumbbell';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
-	import { userDocumentId } from '$lib/states/userDocumentIds.svelte';
+	import { userDocument } from '$lib/state/userDocument.svelte';
 	import Logo from './Logo.svelte';
 	import logoHorizontalWEBP from '$lib/assets/logo-horizontal.webp';
 	import { goto } from '$app/navigation';
@@ -20,7 +20,7 @@
 	}
 
 	function onSignOut() {
-		userDocumentId.clear();
+		userDocument.clear();
 		goto(`${base}/signin`);
 		onGoto();
 	}
@@ -54,7 +54,7 @@
 						<Menu />
 					</button>
 				{/snippet}
-				{#if userDocumentId.documentId}
+				{#if userDocument.documentId}
 					<a
 						href={`${base}/profile`}
 						class={{

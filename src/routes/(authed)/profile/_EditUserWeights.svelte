@@ -15,11 +15,11 @@
 	import { m } from '$lib/paraglide/messages';
 	import Plus from 'lucide-svelte/icons/plus';
 	import Pencil from 'lucide-svelte/icons/pencil';
-	import type { UserWeight } from '$lib/states/user.svelte';
+	import type { UserWeight } from '$lib/state/user.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Measurement from '$lib/components/inputs/Measurement.svelte';
 	import UserWeightForm, { type UserWeightFormValid } from './_UserWeightForm.svelte';
-	import { language } from '$lib/states/language.svelte';
+	import { language } from '$lib/state/language.svelte';
 
 	let {
 		timeFrame = '1d',
@@ -40,6 +40,31 @@
 			: null
 	);
 	let bmi = $derived(weight && heightInCm ? weight.weightInKg / (heightInCm / 100) ** 2 : null);
+	let weightsByTime = $derived.by(() => {
+		let lookBackDate: Date;
+		switch (timeFrame) {
+			case '1d':
+				lookBackDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+				break;
+			case '1w':
+				lookBackDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+				break;
+			case '1m':
+				lookBackDate = new Date(Date.now() - 30.4375 * 24 * 60 * 60 * 1000);
+				break;
+			case '1y':
+				lookBackDate = new Date(Date.now() - 365.25 * 24 * 60 * 60 * 1000);
+				break;
+		}
+		const newWeights: UserWeight[] = [];
+		for (let i = weights.length - 1; i >= 0; i--) {
+			const weight = weights[i];
+			if (weight.createdAt > lookBackDate) {
+				newWeights.push(weight);
+			}
+		}
+		return newWeights;
+	});
 
 	let editWeightOpen = $state(false);
 	let editWeight = $state<UserWeight>();
@@ -108,7 +133,22 @@
 				{/if}
 			</div>
 		{:else}
-			<div class="flex flex-col flex-grow justify-center items-center"></div>
+			<div class="flex flex-col flex-grow justify-center items-center">
+				<div class="flex flex-col flex-grow">
+					{#if weightsByTime.length}
+						{#each weightsByTime as weight (weight.createdAt)}
+							<p class="m-0 p-0">
+								<span>{weight.createdAt.toLocaleDateString()}</span>
+								<span class="ms-1"
+									><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></span
+								>
+							</p>
+						{/each}
+					{:else}
+						<p class="m-0 p-2">{m.user_weights_no_weight()}</p>
+					{/if}
+				</div>
+			</div>
 		{/if}
 	</div>
 	<hr />

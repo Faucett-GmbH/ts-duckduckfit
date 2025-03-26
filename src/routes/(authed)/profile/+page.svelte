@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-	import { automergeState } from '$lib/automergeState.svelte';
+	import { automergeDocHandleState } from '$lib/automergeState.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import EditUserInfo, { type EditUserInfoForm } from './_EditUserInfo.svelte';
@@ -14,7 +14,7 @@
 
 	let { data }: Props = $props();
 
-	const userState = automergeState(data.userDocumentId);
+	const userState = automergeDocHandleState(data.user);
 
 	function onEditUserInfo({ birthdate, heightInCm }: EditUserInfoForm) {
 		userState.change((user) => {

@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-	import { language } from '$lib/states/language.svelte';
+	import { language } from '$lib/state/language.svelte';
 	import { selectElementContents } from '$lib/util';
 	import type { EventHandler } from 'svelte/elements';
 	import AutosizeInput from './AutosizeInput.svelte';

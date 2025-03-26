@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-	import { removeNotification, type Notification } from '$lib/states/notifications.svelte';
+	import { removeNotification, type Notification } from '$lib/state/notifications.svelte';
 	import CircleX from 'lucide-svelte/icons/circle-x';
 	import CircleCheck from 'lucide-svelte/icons/circle-check';
 	import Info from 'lucide-svelte/icons/info';

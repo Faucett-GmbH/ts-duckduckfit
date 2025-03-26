@@ -1,5 +1,5 @@
 import { m } from '$lib/paraglide/messages';
-import { createNotification } from './states/notifications.svelte';
+import { createNotification } from './state/notifications.svelte';
 
 export type Messages = typeof m;
 export type MessageKey = keyof Messages;

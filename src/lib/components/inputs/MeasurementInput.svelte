@@ -403,7 +403,7 @@
 </script>
 
 <script lang="ts" generics="S extends MeasurementSystem, T extends MeasurementType">
-	import { language } from '$lib/states/language.svelte';
+	import { language } from '$lib/state/language.svelte';
 	import type { EventHandler } from 'svelte/elements';
 	import TypedInput from './TypedInput.svelte';
 

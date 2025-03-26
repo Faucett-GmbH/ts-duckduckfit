@@ -26,7 +26,7 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
-	import { signIn } from '$lib/states/userDocumentIds.svelte';
+	import { signIn } from '$lib/state/userDocument.svelte';
 	import { handleError } from '$lib/error';
 
 	let username = $state('');
