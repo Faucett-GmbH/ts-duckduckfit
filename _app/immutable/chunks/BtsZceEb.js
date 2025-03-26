@@ -1,0 +1,1 @@
+import{R as n}from"./NQ5eUG1V.js";import{c as a,a as i}from"./BG_xrjDa.js";import{f as m}from"./RTzytnS2.js";import{s}from"./Bdp_c0CR.js";function h(r,t){throw new n(r,t.toString())}new TextEncoder;function u(r,t){var o=a(),e=m(o);s(e,()=>t.children),i(r,o)}export{u as L,h as r};
