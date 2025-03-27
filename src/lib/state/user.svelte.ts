@@ -1,5 +1,3 @@
-export const USER_VERSION = 1;
-
 export interface UserWeight {
   weightInKg: number;
   createdAt: Date;

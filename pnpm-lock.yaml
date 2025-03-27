@@ -45,6 +45,9 @@ importers:
         specifier: ^5.4.6
         version: 5.4.6
     devDependencies:
+      '@aicacia/hash':
+        specifier: ^0.2.3
+        version: 0.2.3(tslib@2.8.1)
       '@eslint/compat':
         specifier: ^1.2.7
         version: 1.2.7(eslint@9.23.0(jiti@2.4.2))
@@ -122,6 +125,11 @@ packages:
 
   '@aicacia/debounce@0.1.23':
     resolution: {integrity: sha512-60R9UPxLmKCz5so3i8CleBeRUjUh1U+yycLZwYZKkiVz/XWaPmQSN43fOEo+8OCdxf4uUv2QffDUJHw2dkMg3g==}
+    peerDependencies:
+      tslib: '2'
+
+  '@aicacia/hash@0.2.3':
+    resolution: {integrity: sha512-HzzyyuCVoPCV+hISqW3RnVEFvOuqO5f4jRczydG7qgf3ECOl8N729T35F1HrAx+ASWibUZXp9flhBR7dteuOAg==}
     peerDependencies:
       tslib: '2'
 
@@ -2011,6 +2019,10 @@ packages:
 snapshots:
 
   '@aicacia/debounce@0.1.23(tslib@2.8.1)':
+    dependencies:
+      tslib: 2.8.1
+
+  '@aicacia/hash@0.2.3(tslib@2.8.1)':
     dependencies:
       tslib: 2.8.1
 

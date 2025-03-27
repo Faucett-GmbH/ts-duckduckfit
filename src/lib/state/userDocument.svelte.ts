@@ -3,21 +3,35 @@ import { localStorageState } from '$lib/localStorageState.svelte';
 import { findDocument, migrate, getRepo, type AutomergeDocumentId } from '$lib/repo';
 import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userMigrations, type User } from './user.svelte';
-
-export const USER_DOCUMENT_VERSION = 1;
+import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
+import { exercisesMigrations, type Exercises } from './exercises.svelte';
 
 export interface UserDocument {
 	version: number;
 	user: AutomergeDocumentId<User>;
+	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
+	exercises: AutomergeDocumentId<Exercises>;
 }
 
 export const userDocumentMigrations = {
 	1: (userDocument: UserDocument) => {
-		const repo = getRepo();
 		userDocument.version = 1;
-		userDocument.user = repo.create<User>().documentId as AutomergeDocumentId<User>;
+		userDocument.user = getRepo().create<User>().documentId as AutomergeDocumentId<User>;
+		userDocument.workoutTemplates = getRepo().create<WorkoutTemplates>().documentId as AutomergeDocumentId<WorkoutTemplates>;
+		userDocument.exercises = getRepo().create<Exercises>().documentId as AutomergeDocumentId<Exercises>;
 	}
 };
+
+async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
+	await migrate(userDocumentHandle, userDocumentMigrations);
+	const userDocument = await userDocumentHandle.doc();
+	if (!userDocument) {
+		throw InternalError.from('errors_name_application', 'errors_message_application');
+	}
+	await migrate(findDocument(userDocument.user), userMigrations);
+	await migrate(findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
+	await migrate(findDocument(userDocument.exercises), exercisesMigrations);
+}
 
 export interface UserDocumentIds {
 	[username: string]: AutomergeDocumentId<UserDocument>;
@@ -35,15 +49,24 @@ export class CurrentUserDocument {
 	userDocumentId() {
 		return this.#userDocumentId;
 	}
-	userDocument() {
+	userDocumentHandle() {
 		return this.#userDocumentDocHandle;
 	}
-	async user() {
+	async userDocument() {
 		const userDocument = await this.#userDocumentDocHandle.doc();
 		if (!userDocument) {
 			throw InternalError.from('errors_name_application', 'errors_message_application');
 		}
-		return findDocument(userDocument.user);
+		return userDocument;
+	}
+	async user() {
+		return findDocument((await this.userDocument()).user);
+	}
+	async workoutTemplates() {
+		return findDocument((await this.userDocument()).workoutTemplates);
+	}
+	async exercises() {
+		return findDocument((await this.userDocument()).exercises);
 	}
 }
 
@@ -76,7 +99,7 @@ export async function signUp(username: string) {
 	await userDocument.whenReady();
 	await runAllMigrations(userDocument);
 
-	const user = findDocument<User>(userDocument.docSync()!.user);
+	const user = findDocument(userDocument.docSync()!.user);
 	await user.whenReady();
 
 	state[username] = userDocument.documentId as AutomergeDocumentId<UserDocument>;
@@ -91,8 +114,7 @@ export async function signIn(username: string) {
 	if (!userDocumentId) {
 		throw InternalError.from('errors_name_user', 'errors_message_invalid_credentials');
 	}
-	const repo = getRepo();
-	const userDocument = findDocument<UserDocument>(userDocumentId);
+	const userDocument = findDocument(userDocumentId);
 	await userDocument.whenReady();
 	await runAllMigrations(userDocument);
 	currentUsername.value = username;
@@ -100,21 +122,10 @@ export async function signIn(username: string) {
 
 export async function signInWithDocumentId(username: string, userDocumentId: AutomergeDocumentId<UserDocument>) {
 	const state = userDocumentIds.value;
-	const repo = getRepo();
-	const userDocument = findDocument<UserDocument>(userDocumentId);
+	const userDocument = findDocument(userDocumentId);
 	await userDocument.whenReady();
 	await runAllMigrations(userDocument);
 
 	state[username] = userDocument.documentId as AutomergeDocumentId<UserDocument>;
 	currentUsername.value = username;
-}
-
-async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
-	await migrate(userDocumentHandle, userDocumentMigrations);
-	const userDocument = await userDocumentHandle.doc();
-	if (!userDocument) {
-		throw InternalError.from('errors_name_application', 'errors_message_application');
-	}
-	const repo = getRepo();
-	await migrate(findDocument<User>(userDocument.user), userMigrations);
 }

@@ -139,7 +139,7 @@
 						{#each weightsByTime as weight (weight.createdAt)}
 							<p class="m-0 p-0">
 								<span>{weight.createdAt.toLocaleDateString()}</span>
-								<span class="ms-1"
+								<span class="ms-2"
 									><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></span
 								>
 							</p>

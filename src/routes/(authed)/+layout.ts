@@ -10,6 +10,7 @@ export const load: LayoutLoad = async (event) => {
 		redirect(302, `${base}/signin`);
 	}
 	return {
+		currentUserDocument,
 		user: await currentUserDocument.user(),
 	};
 };

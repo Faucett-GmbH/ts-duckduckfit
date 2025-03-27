@@ -67,15 +67,15 @@
 						<User /><span class="ms-4">{m.profile_title()}</span>
 					</a>
 					<a
-						href={`${base}/routines`}
+						href={`${base}/workout-templates`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(authed)/routines'
+							'bg-black/10': page.route.id === '/(authed)/workout-templates'
 						}}
-						class:active={page.route.id === '/(authed)/routines'}
+						class:active={page.route.id === '/(authed)/workout-templates'}
 						onclick={onGoto}
 					>
-						<Dumbbell /><span class="ms-4">{m.routines_title()}</span>
+						<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
 					</a>
 					<button
 						class="flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600"

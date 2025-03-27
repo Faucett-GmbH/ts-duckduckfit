@@ -23,6 +23,7 @@
 		"postinstall": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide"
 	},
 	"devDependencies": {
+		"@aicacia/hash": "^0.2.3",
 		"@eslint/compat": "^1.2.7",
 		"@eslint/js": "^9.23.0",
 		"@inlang/cli": "^3.0.7",
