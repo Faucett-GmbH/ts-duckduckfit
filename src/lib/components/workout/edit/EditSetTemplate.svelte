@@ -16,7 +16,7 @@
 	import X from 'lucide-svelte/icons/x';
 	import Grip from 'lucide-svelte/icons/grip';
 	import ExerciseSetInput, { type ExerciseSetInputParams } from '../ExerciseSetInput.svelte';
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
@@ -101,17 +101,17 @@
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={setTemplate.setType === 'working'}
-				on:click={createOnSetType('working')}>{$LL.workouts.workingSetTitle()}</button
+				on:click={createOnSetType('working')}>{m.workouts.workingSetTitle()}</button
 			>
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={setTemplate.setType === 'warmup'}
-				on:click={createOnSetType('warmup')}>{$LL.workouts.warmupTitle()}</button
+				on:click={createOnSetType('warmup')}>{m.workouts.warmupTitle()}</button
 			>
 			<!-- <button
 				class="btn ghost text-nowrap text-left"
 				class:active={setTemplate.setType === "backoff"}
-				on:click={createOnSetType("backoff")}>{$LL.workouts.backoffTitle()}</button
+				on:click={createOnSetType("backoff")}>{m.workouts.backoffTitle()}</button
 			> -->
 		</Dropdown>
 	</div>
@@ -146,11 +146,11 @@
 </div>
 
 <Modal bind:open={openDelete}>
-	<h5 slot="title">{$LL.workouts.set.delete.title()}</h5>
-	<p>{$LL.workouts.set.delete.body()}</p>
+	<h5 slot="title">{m.workouts.set.delete.title()}</h5>
+	<p>{m.workouts.set.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDeleteInternal}>
-			{$LL.workouts.set.delete.submit()}
+			{m.workouts.set.delete.submit()}
 		</button>
 	</div>
 </Modal>

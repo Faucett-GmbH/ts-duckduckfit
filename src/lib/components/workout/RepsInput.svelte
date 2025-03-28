@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import type { SuiteResult } from 'vest';
 	import InputResults from '../InputResults.svelte';
 	import TypedInput from '../inputs/TypedInput.svelte';
@@ -141,15 +141,13 @@
 	{/if}
 	<div class="me-1 flex flex-shrink flex-col">
 		<select on:change={onSelectRepsInputType} value={inputType}>
-			<option value="reps" title={$LL.workouts.set.repsLabel()}
-				>{$LL.workouts.set.repsLabel()}</option
+			<option value="reps" title={m.workouts.set.repsLabel()}>{m.workouts.set.repsLabel()}</option>
+			<!-- <option value="percentOfOneRepMax" title={m.workouts.set.percentOfOneRepMaxLabel()}>{m.workouts.set.percentOfOneRepMaxLabel()}</option> -->
+			<option value="repRange" title={m.workouts.set.repRangeLabel()}
+				>{m.workouts.set.repRangeLabel()}</option
 			>
-			<!-- <option value="percentOfOneRepMax" title={$LL.workouts.set.percentOfOneRepMaxLabel()}>{$LL.workouts.set.percentOfOneRepMaxLabel()}</option> -->
-			<option value="repRange" title={$LL.workouts.set.repRangeLabel()}
-				>{$LL.workouts.set.repRangeLabel()}</option
-			>
-			<option value="asManyRoundsAsPossible" title={$LL.workouts.set.asManyRoundsAsPossibleLabel()}
-				>{$LL.workouts.set.asManyRoundsAsPossibleAcronym()}</option
+			<option value="asManyRoundsAsPossible" title={m.workouts.set.asManyRoundsAsPossibleLabel()}
+				>{m.workouts.set.asManyRoundsAsPossibleAcronym()}</option
 			>
 		</select>
 	</div>

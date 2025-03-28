@@ -22,7 +22,7 @@
 	import Sortable from '../Sortable.svelte';
 	import ExerciseSelector from './ExerciseSelector.svelte';
 	import { getRealSetPosition } from './util';
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import { debounce } from '@aicacia/debounce';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import EditSetTemplate, { type SetTemplateParams } from './edit/EditSetTemplate.svelte';

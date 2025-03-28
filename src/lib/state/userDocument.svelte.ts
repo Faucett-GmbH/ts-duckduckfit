@@ -4,13 +4,11 @@ import { findDocument, migrate, getRepo, type AutomergeDocumentId } from '$lib/r
 import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userMigrations, type User } from './user.svelte';
 import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
-import { exercisesMigrations, type Exercises } from './exercises.svelte';
 
 export interface UserDocument {
 	version: number;
 	user: AutomergeDocumentId<User>;
 	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
-	exercises: AutomergeDocumentId<Exercises>;
 }
 
 export const userDocumentMigrations = {
@@ -18,7 +16,6 @@ export const userDocumentMigrations = {
 		userDocument.version = 1;
 		userDocument.user = getRepo().create<User>().documentId as AutomergeDocumentId<User>;
 		userDocument.workoutTemplates = getRepo().create<WorkoutTemplates>().documentId as AutomergeDocumentId<WorkoutTemplates>;
-		userDocument.exercises = getRepo().create<Exercises>().documentId as AutomergeDocumentId<Exercises>;
 	}
 };
 
@@ -30,7 +27,6 @@ async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
 	}
 	await migrate(findDocument(userDocument.user), userMigrations);
 	await migrate(findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
-	await migrate(findDocument(userDocument.exercises), exercisesMigrations);
 }
 
 export interface UserDocumentIds {
@@ -64,9 +60,6 @@ export class CurrentUserDocument {
 	}
 	async workoutTemplates() {
 		return findDocument((await this.userDocument()).workoutTemplates);
-	}
-	async exercises() {
-		return findDocument((await this.userDocument()).exercises);
 	}
 }
 

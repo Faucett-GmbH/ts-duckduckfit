@@ -3,16 +3,13 @@
 <script lang="ts">
 	import Trash from 'lucide-svelte/icons/trash';
 	import { Pencil } from 'lucide-svelte';
-	import { SetGroupType, SetStatusType, UnitSystem, type Workout } from '$lib/openapi/duckduckfit';
 	import SetTypeComponent from './SetType.svelte';
 	import AttemptedSetAmounts from './AttemptedSetAmounts.svelte';
-	import LL from '$lib/i18n/i18n-svelte';
-	import { locale } from '$lib/stores/language';
+	import { m } from '$lib/paraglide/messages';
+	import { language } from '$lib/state/language';
 	import { base } from '$app/paths';
 	import Modal from '../Modal.svelte';
-	import { handleError } from '$lib/errors';
-	import { workoutApi } from '$lib/openapi';
-	import { invalidateAll } from '$app/navigation';
+	import { handleError } from '$lib/error';
 	import { getRealSetPosition } from './util';
 
 	export let workout: Workout;
@@ -28,7 +25,6 @@
 		try {
 			await workoutApi.deleteWorkout(workout.id);
 			deleteOpen = false;
-			await invalidateAll();
 		} catch (error) {
 			await handleError(error);
 		}
@@ -101,15 +97,15 @@
 											class:success={set.status === SetStatusType.SuccessSetStatusType}
 											class:danger={set.status === SetStatusType.FailedSetStatusType}
 											title={set.status === SetStatusType.SuccessSetStatusType
-												? $LL.workouts.set.successTitle()
+												? m.workouts.set.successTitle()
 												: set.status === SetStatusType.FailedSetStatusType
-													? $LL.workouts.set.failedTitle()
+													? m.workouts.set.failedTitle()
 													: ''}
 										>
 											{#if set.status === SetStatusType.SuccessSetStatusType}
-												{$LL.workouts.set.successLetter()}
+												{m.workouts.set.successLetter()}
 											{:else if set.status === SetStatusType.FailedSetStatusType}
-												{$LL.workouts.set.failedLetter()}
+												{m.workouts.set.failedLetter()}
 											{/if}
 										</div>
 									</div>
@@ -127,11 +123,11 @@
 </div>
 
 <Modal bind:open={deleteOpen}>
-	<h5 slot="title">{$LL.workouts.delete.title(workout.name)}</h5>
-	<p>{$LL.workouts.delete.body()}</p>
+	<h5 slot="title">{m.workouts.delete.title(workout.name)}</h5>
+	<p>{m.workouts.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDeleteInternal}>
-			{$LL.workouts.delete.submit()}
+			{m.workouts.delete.submit()}
 		</button>
 	</div>
 </Modal>

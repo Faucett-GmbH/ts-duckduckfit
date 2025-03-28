@@ -1,7 +1,7 @@
 <svelte:options immutable />
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
 	import Grip from 'lucide-svelte/icons/grip';
 	import {
@@ -143,20 +143,22 @@
 				anchorPosition="bottom-left"
 				bind:open={menuOpen}
 			>
-				<button slot="button" class="btn icon primary ghost flex">
-					<EllipsisVertical size="1rem" />
-				</button>
+				{#snippet button()}
+					<button class="btn icon primary ghost flex">
+						<EllipsisVertical size="1rem" />
+					</button>
+				{/snippet}
 				<button class="btn ghost text-nowrap text-left" on:click={onCopySet}
-					>{$LL.workouts.set.duplicate()}</button
+					>{m.workouts.set.duplicate()}</button
 				>
 				{#if active}
 					<button class="btn ghost text-nowrap text-left" on:click={onResetTimer}
-						>{$LL.workouts.set.resetTimer()}</button
+						>{m.workouts.set.resetTimer()}</button
 					>
 				{/if}
 				<hr class="my-1" />
 				<button class="btn ghost text-nowrap text-left" on:click={onOpenDeleteSet}
-					>{$LL.workouts.set.delete.title()}</button
+					>{m.workouts.set.delete.title()}</button
 				>
 			</Dropdown>
 			<Dropdown
@@ -165,21 +167,23 @@
 				anchorPosition="bottom-left"
 				bind:open={setTypeDropdownOpen}
 			>
-				<SetTypeComponent slot="button" setType={set.setType} {position} />
+				{#snippet button()}
+					<SetTypeComponent setType={set.setType} {position} />
+				{/snippet}
 				<button
 					class="btn ghost text-nowrap text-left"
 					class:active={set.setType === 'working'}
-					on:click={createOnSetType('working')}>{$LL.workouts.workingSetTitle()}</button
+					on:click={createOnSetType('working')}>{m.workouts.workingSetTitle()}</button
 				>
 				<button
 					class="btn ghost text-nowrap text-left"
 					class:active={set.setType === 'warmup'}
-					on:click={createOnSetType('warmup')}>{$LL.workouts.warmupTitle()}</button
+					on:click={createOnSetType('warmup')}>{m.workouts.warmupTitle()}</button
 				>
 				<!-- <button
             class="btn ghost text-nowrap text-left"
             class:active={set.setType === "backoff"}
-            on:click={createOnSetType("backoff")}>{$LL.workouts.backoffTitle()}</button
+            on:click={createOnSetType("backoff")}>{m.workouts.backoffTitle()}</button
           > -->
 			</Dropdown>
 		</div>
@@ -199,33 +203,33 @@
 						class:success={set.status === SetStatusType.SuccessSetStatusType}
 						class:danger={set.status === SetStatusType.FailedSetStatusType}
 						title={set.status === SetStatusType.SuccessSetStatusType
-							? $LL.workouts.set.successTitle()
+							? m.workouts.set.successTitle()
 							: set.status === SetStatusType.FailedSetStatusType
-								? $LL.workouts.set.failedTitle()
+								? m.workouts.set.failedTitle()
 								: ''}
 					>
 						{#if set.status === SetStatusType.SuccessSetStatusType}
-							{$LL.workouts.set.successLetter()}
+							{m.workouts.set.successLetter()}
 						{:else if set.status === SetStatusType.FailedSetStatusType}
-							{$LL.workouts.set.failedLetter()}
+							{m.workouts.set.failedLetter()}
 						{/if}
 					</button>
 					<button
 						class="btn ghost text-nowrap text-left"
 						class:active={set.status === SetStatusType.SuccessSetStatusType}
 						on:click={createOnStatus(SetStatusType.SuccessSetStatusType)}
-						>{$LL.workouts.set.successTitle()}</button
+						>{m.workouts.set.successTitle()}</button
 					>
 					<button
 						class="btn ghost text-nowrap text-left"
 						class:active={set.status === SetStatusType.FailedSetStatusType}
 						on:click={createOnStatus(SetStatusType.FailedSetStatusType)}
-						>{$LL.workouts.set.failedTitle()}</button
+						>{m.workouts.set.failedTitle()}</button
 					>
 					<button
 						class="btn ghost text-nowrap text-left"
 						class:active={!set.status}
-						on:click={createOnStatus(null)}>{$LL.workouts.set.incompleteTitle()}</button
+						on:click={createOnStatus(null)}>{m.workouts.set.incompleteTitle()}</button
 					>
 				</Dropdown>
 			</div>
@@ -242,7 +246,7 @@
 			<!-- svelte-ignore a11y-autofocus -->
 			<textarea
 				bind:this={notesElement}
-				placeholder={$LL.workouts.set.notesPlaceholder()}
+				placeholder={m.workouts.set.notesPlaceholder()}
 				value={set.notes || ''}
 				maxlength="255"
 				on:input={debouncedOnNoteUpdate}
@@ -252,11 +256,11 @@
 </div>
 
 <Modal bind:open={openDeleteSet}>
-	<h5 slot="title">{$LL.workouts.set.delete.title()}</h5>
-	<p>{$LL.workouts.set.delete.body()}</p>
+	<h5 slot="title">{m.workouts.set.delete.title()}</h5>
+	<p>{m.workouts.set.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDeleteSet}>
-			{$LL.workouts.set.delete.submit()}
+			{m.workouts.set.delete.submit()}
 		</button>
 	</div>
 </Modal>

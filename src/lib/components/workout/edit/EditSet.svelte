@@ -12,7 +12,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import X from 'lucide-svelte/icons/x';
 	import Grip from 'lucide-svelte/icons/grip';
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
@@ -122,17 +122,17 @@
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={set.setType === 'working'}
-				on:click={createOnSetType('working')}>{$LL.workouts.workingSetTitle()}</button
+				on:click={createOnSetType('working')}>{m.workouts.workingSetTitle()}</button
 			>
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={set.setType === 'warmup'}
-				on:click={createOnSetType('warmup')}>{$LL.workouts.warmupTitle()}</button
+				on:click={createOnSetType('warmup')}>{m.workouts.warmupTitle()}</button
 			>
 			<!-- <button
 				class="btn ghost text-nowrap text-left"
 				class:active={set.setType === "backoff"}
-				on:click={createOnSetType("backoff")}>{$LL.workouts.backoffTitle()}</button
+				on:click={createOnSetType("backoff")}>{m.workouts.backoffTitle()}</button
 			> -->
 		</Dropdown>
 	</div>
@@ -143,7 +143,7 @@
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-between">
 			<div class="flex flex-grow flex-row flex-wrap items-start justify-between">
 				<div class="flex flex-shrink flex-col">
-					<p class="m-0 text-xs">{$LL.workouts.set.expected()}</p>
+					<p class="m-0 text-xs">{m.workouts.set.expected()}</p>
 					<ExerciseSetInput
 						setInput={set}
 						exercise={set.exercise}
@@ -156,7 +156,7 @@
 					/>
 				</div>
 				<div class="flex flex-shrink flex-col">
-					<p class="m-0 text-xs">{$LL.workouts.set.actual()}</p>
+					<p class="m-0 text-xs">{m.workouts.set.actual()}</p>
 					<WorkoutSetInput
 						setInput={set}
 						exercise={set.exercise}
@@ -177,33 +177,33 @@
 							class:success={set.status === SetStatusType.SuccessSetStatusType}
 							class:danger={set.status === SetStatusType.FailedSetStatusType}
 							title={set.status === SetStatusType.SuccessSetStatusType
-								? $LL.workouts.set.successTitle()
+								? m.workouts.set.successTitle()
 								: set.status === SetStatusType.FailedSetStatusType
-									? $LL.workouts.set.failedTitle()
+									? m.workouts.set.failedTitle()
 									: ''}
 						>
 							{#if set.status === SetStatusType.SuccessSetStatusType}
-								{$LL.workouts.set.successLetter()}
+								{m.workouts.set.successLetter()}
 							{:else if set.status === SetStatusType.FailedSetStatusType}
-								{$LL.workouts.set.failedLetter()}
+								{m.workouts.set.failedLetter()}
 							{/if}
 						</button>
 						<button
 							class="btn ghost text-nowrap text-left"
 							class:active={set.status === SetStatusType.SuccessSetStatusType}
 							on:click={createOnStatus(SetStatusType.SuccessSetStatusType)}
-							>{$LL.workouts.set.successTitle()}</button
+							>{m.workouts.set.successTitle()}</button
 						>
 						<button
 							class="btn ghost text-nowrap text-left"
 							class:active={set.status === SetStatusType.FailedSetStatusType}
 							on:click={createOnStatus(SetStatusType.FailedSetStatusType)}
-							>{$LL.workouts.set.failedTitle()}</button
+							>{m.workouts.set.failedTitle()}</button
 						>
 						<button
 							class="btn ghost text-nowrap text-left"
 							class:active={!set.status}
-							on:click={createOnStatus(null)}>{$LL.workouts.set.incompleteTitle()}</button
+							on:click={createOnStatus(null)}>{m.workouts.set.incompleteTitle()}</button
 						>
 					</Dropdown>
 				</div>
@@ -226,11 +226,11 @@
 </div>
 
 <Modal bind:open={openDelete}>
-	<h5 slot="title">{$LL.workouts.set.delete.title()}</h5>
-	<p>{$LL.workouts.set.delete.body()}</p>
+	<h5 slot="title">{m.workouts.set.delete.title()}</h5>
+	<p>{m.workouts.set.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDeleteInternal}>
-			{$LL.workouts.set.delete.submit()}
+			{m.workouts.set.delete.submit()}
 		</button>
 	</div>
 </Modal>

@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import { onMount } from 'svelte';
 	import type { RepsInputType } from './RepsInput.svelte';
 	import { numbers } from '$lib/stores/language';
@@ -33,16 +33,16 @@
 </script>
 
 {#if inputType === 'reps'}
-	<span>{reps.reps || 0} {$LL.workouts.set.repsLabel()}</span>
+	<span>{reps.reps || 0} {m.workouts.set.repsLabel()}</span>
 {:else if inputType === 'asManyRoundsAsPossible'}
-	<span title={$LL.workouts.set.asManyRoundsAsPossibleLabel()}
-		>{$LL.workouts.set.asManyRoundsAsPossibleAcronym()}</span
+	<span title={m.workouts.set.asManyRoundsAsPossibleLabel()}
+		>{m.workouts.set.asManyRoundsAsPossibleAcronym()}</span
 	>
 {:else if inputType === 'percentOfOneRepMax'}
 	<span>{$numbers.format(reps.percentOfOneRepMax || 0, 1)}%</span>
 {:else if inputType === 'repRange'}
 	<span
 		>{reps.repRangeLow || 0} - {reps.repRangeHigh || 0}
-		{$LL.workouts.set.repsLabel()}</span
+		{m.workouts.set.repsLabel()}</span
 	>
 {/if}

@@ -18,7 +18,7 @@
 	import { getId, unsafeId } from '$lib/util';
 	import Sortable from '../Sortable.svelte';
 	import type { Writable } from 'svelte/store';
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import Modal from '../Modal.svelte';
 	import { getUniqueExercises } from './util';
 	import NewSet from './NewSet.svelte';
@@ -233,13 +233,13 @@
 	<div class="mt-2 flex flex-row justify-center" class:hidden={!open}>
 		<button class="btn success flex flex-row" on:click|stopPropagation={onOpenAddSet}>
 			<Plus />
-			{$LL.workouts.set.add.title()}
+			{m.workouts.set.add.title()}
 		</button>
 	</div>
 </div>
 
 <Modal bind:open={addSetsOpen}>
-	<h5 slot="title">{$LL.workouts.set.add.title()}</h5>
+	<h5 slot="title">{m.workouts.set.add.title()}</h5>
 	<NewSet
 		{exercises}
 		{unitSystem}
@@ -256,17 +256,17 @@
 			{#if addingSets}<div class="mr-2 flex flex-row justify-center">
 					<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 				</div>{/if}
-			{$LL.workouts.set.add.submit()}
+			{m.workouts.set.add.submit()}
 		</button>
 	</div>
 </Modal>
 
 <Modal bind:open={openDelete}>
-	<h5 slot="title">{$LL.workouts.setGroup.delete.title()}</h5>
-	<p>{$LL.workouts.setGroup.delete.body()}</p>
+	<h5 slot="title">{m.workouts.setGroup.delete.title()}</h5>
+	<p>{m.workouts.setGroup.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDelete}>
-			{$LL.workouts.setGroup.delete.submit()}
+			{m.workouts.setGroup.delete.submit()}
 		</button>
 	</div>
 </Modal>

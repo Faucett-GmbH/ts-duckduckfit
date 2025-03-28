@@ -130,7 +130,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import { ExerciseExecutionType, UnitSystem, type Exercise } from '$lib/openapi/duckduckfit';
 	import classnames from 'vest/classnames';
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -275,9 +275,7 @@
 <div class="flex flex-shrink flex-row">
 	{#if exercise.execution === ExerciseExecutionType.DistanceDurationExerciseExecutionType}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters"
-				>{$LL.workouts.set.distanceInMetersLabel()}</label
-			>
+			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
 			<MeasurementInput
 				className={cn('distanceInMeters')}
 				name="distanceInMeters"
@@ -291,7 +289,7 @@
 			<InputResults name="distanceInMeters" {result} />
 		</div>
 		<div class="me-1 ms-2 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{$LL.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
 			<MeasurementInput
 				className={cn('timeInSeconds')}
 				name="timeInSeconds"
@@ -306,9 +304,7 @@
 		</div>
 	{:else if exercise.execution === ExerciseExecutionType.DistanceExerciseExecutionType}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters"
-				>{$LL.workouts.set.distanceInMetersLabel()}</label
-			>
+			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
 			<MeasurementInput
 				className={cn('distanceInMeters')}
 				name="distanceInMeters"
@@ -323,7 +319,7 @@
 		</div>
 	{:else if exercise.execution === ExerciseExecutionType.DurationExerciseExecutionType}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{$LL.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
 			<MeasurementInput
 				className={cn('timeInSeconds')}
 				name="timeInSeconds"
@@ -348,7 +344,7 @@
 	{:else if exercise.execution === ExerciseExecutionType.WeightDistanceExerciseExecutionType}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
-				>{$LL.workouts.set.weightInKilogramsLabel()}</label
+				>{m.workouts.set.weightInKilogramsLabel()}</label
 			>
 			<MeasurementInput
 				className={cn('weightInKilograms')}
@@ -363,9 +359,7 @@
 			<InputResults name="weightInKilograms" {result} />
 		</div>
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters"
-				>{$LL.workouts.set.distanceInMetersLabel()}</label
-			>
+			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
 			<MeasurementInput
 				className={cn('distanceInMeters')}
 				name="distanceInMeters"
@@ -381,7 +375,7 @@
 	{:else if exercise.execution === ExerciseExecutionType.WeightDurationExerciseExecutionType}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
-				>{$LL.workouts.set.weightInKilogramsLabel()}</label
+				>{m.workouts.set.weightInKilogramsLabel()}</label
 			>
 			<MeasurementInput
 				className={cn('weightInKilograms')}
@@ -396,7 +390,7 @@
 			<InputResults name="weightInKilograms" {result} />
 		</div>
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{$LL.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
 			<MeasurementInput
 				className={cn('timeInSeconds')}
 				name="timeInSeconds"
@@ -435,9 +429,7 @@
 	{/if}
 </div>
 <div class="me-1 flex flex-shrink flex-col" class:hidden={!restAfter}>
-	<label class="text-xs" for="restAfterInSeconds"
-		>{$LL.workouts.set.restAfterInSecondsLabel()}</label
-	>
+	<label class="text-xs" for="restAfterInSeconds">{m.workouts.set.restAfterInSecondsLabel()}</label>
 	<MeasurementInput
 		name="restAfterInSeconds"
 		{disabled}

@@ -20,7 +20,8 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-		"postinstall": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide"
+		"postinstall": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide",
+		"exdb-openapi-local": "rm -rf src/lib/openapi/exdb && openapi-generator-cli generate -i http://localhost:8000/schema/openapi.json -g typescript-fetch -o 'src/lib/openapi/exdb' --type-mappings=DateTime=Date --additional-properties=supportsES6=true,withInterfaces=true,useSingleRequestParameter=false"
 	},
 	"devDependencies": {
 		"@aicacia/hash": "^0.2.3",

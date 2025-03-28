@@ -41,7 +41,7 @@
 	import { onMount } from 'svelte';
 	import X from 'lucide-svelte/icons/x';
 	import Plus from 'lucide-svelte/icons/plus';
-	// import ExerciseSelector from '../ExerciseSelector.svelte';
+	import ExerciseSelector from '../ExerciseSelector.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import { type SetTemplateParams } from './EditSetTemplate.svelte';
 	import InputResults from '$lib/components/InputResults.svelte';
@@ -56,13 +56,13 @@
 	import { createExercisesById, getRealSetPosition, getUniqueExercises } from '../util';
 	import { m } from '$lib/paraglide/messages';
 	import type { SetGroupType, SetType } from '$lib/state/workoutTemplates.svelte';
-	import type { Exercise } from '$lib/state/exercises.svelte';
+	import type { Exercise } from '$lib/openapi/exdb';
 
 	let {
-		setGroupTemplate,
+		setGroupTemplate = $bindable(),
 		index,
-		valid,
-		open,
+		valid = $bindable(),
+		open = $bindable(true),
 		isDragging,
 		isDraggingOver,
 		onDragStart,
@@ -83,7 +83,8 @@
 		draggable = false;
 	}
 
-	function onOpen() {
+	function onOpen(e: Event) {
+		e.stopPropagation();
 		open = !open;
 	}
 
@@ -92,7 +93,8 @@
 		ondelete(setGroupTemplate);
 	}
 	let openDelete = $state(false);
-	function onOpenDelete() {
+	function onOpenDelete(e: Event) {
+		e.stopPropagation();
 		openDelete = true;
 	}
 
@@ -141,7 +143,7 @@
 		validate.flush();
 	}
 
-	let exerciseSelectorOpen = $derived(exercises.length === 0);
+	let exerciseSelectorOpen = $state(false);
 	let shouldAddSetTemplates = false;
 	$effect(() => {
 		if (!shouldAddSetTemplates && exerciseSelectorOpen) {
@@ -263,6 +265,7 @@
 	}
 
 	onMount(() => {
+		exerciseSelectorOpen = exercises.length === 0;
 		validateAll();
 	});
 </script>
@@ -315,12 +318,12 @@
 
 	<div class="mb-2" class:hidden={!open}>
 		<label for="exercise-selector">{m.workouts_new_exercises_label()}</label>
-		<!-- <ExerciseSelector
+		<ExerciseSelector
 			id={`exercise-selector-${setGroupTemplate.id}`}
 			bind:open={exerciseSelectorOpen}
 			oninput={onExercisesChange}
 			{exercises}
-		/> -->
+		/>
 	</div>
 	{#if setGroupTemplate.setTemplates.length}
 		<div class="mb-2 flex flex-row items-end" class:hidden={!open}>
@@ -373,6 +376,7 @@
 		<!-- <Sortable
 			id={`set-templates-${setGroupTemplate.id}`}
 			items={setGroupTemplate.setTemplates}
+			getKey={getId}
 			onMove={onMoveSet}
 		>
 			{#snippet child({ item, index, ...props })}

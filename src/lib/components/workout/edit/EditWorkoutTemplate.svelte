@@ -38,18 +38,18 @@
 	import InputResults from '$lib/components/InputResults.svelte';
 	import Plus from 'lucide-svelte/icons/plus';
 	import EditSetGroupTemplate, { type SetGroupTemplateParams } from './EditSetGroupTemplate.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { unsafeId } from '$lib/util';
+	import { getId, unsafeId } from '$lib/util';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import { m } from '$lib/paraglide/messages';
 
 	let {
-		workoutTemplate = {
+		workoutTemplate = $bindable({
 			name: '',
 			setGroupTemplates: []
-		}
+		})
 	}: WorkoutTemplateProps = $props();
 	let setGroupTemplatesValid: Array<boolean | undefined> = [];
 
@@ -137,7 +137,6 @@
 				if (workoutTemplate.id) {
 				} else {
 				}
-				await invalidateAll();
 				await goto(`${base}/workout-templates`);
 			}
 		} catch (error) {
@@ -175,7 +174,7 @@
 		workoutTemplate = { ...workoutTemplate, setGroupTemplates: newSetGroupTemplates };
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		if (workoutTemplate.id) {
 			validateAll();
 		}
@@ -209,6 +208,7 @@
 	<Sortable
 		id={`set-group-templates-${workoutTemplate.id}`}
 		items={workoutTemplate.setGroupTemplates}
+		getKey={getId}
 		onMove={onMoveSetGroups}
 	>
 		{#snippet child({ item, index, ...props })}

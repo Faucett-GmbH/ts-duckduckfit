@@ -85,7 +85,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import { ExerciseExecutionType, UnitSystem, type Exercise } from '$lib/openapi/duckduckfit';
 	import classnames from 'vest/classnames';
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -219,7 +219,7 @@
 				name="attemptedReps"
 				{disabled}
 				value={setInput.attemptedReps || 0}
-				unit={$LL.workouts.set.repsLabel()}
+				unit={m.workouts.set.repsLabel()}
 				on:input={onTypedInputChange}
 			/>
 			<InputResults name="attemptedReps" {result} />
@@ -298,7 +298,7 @@
 				name="attemptedReps"
 				{disabled}
 				value={setInput.attemptedReps || 0}
-				unit={$LL.workouts.set.repsLabel()}
+				unit={m.workouts.set.repsLabel()}
 				on:input={onTypedInputChange}
 			/>
 			<InputResults name="attemptedReps" {result} />

@@ -27,7 +27,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import type { TranslationFunctions } from '$lib/i18n/i18n-types';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import classnames from 'vest/classnames';
@@ -174,12 +174,12 @@
 </script>
 
 <div class="mb-2">
-	<label for="name">{$LL.workouts.nameLabel()}</label>
+	<label for="name">{m.workouts.nameLabel()}</label>
 	<input
 		class="w-full {cn('name')}"
 		type="text"
 		name="name"
-		placeholder={$LL.workouts.namePlaceholder()}
+		placeholder={m.workouts.namePlaceholder()}
 		value={workout.name}
 		on:input={onChange}
 	/>
@@ -222,12 +222,12 @@
 <div class="flex flex-row justify-between">
 	<button class="btn success flex flex-row" on:click|stopPropagation={onAddSetGroup}>
 		<Plus />
-		{$LL.workouts.setGroup.add()}
+		{m.workouts.setGroup.add()}
 	</button>
 	<button class="btn primary flex flex-shrink" {disabled} on:click={onSubmit}>
 		{#if loading}<div class="mr-2 flex flex-row justify-center">
 				<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 			</div>{/if}
-		{#if workout.id}{$LL.workouts.edit.submit()}{:else}{$LL.workouts.new.submit()}{/if}
+		{#if workout.id}{m.workouts.edit.submit()}{:else}{m.workouts.new.submit()}{/if}
 	</button>
 </div>

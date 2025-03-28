@@ -77,3 +77,13 @@ export function selectElementContents(el: HTMLElement) {
 		selection.addRange(range);
 	}
 }
+
+export function getId<T extends { id: number }>(value: T) {
+	return value.id;
+}
+export function getLocalId<T extends { localId: string }>(value: T) {
+	return value.localId;
+}
+export function getName<T extends { name: string }>(value: T) {
+	return value.name;
+}

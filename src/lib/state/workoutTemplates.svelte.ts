@@ -7,7 +7,7 @@ export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
   id: string;
-  exerciseId: string;
+  exerciseId: number;
   setType: SetType;
   asManyRoundsAsPossible?: boolean;
   distanceInMeters?: number;

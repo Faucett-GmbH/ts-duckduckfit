@@ -28,7 +28,7 @@
 </script>
 
 <script lang="ts">
-	import LL from '$lib/i18n/i18n-svelte';
+	import { m } from '$lib/paraglide/messages';
 	import type { TranslationFunctions } from '$lib/i18n/i18n-types';
 	import { debounce } from '@aicacia/debounce';
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -297,7 +297,7 @@
 	</div>
 
 	<div class="mb-2" class:hidden={!open}>
-		<label for="exercise-selector">{$LL.workouts.new.exercisesLabel()}</label>
+		<label for="exercise-selector">{m.workouts.new.exercisesLabel()}</label>
 		<ExerciseSelector
 			id={`exercise-selector-${setGroup.id}`}
 			bind:open={exerciseSelectorOpen}
@@ -318,19 +318,19 @@
 						class="btn ghost text-nowrap text-left"
 						class:active={restAfterInSecondsSetType === 'working'}
 						on:click={createOnRestAfterInSecondsSetType('working')}
-						>{$LL.workouts.workingSetTitle()}</button
+						>{m.workouts.workingSetTitle()}</button
 					>
 					<button
 						class="btn ghost text-nowrap text-left"
 						class:active={restAfterInSecondsSetType === 'warmup'}
 						on:click={createOnRestAfterInSecondsSetType('warmup')}
-						>{$LL.workouts.warmupTitle()}</button
+						>{m.workouts.warmupTitle()}</button
 					>
 				</Dropdown>
 			</div>
 			<div class="me-1 flex flex-shrink flex-col">
 				<label class="text-xs" for="restAfterInSeconds"
-					>{$LL.workouts.set.restAfterInSecondsLabel()}</label
+					>{m.workouts.set.restAfterInSecondsLabel()}</label
 				>
 				<MeasurementInput
 					name="restAfterInSeconds"
@@ -343,9 +343,9 @@
 			<div class="me-1 flex flex-shrink flex-col">
 				<button class="btn secondary text-sm" on:click={onSetAllRestAfterInSeconds}>
 					{#if restAfterInSecondsSetType === 'warmup'}
-						{$LL.workouts.setGroup.setWarmUpRestTimers()}
+						{m.workouts.setGroup.setWarmUpRestTimers()}
 					{:else}
-						{$LL.workouts.setGroup.setWorkingSetRestTimers()}
+						{m.workouts.setGroup.setWorkingSetRestTimers()}
 					{/if}
 				</button>
 			</div>
@@ -394,17 +394,17 @@
 			on:click|stopPropagation={onAddSet}
 		>
 			<Plus />
-			{$LL.workouts.set.add.title()}
+			{m.workouts.set.add.title()}
 		</button>
 	</div>
 </div>
 
 <Modal bind:open={openDelete}>
-	<h5 slot="title">{$LL.workouts.setGroup.delete.title()}</h5>
-	<p>{$LL.workouts.setGroup.delete.body()}</p>
+	<h5 slot="title">{m.workouts.setGroup.delete.title()}</h5>
+	<p>{m.workouts.setGroup.delete.body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" on:click={onDeleteInternal}>
-			{$LL.workouts.setGroup.delete.submit()}
+			{m.workouts.setGroup.delete.submit()}
 		</button>
 	</div>
 </Modal>

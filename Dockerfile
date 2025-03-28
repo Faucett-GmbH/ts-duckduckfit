@@ -15,7 +15,7 @@ COPY postcss.config.cjs svelte.config.js tailwind.config.cjs vite.config.js ./
 
 RUN pnpm run build
 
-FROM --platform=linux/amd64 nginx:1.27-alpine3.20-slim
+FROM --platform=linux/amd64 nginx:1.27-alpine3.21-slim
 LABEL org.opencontainers.image.source https://github.com/Faucett-GmbH/ts-duckduckfit
 
 COPY default.conf.template /etc/nginx/templates/default.conf.template
