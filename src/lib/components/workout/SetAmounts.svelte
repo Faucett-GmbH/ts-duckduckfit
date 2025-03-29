@@ -19,7 +19,7 @@
 </script>
 
 <div class="flex flex-shrink flex-col justify-end sm:flex-row">
-	{#if execution === ExerciseExecutionType.DistanceDurationExerciseExecutionType}
+	{#if execution === ExerciseExecutionTypeEnum.DistanceDuration}
 		<div class="badge info">
 			<Measurement
 				type="distance"
@@ -36,7 +36,7 @@
 				system={unitSystem}
 			/>
 		</div>
-	{:else if execution === ExerciseExecutionType.DistanceExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.Distance}
 		<div class="badge info">
 			<Measurement
 				type="distance"
@@ -45,7 +45,7 @@
 				system={unitSystem}
 			/>
 		</div>
-	{:else if execution === ExerciseExecutionType.DurationExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.Duration}
 		<div class="badge info">
 			<Measurement
 				type="duration"
@@ -54,11 +54,11 @@
 				system={unitSystem}
 			/>
 		</div>
-	{:else if execution === ExerciseExecutionType.RepsOnlyExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.RepsOnly}
 		<div class="badge info">
 			{set.reps}
 		</div>
-	{:else if execution === ExerciseExecutionType.WeightDistanceExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.WeightDistance}
 		<div class="badge info">
 			<Measurement
 				type="mass"
@@ -75,7 +75,7 @@
 				system={unitSystem}
 			/>
 		</div>
-	{:else if execution === ExerciseExecutionType.WeightDurationExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.WeightDuration}
 		<div class="badge info">
 			<Measurement
 				type="mass"
@@ -92,7 +92,7 @@
 				system={unitSystem}
 			/>
 		</div>
-	{:else if execution === ExerciseExecutionType.WeightRepsExerciseExecutionType}
+	{:else if execution === ExerciseExecutionTypeEnum.WeightReps}
 		<div class="badge info">
 			<Measurement
 				type="mass"

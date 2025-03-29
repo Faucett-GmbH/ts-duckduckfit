@@ -1,7 +1,15 @@
-<svelte:options immutable />
-
-<script lang="ts" context="module">
+<script lang="ts" module>
 	import { create, test, enforce, only, omitWhen } from 'vest';
+
+	export interface ExerciseSetInputProps {
+		setInput: ExerciseSetInputParams;
+		exercise: Exercise;
+		valid?: boolean;
+		disabled?: boolean;
+		restAfter?: boolean;
+		oninput(params: ExerciseSetInputParams): void;
+		onvalid(valid: boolean): void;
+	}
 
 	export interface ExerciseSetInputParams extends RepsInputParams {
 		distanceInMeters?: number;
@@ -14,7 +22,7 @@
 		weightUnits?: Units<'METRIC', 'mass'>;
 	}
 
-	const createSuite = (LL: TranslationFunctions) =>
+	const createSuite = () =>
 		create(
 			(
 				data: Partial<ExerciseSetInputParams> = {},
@@ -38,34 +46,34 @@
 				let reps = false;
 				let weightInKilograms = false;
 				switch (exercise.execution) {
-					case ExerciseExecutionType.DistanceDurationExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.DistanceDuration: {
 						distanceInMeters = true;
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionType.DistanceExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.Distance: {
 						distanceInMeters = true;
 						break;
 					}
-					case ExerciseExecutionType.DurationExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.Duration: {
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionType.RepsOnlyExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.RepsOnly: {
 						reps = true;
 						break;
 					}
-					case ExerciseExecutionType.WeightDistanceExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.WeightDistance: {
 						weightInKilograms = true;
 						distanceInMeters = true;
 						break;
 					}
-					case ExerciseExecutionType.WeightDurationExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.WeightDuration: {
 						weightInKilograms = true;
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionType.WeightRepsExerciseExecutionType: {
+					case ExerciseExecutionTypeEnum.WeightReps: {
 						weightInKilograms = true;
 						reps = true;
 						break;
@@ -93,7 +101,7 @@
 						});
 						test(
 							'repRangeLow',
-							LL.errors.message.mustBeLessThan(LL.workouts.set.repRangeHighLabel()),
+							m.errors_message_must_be_less_than({ value: m.workouts_set_rep_range_high_label() }),
 							() => {
 								enforce(data.repRangeLow || 0).lessThanOrEquals(data.repRangeHigh);
 							}
@@ -103,7 +111,7 @@
 						});
 						test(
 							'repRangeHigh',
-							LL.errors.message.mustBeLessThan(LL.workouts.set.repRangeLowLabel()),
+							m.errors_message_must_be_less_than({ value: m.workouts_set_rep_range_low_label() }),
 							() => {
 								enforce(data.repRangeHigh || 0).greaterThanOrEquals(data.repRangeLow);
 							}
@@ -131,39 +139,38 @@
 
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
-	import { ExerciseExecutionType, UnitSystem, type Exercise } from '$lib/openapi/duckduckfit';
 	import classnames from 'vest/classnames';
-	import { createEventDispatcher, onMount } from 'svelte';
-	import type { TranslationFunctions } from '$lib/i18n/i18n-types';
+	import { onMount } from 'svelte';
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '../InputResults.svelte';
 	import MeasurementInput, { type Units } from '../inputs/MeasurementInput.svelte';
 	import RepsInput, { type RepsInputParams, type RepsInputType } from './RepsInput.svelte';
+	import { ExerciseExecutionTypeEnum, type Exercise } from '$lib/openapi/exdb';
 
-	export let setInput: ExerciseSetInputParams;
-	export let exercise: Exercise;
-	export let valid: boolean | undefined = undefined;
-	export let unitSystem: UnitSystem = UnitSystem.MetricUnitSystem;
-	export let disabled = false;
-	export let restAfter = true;
+	let {
+		setInput,
+		exercise,
+		valid = $bindable(),
+		disabled = $bindable(false),
+		restAfter,
+		onvalid,
+		oninput
+	}: ExerciseSetInputProps = $props();
 
-	const dispatch = createEventDispatcher<{
-		input: ExerciseSetInputParams;
-		valid: boolean;
-	}>();
+	let repsInputType: RepsInputType = $state('reps');
+	let suite = createSuite();
+	let result = $state(suite.get());
+	let loading = $state(false);
+	let cn = $derived(
+		classnames(result, {
+			untested: 'untested',
+			tested: 'tested',
+			invalid: 'invalid',
+			valid: 'valid',
+			warning: 'warning'
+		})
+	);
 
-	let repsInputType: RepsInputType = 'reps';
-	$: suite = createSuite($LL);
-	$: result = suite.get();
-	let loading = false;
-	$: disabled = loading;
-	$: cn = classnames(result, {
-		untested: 'untested',
-		tested: 'tested',
-		invalid: 'invalid',
-		valid: 'valid',
-		warning: 'warning'
-	});
 	const fields = new Set<keyof ExerciseSetInputParams>();
 	const validate = debounce(() => {
 		suite(setInput, exercise, repsInputType, fields).done((r) => {
@@ -171,26 +178,26 @@
 			const newValid = result.isValid();
 			if (newValid !== valid) {
 				valid = newValid;
-				dispatch('valid', valid);
+				onvalid(valid);
 			}
 		});
 		fields.clear();
 	}, 300);
 	function onMeasurementChange(
-		e: CustomEvent<[name: string, value: [metricValue: number, metricUnits: Units<'METRIC', any>]]>
+		metricValue: number,
+		_metricUnits: Units<'METRIC', any>,
+		name?: string
 	) {
-		let [name, [value, _unit]] = e.detail;
 		const field = name as keyof ExerciseSetInputParams;
-		onChange(field, value);
+		onChange(field, metricValue);
 	}
-	function onTypedInputChange(e: CustomEvent<[name: string, value: string | number]>) {
-		const [name, value] = e.detail;
+	function onTypedInputChange(value: number, name?: string) {
 		const field = name as keyof ExerciseSetInputParams;
 		onChange(field, value);
 	}
 	function onChange<K extends keyof ExerciseSetInputParams>(field: K, value: any) {
 		setInput = { ...setInput, [field]: value };
-		dispatch('input', setInput);
+		oninput(setInput);
 		fields.add(field);
 		validate();
 	}
@@ -200,12 +207,16 @@
 		updatedFields: Array<keyof ExerciseSetInputParams>
 	) {
 		setInput = newSetTemplate;
-		dispatch('input', setInput);
+		oninput(setInput);
 		for (const field of updatedFields) {
 			fields.add(field);
 		}
 		validate();
 	}
+
+	$effect(() => {
+		disabled = loading || result.isValid();
+	});
 
 	onMount(() => {
 		fields.add('restAfterInSeconds');
@@ -215,34 +226,34 @@
 		let reps = false;
 		let weightInKilograms = false;
 		switch (exercise.execution) {
-			case ExerciseExecutionType.DistanceDurationExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.DistanceDuration: {
 				distanceInMeters = true;
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionType.DistanceExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.Distance: {
 				distanceInMeters = true;
 				break;
 			}
-			case ExerciseExecutionType.DurationExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.Duration: {
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionType.RepsOnlyExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.RepsOnly: {
 				reps = true;
 				break;
 			}
-			case ExerciseExecutionType.WeightDistanceExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.WeightDistance: {
 				weightInKilograms = true;
 				distanceInMeters = true;
 				break;
 			}
-			case ExerciseExecutionType.WeightDurationExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.WeightDuration: {
 				weightInKilograms = true;
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionType.WeightRepsExerciseExecutionType: {
+			case ExerciseExecutionTypeEnum.WeightReps: {
 				weightInKilograms = true;
 				reps = true;
 				break;
@@ -273,66 +284,66 @@
 </script>
 
 <div class="flex flex-shrink flex-row">
-	{#if exercise.execution === ExerciseExecutionType.DistanceDurationExerciseExecutionType}
+	{#if exercise.execution === ExerciseExecutionTypeEnum.DistanceDuration}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
+			<label class="text-xs" for="distanceInMeters"
+				>{m.workouts_set_distance_in_meters_label()}</label
+			>
 			<MeasurementInput
-				className={cn('distanceInMeters')}
+				class={cn('distanceInMeters')}
 				name="distanceInMeters"
 				{disabled}
 				metricValue={setInput.distanceInMeters || 0}
 				metricUnits="m"
 				type="distance"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
 		<div class="me-1 ms-2 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts_set_time_in_seconds_label()}</label>
 			<MeasurementInput
-				className={cn('timeInSeconds')}
+				class={cn('timeInSeconds')}
 				name="timeInSeconds"
 				{disabled}
 				metricValue={setInput.timeInSeconds || 0}
 				metricUnits="s"
 				type="duration"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionType.DistanceExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.Distance}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
+			<label class="text-xs" for="distanceInMeters"
+				>{m.workouts_set_distance_in_meters_label()}</label
+			>
 			<MeasurementInput
-				className={cn('distanceInMeters')}
+				class={cn('distanceInMeters')}
 				name="distanceInMeters"
 				{disabled}
 				metricValue={setInput.distanceInMeters || 0}
 				metricUnits="m"
 				type="distance"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionType.DurationExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.Duration}
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts_set_time_in_seconds_label()}</label>
 			<MeasurementInput
-				className={cn('timeInSeconds')}
+				class={cn('timeInSeconds')}
 				name="timeInSeconds"
 				{disabled}
 				metricValue={setInput.timeInSeconds || 0}
 				metricUnits="s"
 				type="duration"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionType.RepsOnlyExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.RepsOnly}
 		<RepsInput
 			repsInput={setInput}
 			{cn}
@@ -341,79 +352,76 @@
 			{onInputTypeChange}
 			{result}
 		/>
-	{:else if exercise.execution === ExerciseExecutionType.WeightDistanceExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.WeightDistance}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
-				>{m.workouts.set.weightInKilogramsLabel()}</label
+				>{m.workouts_set_weight_in_kilograms_label()}</label
 			>
 			<MeasurementInput
-				className={cn('weightInKilograms')}
+				class={cn('weightInKilograms')}
 				name="weightInKilograms"
 				{disabled}
 				metricValue={setInput.weightInKilograms || 0}
 				metricUnits="kg"
 				type="mass"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="weightInKilograms" {result} />
 		</div>
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="distanceInMeters">{m.workouts.set.distanceInMetersLabel()}</label>
+			<label class="text-xs" for="distanceInMeters"
+				>{m.workouts_set_distance_in_meters_label()}</label
+			>
 			<MeasurementInput
-				className={cn('distanceInMeters')}
+				class={cn('distanceInMeters')}
 				name="distanceInMeters"
 				{disabled}
 				metricValue={setInput.distanceInMeters || 0}
 				metricUnits="m"
 				type="distance"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionType.WeightDurationExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.WeightDuration}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
-				>{m.workouts.set.weightInKilogramsLabel()}</label
+				>{m.workouts_set_weight_in_kilograms_label()}</label
 			>
 			<MeasurementInput
-				className={cn('weightInKilograms')}
+				class={cn('weightInKilograms')}
 				name="weightInKilograms"
 				{disabled}
 				metricValue={setInput.weightInKilograms || 0}
 				metricUnits="kg"
 				type="mass"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="weightInKilograms" {result} />
 		</div>
 		<div class="me-1 flex flex-shrink flex-col">
-			<label class="text-xs" for="timeInSeconds">{m.workouts.set.timeInSecondsLabel()}</label>
+			<label class="text-xs" for="timeInSeconds">{m.workouts_set_time_in_seconds_label()}</label>
 			<MeasurementInput
-				className={cn('timeInSeconds')}
+				class={cn('timeInSeconds')}
 				name="timeInSeconds"
 				{disabled}
 				metricValue={setInput.timeInSeconds || 0}
 				metricUnits="s"
 				type="duration"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionType.WeightRepsExerciseExecutionType}
+	{:else if exercise.execution === ExerciseExecutionTypeEnum.WeightReps}
 		<div class="me-1 flex flex-shrink flex-col">
 			<MeasurementInput
-				className={cn('weightInKilograms')}
+				class={cn('weightInKilograms')}
 				name="weightInKilograms"
 				{disabled}
 				metricValue={setInput.weightInKilograms || 0}
 				metricUnits="kg"
 				type="mass"
-				system={unitSystem}
-				on:input={onMeasurementChange}
+				oninput={onMeasurementChange}
 			/>
 			<InputResults name="weightInKilograms" {result} />
 		</div>
@@ -429,14 +437,15 @@
 	{/if}
 </div>
 <div class="me-1 flex flex-shrink flex-col" class:hidden={!restAfter}>
-	<label class="text-xs" for="restAfterInSeconds">{m.workouts.set.restAfterInSecondsLabel()}</label>
+	<label class="text-xs" for="restAfterInSeconds"
+		>{m.workouts_set_rest_after_in_seconds_label()}</label
+	>
 	<MeasurementInput
 		name="restAfterInSeconds"
 		{disabled}
 		metricValue={setInput.restAfterInSeconds || 0}
 		type="duration"
 		metricUnits="s"
-		system={unitSystem}
-		on:input={onMeasurementChange}
+		oninput={onMeasurementChange}
 	/>
 </div>

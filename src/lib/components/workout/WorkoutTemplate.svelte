@@ -13,11 +13,12 @@
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import Modal from '../Modal.svelte';
 	import { handleError } from '$lib/error';
-	// import SetAmounts from './SetAmounts.svelte';
-	// import SetTypeComponent from './SetType.svelte';
+	import SetAmounts from './SetAmounts.svelte';
+	import SetTypeComponent from './SetType.svelte';
 	import { getRealSetPosition } from './util';
 	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import { ExerciseExecutionTypeEnum } from '$lib/openapi/exdb';
 
 	let { workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps = $props();
 
@@ -88,13 +89,13 @@
 						>
 							<div class="me-2 flex flex-shrink flex-row">
 								<div class="me-2 flex flex-col justify-center">
-									<!-- <SetTypeComponent setType={setTemplate.setType} {position} /> -->
+									<SetTypeComponent setType={setTemplate.setType} {position} />
 								</div>
 								<div class="h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"></div>
 								<p class="mb-0 ms-2">{setTemplate.exerciseId}</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
-								<!-- <SetAmounts execution={setTemplate.exercise.execution} set={setTemplate} /> -->
+								<SetAmounts execution={ExerciseExecutionTypeEnum.RepsOnly} set={setTemplate} />
 							</div>
 						</div>
 					{/each}

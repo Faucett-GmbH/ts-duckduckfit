@@ -78,7 +78,7 @@ export function selectElementContents(el: HTMLElement) {
 	}
 }
 
-export function getId<T extends { id: number }>(value: T) {
+export function getId<T extends { id: string | number }>(value: T) {
 	return value.id;
 }
 export function getLocalId<T extends { localId: string }>(value: T) {

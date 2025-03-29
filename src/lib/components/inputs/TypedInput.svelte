@@ -8,9 +8,9 @@
 		unit?: string;
 		tabindex?: number;
 		disabled?: boolean;
-		value?: string;
-		oninput?: EventHandler<Event, HTMLSpanElement>;
-		onchange?: EventHandler<Event, HTMLSpanElement>;
+		value?: number | string;
+		oninput?: (value: number, name?: string) => void;
+		onchange?: (value: number, name?: string) => void;
 	}
 </script>
 
@@ -27,7 +27,7 @@
 		unit,
 		tabindex,
 		disabled,
-		value = $bindable(''),
+		value = $bindable(),
 		oninput,
 		onchange
 	}: TypedInputProps = $props();
@@ -37,23 +37,23 @@
 		selectElementContents(inputElement!);
 	};
 
+	let lastValueNumber = $state<number>();
 	$effect(() => {
-		value = value.replace(NUMERIC_RE, '');
+		value = ((value ?? 0) + '').replace(NUMERIC_RE, '');
 		const newValueNumber = language.numbers.parse(value);
 		if (isNaN(newValueNumber)) {
 			value = '';
 		}
+		if (lastValueNumber !== newValueNumber) {
+			oninput?.(newValueNumber, name);
+			onchange?.(newValueNumber, name);
+		}
+		lastValueNumber = newValueNumber;
 	});
 </script>
 
 <span {tabindex} role="textbox" onfocuscapture={onFocus} class="cursor-text {className}"
-	><AutosizeInput
-		bind:inputElement
-		{id}
-		{name}
-		{disabled}
-		bind:value
-		{oninput}
-		{onchange}
-	/>{#if unit}<span class="badge dark ms-1 inline p-1">{unit}</span>{/if}</span
+	><AutosizeInput bind:inputElement {id} {name} {disabled} bind:value />{#if unit}<span
+			class="badge dark ms-1 inline p-1">{unit}</span
+		>{/if}</span
 >

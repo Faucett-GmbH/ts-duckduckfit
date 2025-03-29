@@ -1,6 +1,20 @@
-<svelte:options immutable />
+<script lang="ts" module>
+	export type EditSetTemplateProps = Omit<
+		SortableItemProps<SetTemplateParams>,
+		'item' | 'index'
+	> & {
+		id?: number;
+		position: number;
+		setTemplate: SetTemplateParams;
+		showExercise?: boolean;
+		showDelete?: boolean;
+		canMove?: boolean;
+		valid?: boolean;
+		oninput(params: SetTemplateParams): void;
+		ondelete(params: SetTemplateParams): void;
+		onvalid(valid: boolean): void;
+	};
 
-<script lang="ts" context="module">
 	export type SetTemplateParams = ExerciseSetInputParams & {
 		id?: number;
 		localId: string;
@@ -11,8 +25,6 @@
 </script>
 
 <script lang="ts">
-	import { SetType, UnitSystem, type Exercise } from '$lib/openapi/duckduckfit';
-	import { createEventDispatcher } from 'svelte';
 	import X from 'lucide-svelte/icons/x';
 	import Grip from 'lucide-svelte/icons/grip';
 	import ExerciseSetInput, { type ExerciseSetInputParams } from '../ExerciseSetInput.svelte';
@@ -20,22 +32,29 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import type { SortableItemProps } from '$lib/components/Sortable.svelte';
+	import type { Exercise } from '$lib/openapi/exdb';
+	import type { SetType } from '$lib/state/workoutTemplates.svelte';
 
-	export let position: number;
-	export let setTemplate: SetTemplateParams;
-	export let showExercise = false;
-	export let showDelete = true;
-	export let canMove = true;
-	export let valid: boolean | undefined = undefined;
-	export let unitSystem: UnitSystem = UnitSystem.MetricUnitSystem;
-	export let isDragging = false;
-	export let isDraggingOver = false;
-	export let onDragStart: (e: DragEvent) => void;
-	export let onDragEnd: (e: DragEvent) => void;
-	export let onDragLeave: (e: DragEvent) => void;
-	export let onDragOver: (e: DragEvent) => void;
+	let {
+		position,
+		setTemplate,
+		showExercise = $bindable(false),
+		showDelete = $bindable(true),
+		canMove = true,
+		valid = $bindable(false),
+		isDragging,
+		isDraggingOver,
+		onDragStart,
+		onDragEnd,
+		onDragLeave,
+		onDragOver,
+		oninput,
+		ondelete,
+		onvalid
+	}: EditSetTemplateProps = $props();
 
-	let draggable = false;
+	let draggable = $state(false);
 
 	function onDraggable() {
 		draggable = true;
@@ -46,32 +65,23 @@
 
 	async function onDeleteInternal() {
 		openDelete = false;
-		dispatch('delete', setTemplate);
+		ondelete(setTemplate);
 	}
-	let openDelete = false;
+	let openDelete = $state(false);
 	function onOpenDelete() {
 		openDelete = true;
 	}
 
-	const dispatch = createEventDispatcher<{
-		input: SetTemplateParams;
-		delete: SetTemplateParams;
-		valid: boolean;
-	}>();
-
-	function onInput(event: CustomEvent<ExerciseSetInputParams>) {
-		dispatch('input', { ...setTemplate, ...event.detail });
-	}
-	function onValid(event: CustomEvent<boolean>) {
-		dispatch('valid', event.detail);
+	function onInput(params: ExerciseSetInputParams) {
+		oninput({ ...setTemplate, ...params });
 	}
 
-	let setTypeDropdownOpen = false;
+	let setTypeDropdownOpen = $state(false);
 	function createOnSetType(setType: SetType) {
 		return () => {
 			setTemplate = { ...setTemplate, setType };
 			setTypeDropdownOpen = false;
-			dispatch('input', setTemplate);
+			oninput(setTemplate);
 		};
 	}
 </script>
@@ -80,39 +90,41 @@
 	class="mb-2 flex flex-grow flex-row"
 	role="listitem"
 	{draggable}
-	on:dragstart={onDragStart}
-	on:dragend={onDragEnd}
-	on:dragleave={onDragLeave}
-	on:dragover={onDragOver}
+	ondragstart={onDragStart}
+	ondragend={onDragEnd}
+	ondragleave={onDragLeave}
+	ondragover={onDragOver}
 >
 	<div class="me-1 flex flex-shrink flex-col items-center justify-center">
 		{#if canMove}
 			<button
 				class="btn icon secondary mb-1 cursor-grab"
 				class:cursor-grabbing={isDragging}
-				on:pointerdown={onDraggable}
-				on:pointerup={onNotDraggable}
+				onpointerdown={onDraggable}
+				onpointerup={onNotDraggable}
 			>
 				<div class="h-4 w-4"><Grip size="1rem" /></div>
 			</button>
 		{/if}
 		<Dropdown position="top-left" anchorPosition="bottom-left" bind:open={setTypeDropdownOpen}>
-			<SetTypeComponent slot="button" setType={setTemplate.setType} {position} />
+			{#snippet button()}
+				<SetTypeComponent setType={setTemplate.setType} {position} />
+			{/snippet}
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={setTemplate.setType === 'working'}
-				on:click={createOnSetType('working')}>{m.workouts.workingSetTitle()}</button
+				onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
 			>
 			<button
 				class="btn ghost text-nowrap text-left"
 				class:active={setTemplate.setType === 'warmup'}
-				on:click={createOnSetType('warmup')}>{m.workouts.warmupTitle()}</button
+				onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
 			>
-			<!-- <button
+			<button
 				class="btn ghost text-nowrap text-left"
-				class:active={setTemplate.setType === "backoff"}
-				on:click={createOnSetType("backoff")}>{m.workouts.backoffTitle()}</button
-			> -->
+				class:active={setTemplate.setType === 'backoff'}
+				onclick={createOnSetType('backoff')}>{m.workouts_backoff_title()}</button
+			>
 		</Dropdown>
 	</div>
 	<div
@@ -123,22 +135,21 @@
 			<ExerciseSetInput
 				exercise={setTemplate.exercise}
 				setInput={setTemplate}
-				{unitSystem}
 				bind:valid
-				on:valid={onValid}
-				on:input={onInput}
+				{onvalid}
+				oninput={onInput}
 			/>
 		</div>
 		<div
 			class="mt-1 flex flex-grow flex-row items-center justify-start"
 			class:hidden={!showExercise}
 		>
-			<div class="badge sm light">{setTemplate.exercise.translation.name}</div>
+			<div class="badge sm light">{setTemplate.exercise.translation?.name}</div>
 		</div>
 	</div>
 	{#if showDelete}
 		<div class="flex flex-col items-center justify-center">
-			<button class="btn danger icon" on:click={onOpenDelete}>
+			<button class="btn danger icon" onclick={onOpenDelete}>
 				<X size="1rem" />
 			</button>
 		</div>
@@ -146,11 +157,13 @@
 </div>
 
 <Modal bind:open={openDelete}>
-	<h5 slot="title">{m.workouts.set.delete.title()}</h5>
-	<p>{m.workouts.set.delete.body()}</p>
+	{#snippet title()}
+		<h5>{m.workouts_set_delete_title()}</h5>
+	{/snippet}
+	<p>{m.workouts_set_delete_body()}</p>
 	<div class="flex flex-row justify-end">
-		<button class="btn danger" on:click={onDeleteInternal}>
-			{m.workouts.set.delete.submit()}
+		<button class="btn danger" onclick={onDeleteInternal}>
+			{m.workouts_set_delete_submit()}
 		</button>
 	</div>
 </Modal>

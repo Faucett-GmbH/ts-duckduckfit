@@ -1,7 +1,15 @@
-<svelte:options immutable />
-
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type RepsInputType = 'reps' | 'asManyRoundsAsPossible' | 'percentOfOneRepMax' | 'repRange';
+
+	export interface RepsInputProps {
+		repsInput: RepsInputParams;
+		disabled?: boolean;
+		cn: (fieldName: string) => string;
+		result: SuiteResult<any, any>;
+		inputType?: RepsInputType;
+		onInputTypeChange(repsInput: RepsInputParams, fields: Array<keyof RepsInputParams>): void;
+		onTypedInputChange(value: number, name?: string): void;
+	}
 
 	export interface RepsInputParams {
 		asManyRoundsAsPossible?: boolean;
@@ -21,16 +29,15 @@
 	import TypedInput from '../inputs/TypedInput.svelte';
 	import { onMount } from 'svelte';
 
-	export let repsInput: RepsInputParams;
-	export let disabled = false;
-	export let cn: (fieldName: string) => string;
-	export let result: SuiteResult<any, any>;
-	export let inputType: RepsInputType = 'reps';
-	export let onInputTypeChange: (
-		repsInput: RepsInputParams,
-		fields: Array<keyof RepsInputParams>
-	) => void;
-	export let onTypedInputChange: (e: CustomEvent<[name: string, value: string | number]>) => void;
+	let {
+		repsInput,
+		disabled = $bindable(false),
+		cn,
+		result,
+		inputType = $bindable(),
+		onInputTypeChange,
+		onTypedInputChange
+	}: RepsInputProps = $props();
 
 	onMount(() => {
 		if (repsInput.reps) {
@@ -84,11 +91,11 @@
 	{#if inputType === 'reps'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<TypedInput
-				className="flex-grow {cn('reps')}"
+				class="flex-grow {cn('reps')}"
 				name="reps"
 				{disabled}
 				value={repsInput.reps || 0}
-				on:input={onTypedInputChange}
+				oninput={onTypedInputChange}
 			/>
 			<InputResults name="reps" {result} />
 		</div>
@@ -99,12 +106,12 @@
 	{:else if inputType === 'percentOfOneRepMax'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<TypedInput
-				className="flex-grow {cn('percentOfOneRepMax')}"
+				class="flex-grow {cn('percentOfOneRepMax')}"
 				name="percentOfOneRepMax"
 				{disabled}
 				value={repsInput.percentOfOneRepMax || 0}
 				unit={'%'}
-				on:input={onTypedInputChange}
+				oninput={onTypedInputChange}
 			/>
 			<InputResults name="percentOfOneRepMax" {result} />
 		</div>
@@ -114,11 +121,11 @@
 				<div class="flex flex-shrink flex-col">
 					<div class="flex flex-shrink flex-row">
 						<TypedInput
-							className="flex-grow {cn('repRangeLow')}"
+							class="flex-grow {cn('repRangeLow')}"
 							name="repRangeLow"
 							{disabled}
 							value={repsInput.repRangeLow || 0}
-							on:input={onTypedInputChange}
+							oninput={onTypedInputChange}
 						/>
 					</div>
 					<InputResults name="repRangeLow" {result} />
@@ -127,11 +134,11 @@
 				<div class="flex flex-shrink flex-col">
 					<div class="flex flex-shrink flex-row">
 						<TypedInput
-							className="flex-grow {cn('repRangeHigh')}"
+							class="flex-grow {cn('repRangeHigh')}"
 							name="repRangeHigh"
 							{disabled}
 							value={repsInput.repRangeHigh || 0}
-							on:input={onTypedInputChange}
+							oninput={onTypedInputChange}
 						/>
 					</div>
 					<InputResults name="repRangeHigh" {result} />
@@ -140,14 +147,17 @@
 		</div>
 	{/if}
 	<div class="me-1 flex flex-shrink flex-col">
-		<select on:change={onSelectRepsInputType} value={inputType}>
-			<option value="reps" title={m.workouts.set.repsLabel()}>{m.workouts.set.repsLabel()}</option>
-			<!-- <option value="percentOfOneRepMax" title={m.workouts.set.percentOfOneRepMaxLabel()}>{m.workouts.set.percentOfOneRepMaxLabel()}</option> -->
-			<option value="repRange" title={m.workouts.set.repRangeLabel()}
-				>{m.workouts.set.repRangeLabel()}</option
+		<select onchange={onSelectRepsInputType} value={inputType}>
+			<option value="reps" title={m.workouts_set_reps_label()}>{m.workouts_set_reps_label()}</option
 			>
-			<option value="asManyRoundsAsPossible" title={m.workouts.set.asManyRoundsAsPossibleLabel()}
-				>{m.workouts.set.asManyRoundsAsPossibleAcronym()}</option
+			<!-- <option value="percentOfOneRepMax" title={m.workouts_set_percentOfOneRepMaxLabel()}>{m.workouts_set_percentOfOneRepMaxLabel()}</option> -->
+			<option value="repRange" title={m.workouts_set_rep_range_label()}
+				>{m.workouts_set_rep_range_label()}</option
+			>
+			<option
+				value="asManyRoundsAsPossible"
+				title={m.workouts_set_as_many_rounds_as_possible_label()}
+				>{m.workouts_set_as_many_rounds_as_possible_acronym()}</option
 			>
 		</select>
 	</div>

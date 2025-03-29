@@ -5,7 +5,7 @@
 		name?: string;
 		tabindex?: number;
 		disabled?: boolean;
-		value?: string;
+		value?: string | number;
 		inputElement?: HTMLSpanElement;
 		oninput?: EventHandler<KeyboardEvent, HTMLSpanElement>;
 		onchange?: EventHandler<Event, HTMLSpanElement>;
@@ -27,6 +27,12 @@
 		oninput,
 		onchange
 	}: AutosizeInputProps = $props();
+
+	let innerText = $state((value ?? '') + '');
+
+	$effect(() => {
+		value = innerText;
+	});
 
 	const onFocus: EventHandler<FocusEvent, HTMLSpanElement> = async (e) => {
 		if (disabled) {
@@ -55,9 +61,8 @@
 </script>
 
 <span
-	class="inline-block border-none p-0 m-0 text-nowrap bg-transparent outline-none focus:outline-none {className} {disabled
-		? 'disabled'
-		: ''}"
+	class="inline-block border-none p-0 m-0 text-nowrap bg-transparent outline-none focus:outline-none {className}"
+	class:pointer-events-none={disabled}
 	{id}
 	{name}
 	{tabindex}
@@ -65,7 +70,7 @@
 	aria-disabled={disabled}
 	contenteditable="true"
 	bind:this={inputElement}
-	bind:innerText={value}
+	bind:innerText
 	onfocuscapture={onFocus}
 	onkeyup={onInput}
 	onblurcapture={onBlur}

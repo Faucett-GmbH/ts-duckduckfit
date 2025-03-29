@@ -17,27 +17,16 @@
 		items: T[];
 		child: Snippet<[props: SortableItemProps<T>]>;
 		onMove(from: number, to: number): void;
-		getKey?(item: T, index: number): string | number;
-	}
-
-	function defaultGetKey<T>(item: T, index: number) {
-		return `${hashOf(item)}`;
+		getKey(item: T, index: number): string | number;
 	}
 </script>
 
 <script lang="ts" generics="T">
 	import { unsafeId } from '$lib/util';
 	import type { Snippet } from 'svelte';
-	import { hashOf } from '@aicacia/hash';
 	import type { EventHandler } from 'svelte/elements';
 
-	let {
-		id = unsafeId(),
-		items,
-		child,
-		getKey = defaultGetKey,
-		onMove
-	}: SortableProps<T> = $props();
+	let { id = unsafeId(), items, child, getKey, onMove }: SortableProps<T> = $props();
 
 	let dragLeaveTimeoutId: ReturnType<typeof setTimeout> | undefined;
 	let draggingIndex: number = $state(-1);

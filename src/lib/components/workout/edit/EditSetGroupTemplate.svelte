@@ -43,12 +43,12 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import ExerciseSelector from '../ExerciseSelector.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { type SetTemplateParams } from './EditSetTemplate.svelte';
+	import EditSetTemplate, { type SetTemplateParams } from './EditSetTemplate.svelte';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import Grip from 'lucide-svelte/icons/grip';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
-	import { unsafeId } from '$lib/util';
+	import { getLocalId, unsafeId } from '$lib/util';
 	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
@@ -144,7 +144,7 @@
 	}
 
 	let exerciseSelectorOpen = $state(false);
-	let shouldAddSetTemplates = false;
+	let shouldAddSetTemplates = $state(false);
 	$effect(() => {
 		if (!shouldAddSetTemplates && exerciseSelectorOpen) {
 			shouldAddSetTemplates = setGroupTemplate.setTemplates.length === 0;
@@ -170,9 +170,9 @@
 		validate();
 	}
 	function createOnSetTemplateChange(index: number) {
-		return (event: CustomEvent<SetTemplateParams>) => {
+		return (params: SetTemplateParams) => {
 			const setTemplates = setGroupTemplate.setTemplates.slice();
-			setTemplates[index] = event.detail;
+			setTemplates[index] = params;
 			setGroupTemplate = {
 				...setGroupTemplate,
 				setTemplates
@@ -183,7 +183,7 @@
 		};
 	}
 	function createOnSetTemplateDelete(index: number) {
-		return (_event: CustomEvent<SetTemplateParams>) => {
+		return (_params: SetTemplateParams) => {
 			const setTemplates = setGroupTemplate.setTemplates.slice();
 			setTemplates.splice(index, 1);
 			setGroupTemplate = {
@@ -196,9 +196,9 @@
 		};
 	}
 	function createOnSetTemplateValid(index: number) {
-		return (event: CustomEvent<boolean>) => {
+		return (setTemplateValid: boolean) => {
 			const newSetTemplatesValid = setTemplatesValid.slice(0, setGroupTemplate.setTemplates.length);
-			newSetTemplatesValid[index] = event.detail;
+			newSetTemplatesValid[index] = setTemplateValid;
 			setTemplatesValid = newSetTemplatesValid;
 			const newValid = result.isValid() && isSetTemplatesValid();
 			if (newValid !== valid) {
@@ -215,7 +215,7 @@
 		const setTemplates = setGroupTemplate.setTemplates.slice();
 		for (const exercise of exercises) {
 			setTemplates.push({
-				localId: unsafeId(setTemplates.length),
+				localId: unsafeId('set-template'),
 				exerciseId: exercise.id,
 				exercise: exercise,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
@@ -327,30 +327,38 @@
 	</div>
 	{#if setGroupTemplate.setTemplates.length}
 		<div class="mb-2 flex flex-row items-end" class:hidden={!open}>
-			<div class="me-1 flex flex-shrink flex-col items-center justify-center">
-				<Dropdown
-					position="top-left"
-					anchorPosition="bottom-left"
-					bind:open={restAfterInSecondsDropdownOpen}
-				>
-					{#snippet button()}
-						<SetTypeComponent setType={restAfterInSecondsSetType} />
-					{/snippet}
-					<button
-						class="btn ghost text-nowrap text-left"
-						class:active={restAfterInSecondsSetType === 'working'}
-						onclick={createOnRestAfterInSecondsSetType('working')}
-						>{m.workouts_working_set_title()}</button
+			<div class="flex flex-shrink flex-col mb-1">
+				<div class="cursor-pointer">
+					<Dropdown
+						position="top-left"
+						anchorPosition="bottom-left"
+						bind:open={restAfterInSecondsDropdownOpen}
 					>
-					<button
-						class="btn ghost text-nowrap text-left"
-						class:active={restAfterInSecondsSetType === 'warmup'}
-						onclick={createOnRestAfterInSecondsSetType('warmup')}
-						>{m.workouts_warmup_title()}</button
-					>
-				</Dropdown>
+						{#snippet button()}
+							<SetTypeComponent setType={restAfterInSecondsSetType} />
+						{/snippet}
+						<button
+							class="btn ghost text-nowrap text-left"
+							class:active={restAfterInSecondsSetType === 'working'}
+							onclick={createOnRestAfterInSecondsSetType('working')}
+							>{m.workouts_working_set_title()}</button
+						>
+						<button
+							class="btn ghost text-nowrap text-left"
+							class:active={restAfterInSecondsSetType === 'warmup'}
+							onclick={createOnRestAfterInSecondsSetType('warmup')}
+							>{m.workouts_warmup_title()}</button
+						>
+						<button
+							class="btn ghost text-nowrap text-left"
+							class:active={restAfterInSecondsSetType === 'backoff'}
+							onclick={createOnRestAfterInSecondsSetType('backoff')}
+							>{m.workouts_backoff_title()}</button
+						>
+					</Dropdown>
+				</div>
 			</div>
-			<div class="me-1 flex flex-shrink flex-col">
+			<div class="mx-1 flex flex-shrink flex-col">
 				<label class="text-xs" for="restAfterInSeconds"
 					>{m.workouts_set_rest_after_in_seconds_label()}</label
 				>
@@ -363,20 +371,23 @@
 			</div>
 			<div class="me-1 flex flex-shrink flex-col">
 				<button class="btn secondary text-sm" onclick={onSetAllRestAfterInSeconds}>
-					{#if restAfterInSecondsSetType === 'warmup'}
-						{m.workouts_set_group_set_warmup_rest_timers()}
+					{#if restAfterInSecondsSetType === 'working'}
+						{m.workouts_working_set_rest_timers_update()}
+					{:else if restAfterInSecondsSetType === 'warmup'}
+						{m.workouts_warmup_rest_timers_update()}
 					{:else}
-						{m.workouts_set_group_set_working_set_rest_timers()}
+						{m.workouts_backoff_rest_timers_update()}
 					{/if}
 				</button>
 			</div>
 		</div>
+		<hr />
 	{/if}
 	<div role="list" class:hidden={!open}>
-		<!-- <Sortable
+		<Sortable
 			id={`set-templates-${setGroupTemplate.id}`}
 			items={setGroupTemplate.setTemplates}
-			getKey={getId}
+			getKey={getLocalId}
 			onMove={onMoveSet}
 		>
 			{#snippet child({ item, index, ...props })}
@@ -391,7 +402,7 @@
 					onvalid={createOnSetTemplateValid(index)}
 				/>
 			{/snippet}
-		</Sortable> -->
+		</Sortable>
 	</div>
 	<div class="flex flex-row items-center justify-center" class:hidden={!open}>
 		<InputResults name="setTemplates" {result} />

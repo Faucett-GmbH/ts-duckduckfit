@@ -41,7 +41,7 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { getId, unsafeId } from '$lib/util';
+	import { getLocalId, unsafeId } from '$lib/util';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import { m } from '$lib/paraglide/messages';
 
@@ -135,7 +135,9 @@
 			validateAll();
 			if (valid) {
 				if (workoutTemplate.id) {
+					console.log('update', workoutTemplate);
 				} else {
+					console.log('create', workoutTemplate);
 				}
 				await goto(`${base}/workout-templates`);
 			}
@@ -156,7 +158,7 @@
 			setGroupTemplates: [
 				...workoutTemplate.setGroupTemplates,
 				{
-					localId: unsafeId(),
+					localId: unsafeId('set-group-template'),
 					setGroupType: 'straight',
 					setTemplates: []
 				}
@@ -208,7 +210,7 @@
 	<Sortable
 		id={`set-group-templates-${workoutTemplate.id}`}
 		items={workoutTemplate.setGroupTemplates}
-		getKey={getId}
+		getKey={getLocalId}
 		onMove={onMoveSetGroups}
 	>
 		{#snippet child({ item, index, ...props })}

@@ -397,8 +397,8 @@
 		metricUnits?: Units<'METRIC', T>;
 		metricUnitOptions?: UnitOption[];
 		imperialUnitOptions?: UnitOption[];
-		oninput?: EventHandler<Event, HTMLSpanElement>;
-		onchange?: EventHandler<Event, HTMLSpanElement>;
+		oninput?(metricValue: number, metricUnits: Units<'METRIC', T>, name?: string): void;
+		onchange?(metricValue: number, metricUnits: Units<'METRIC', T>, name?: string): void;
 	}
 </script>
 
@@ -530,8 +530,8 @@
 						nextUnits as Units<'IMPERIAL', T>
 					);
 		valueString = language.numbers.format(v, fractionDigits);
-		oninput?.call(window, e);
-		onchange?.call(window, e);
+		oninput?.call(window, metricValue, metricUnits, name);
+		onchange?.call(window, metricValue, metricUnits, name);
 	};
 </script>
 
@@ -542,8 +542,6 @@
 		{name}
 		{disabled}
 		bind:value={valueString}
-		{oninput}
-		{onchange}
 		unit={unitOptions.length === 1 ? unitOptions[0].units : undefined}
 	/>
 	{#if unitOptions.length > 1}<select

@@ -59,6 +59,12 @@ export interface Exercise {
     thumbnailImage?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof Exercise
+     */
+    execution: ExerciseExecutionTypeEnum;
+    /**
+     * 
      * @type {ExerciseTranslation}
      * @memberof Exercise
      */
@@ -83,6 +89,22 @@ export interface Exercise {
     createdAt: Date;
 }
 
+
+/**
+ * @export
+ */
+export const ExerciseExecutionTypeEnum = {
+    WeightReps: 'WEIGHT_REPS',
+    RepsOnly: 'REPS_ONLY',
+    Duration: 'DURATION',
+    WeightDuration: 'WEIGHT_DURATION',
+    DistanceDuration: 'DISTANCE_DURATION',
+    Distance: 'DISTANCE',
+    WeightDistance: 'WEIGHT_DISTANCE'
+} as const;
+export type ExerciseExecutionTypeEnum = typeof ExerciseExecutionTypeEnum[keyof typeof ExerciseExecutionTypeEnum];
+
+
 /**
  * Check if a given object implements the Exercise interface.
  */
@@ -90,6 +112,7 @@ export function instanceOfExercise(value: object): value is Exercise {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('guid' in value) || value['guid'] === undefined) return false;
     if (!('uri' in value) || value['uri'] === undefined) return false;
+    if (!('execution' in value) || value['execution'] === undefined) return false;
     if (!('updatedAt' in value) || value['updatedAt'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     return true;
@@ -104,12 +127,13 @@ export function ExerciseFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         return json;
     }
     return {
-        
+
         'id': json['id'],
         'guid': json['guid'],
         'uri': json['uri'],
         'image': json['image'] == null ? undefined : json['image'],
         'thumbnailImage': json['thumbnail_image'] == null ? undefined : json['thumbnail_image'],
+        'execution': json['execution'],
         'translation': json['translation'] == null ? undefined : ExerciseTranslationFromJSON(json['translation']),
         'translations': json['translations'] == null ? undefined : ((json['translations'] as Array<any>).map(ExerciseTranslationFromJSON)),
         'updatedAt': (new Date(json['updated_at'])),
@@ -127,12 +151,13 @@ export function ExerciseToJSONTyped(value?: Exercise | null, ignoreDiscriminator
     }
 
     return {
-        
+
         'id': value['id'],
         'guid': value['guid'],
         'uri': value['uri'],
         'image': value['image'],
         'thumbnail_image': value['thumbnailImage'],
+        'execution': value['execution'],
         'translation': ExerciseTranslationToJSON(value['translation']),
         'translations': value['translations'] == null ? undefined : ((value['translations'] as Array<any>).map(ExerciseTranslationToJSON)),
         'updated_at': ((value['updatedAt']).toISOString()),

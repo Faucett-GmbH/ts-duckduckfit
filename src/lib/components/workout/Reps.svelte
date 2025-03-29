@@ -1,6 +1,9 @@
-<svelte:options immutable />
+<script lang="ts" module>
+	export type RepsProps = {
+		reps: Reps;
+		inputType?: RepsInputType;
+	};
 
-<script lang="ts" context="module">
 	export type Reps = {
 		asManyRoundsAsPossible?: boolean;
 		percentOfOneRepMax?: number;
@@ -14,10 +17,9 @@
 	import { m } from '$lib/paraglide/messages';
 	import { onMount } from 'svelte';
 	import type { RepsInputType } from './RepsInput.svelte';
-	import { numbers } from '$lib/stores/language';
+	import { language } from '$lib/state/language.svelte';
 
-	export let reps: Reps;
-	export let inputType: RepsInputType = 'reps';
+	let { reps, inputType }: RepsProps = $props();
 
 	onMount(() => {
 		if (reps.reps) {
@@ -33,16 +35,16 @@
 </script>
 
 {#if inputType === 'reps'}
-	<span>{reps.reps || 0} {m.workouts.set.repsLabel()}</span>
+	<span>{reps.reps || 0} {m.workouts_set_reps_label()}</span>
 {:else if inputType === 'asManyRoundsAsPossible'}
-	<span title={m.workouts.set.asManyRoundsAsPossibleLabel()}
-		>{m.workouts.set.asManyRoundsAsPossibleAcronym()}</span
+	<span title={m.workouts_set_as_many_rounds_as_possible_label()}
+		>{m.workouts_set_as_many_rounds_as_possible_acronym()}</span
 	>
 {:else if inputType === 'percentOfOneRepMax'}
-	<span>{$numbers.format(reps.percentOfOneRepMax || 0, 1)}%</span>
+	<span>{language.numbers.format(reps.percentOfOneRepMax || 0, 1)}%</span>
 {:else if inputType === 'repRange'}
 	<span
 		>{reps.repRangeLow || 0} - {reps.repRangeHigh || 0}
-		{m.workouts.set.repsLabel()}</span
+		{m.workouts_set_reps_label()}</span
 	>
 {/if}
