@@ -1,1 +1,0 @@
-function s(e){const t={};for(const n of e)t[n.exercise.id]=n.exercise;return t}function c(e){return Object.values(s(e))}function u(e,t,n=e.length){if(t.setType!=="working")return-1;let r=0;for(let i=0;i<n;i++)e[i].setType==="working"&&(r+=1);return r}export{c as a,u as g};

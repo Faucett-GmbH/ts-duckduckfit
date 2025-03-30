@@ -1,1 +1,1 @@
-export const env={"PUBLIC_URL":"https://faucett-gmbh.github.io/ts-duckduckfit"}
+export const env={"PUBLIC_EXDB_URL":"https://exdb.faucett-gmbh.com","PUBLIC_URL":"https://faucett-gmbh.github.io/ts-duckduckfit"}
