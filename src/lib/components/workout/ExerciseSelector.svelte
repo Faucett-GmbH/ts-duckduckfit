@@ -108,7 +108,7 @@
 
 <div {id} class="exercise-selector flex flex-row flex-wrap" onclick={onOpen}>
 	<Sortable id={`${id}-exercises`} items={exercises} getKey={getId} onMove={onMoveExercise}>
-		{#snippet child({ item, ...props })}
+		{#snippet children({ item, ...props })}
 			<ExerciseSelectorItem exercise={item} canDrag={exercises.length > 1} {onDelete} {...props} />
 		{/snippet}
 	</Sortable>

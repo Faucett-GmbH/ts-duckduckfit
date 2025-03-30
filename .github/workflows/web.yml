@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PUBLIC_URL: https://faucett-gmbh.github.io/ts-duckduckfit
+      PUBLIC_EXDB_URL: https://exdb.faucett-gmbh.com
       USE_BASE_PATH: true
     steps:
       - uses: actions/checkout@v4

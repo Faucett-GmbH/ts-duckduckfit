@@ -213,7 +213,7 @@
 		getKey={getLocalId}
 		onMove={onMoveSetGroups}
 	>
-		{#snippet child({ item, index, ...props })}
+		{#snippet children({ item, index, ...props })}
 			<EditSetGroupTemplate
 				setGroupTemplate={item}
 				{index}

@@ -390,7 +390,7 @@
 			getKey={getLocalId}
 			onMove={onMoveSet}
 		>
-			{#snippet child({ item, index, ...props })}
+			{#snippet children({ item, index, ...props })}
 				<EditSetTemplate
 					position={getRealSetPosition(setGroupTemplate.setTemplates, item, index)}
 					setTemplate={item}

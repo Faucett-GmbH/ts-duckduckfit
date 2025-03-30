@@ -15,7 +15,7 @@
 	export interface SortableProps<T> {
 		id?: string;
 		items: T[];
-		child: Snippet<[props: SortableItemProps<T>]>;
+		children: Snippet<[props: SortableItemProps<T>]>;
 		onMove(from: number, to: number): void;
 		getKey(item: T, index: number): string | number;
 	}
@@ -26,7 +26,7 @@
 	import type { Snippet } from 'svelte';
 	import type { EventHandler } from 'svelte/elements';
 
-	let { id = unsafeId(), items, child, getKey, onMove }: SortableProps<T> = $props();
+	let { id = unsafeId(), items, children, getKey, onMove }: SortableProps<T> = $props();
 
 	let dragLeaveTimeoutId: ReturnType<typeof setTimeout> | undefined;
 	let draggingIndex: number = $state(-1);
@@ -87,7 +87,7 @@
 {#each items as item, index (getKey(item, index))}
 	{@const isDragging = draggingIndex === index}
 	{@const isDraggingOver = !isDragging && draggingOverIndex === index}
-	{@render child({
+	{@render children({
 		item,
 		index,
 		isDragging,
