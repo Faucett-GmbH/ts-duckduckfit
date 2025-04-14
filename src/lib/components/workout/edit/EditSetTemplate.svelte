@@ -16,8 +16,7 @@
 	};
 
 	export type SetTemplateParams = ExerciseSetInputParams & {
-		id?: number;
-		localId: string;
+		id: string;
 		exerciseId: number;
 		exercise: Exercise;
 		setType: SetType;
@@ -128,7 +127,7 @@
 		</Dropdown>
 	</div>
 	<div
-		class="bg-swamp-green-300 me-1 flex flex-grow flex-col rounded-lg p-1 text-black"
+		class="bg-swamp-green-300 me-1 flex flex-grow flex-col rounded-lg p-1"
 		class:!bg-swamp-green-600={isDraggingOver}
 	>
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-between">

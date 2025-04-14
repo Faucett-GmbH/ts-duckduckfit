@@ -14,8 +14,7 @@
 	};
 
 	export type SetGroupTemplateParams = {
-		id?: number;
-		localId: string;
+		id: string;
 		setGroupType: SetGroupType;
 		setTemplates: Array<SetTemplateParams>;
 	};
@@ -48,7 +47,7 @@
 	import Grip from 'lucide-svelte/icons/grip';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
-	import { getLocalId, unsafeId } from '$lib/util';
+	import { getId, unsafeId } from '$lib/util';
 	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
@@ -215,7 +214,7 @@
 		const setTemplates = setGroupTemplate.setTemplates.slice();
 		for (const exercise of exercises) {
 			setTemplates.push({
-				localId: unsafeId('set-template'),
+				id: unsafeId(),
 				exerciseId: exercise.id,
 				exercise: exercise,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
@@ -387,7 +386,7 @@
 		<Sortable
 			id={`set-templates-${setGroupTemplate.id}`}
 			items={setGroupTemplate.setTemplates}
-			getKey={getLocalId}
+			getKey={getId}
 			onMove={onMoveSet}
 		>
 			{#snippet children({ item, index, ...props })}

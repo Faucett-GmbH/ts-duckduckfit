@@ -1,12 +1,13 @@
+import type { WorkoutTemplateParams } from "$lib/components/workout/edit/EditWorkoutTemplate.svelte";
 import type { Locale } from "$lib/paraglide/runtime";
-import { findDocument, getRepo, type AutomergeDocumentId } from "$lib/repo";
+import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocumentId } from "$lib/repo";
+import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
-  id: string;
   exerciseId: number;
   setType: SetType;
   asManyRoundsAsPossible?: boolean;
@@ -24,7 +25,6 @@ export interface SetTemplate {
 }
 
 export interface SetGroupTemplate {
-  id: string;
   setGroupType: SetGroupType;
   setTemplates: SetTemplate[];
 }
@@ -36,7 +36,6 @@ export interface WorkoutTemplateTranslation {
 
 
 export interface WorkoutTemplate {
-  id: AutomergeDocumentId<WorkoutTemplate>;
   translations: Record<Locale, WorkoutTemplateTranslation>;
   setGroupTemplates: SetGroupTemplate[];
   updatedAt: Date;
@@ -45,7 +44,7 @@ export interface WorkoutTemplate {
 
 export interface WorkoutTemplates {
   version: number;
-  workoutTemplatesById: { [id: string]: AutomergeDocumentId<WorkoutTemplate> };
+  workoutTemplatesById: Record<AutomergeDocumentId<WorkoutTemplate>, boolean>;
 }
 
 export const workoutTemplatesMigrations = {
@@ -55,13 +54,13 @@ export const workoutTemplatesMigrations = {
   }
 };
 
-export async function getWorkoutTemplates(offset: number, limit: number): Promise<WorkoutTemplate[]> {
+export async function getWorkoutTemplates(offset: number, limit: number): Promise<[key: AutomergeDocumentId<WorkoutTemplate>, value: WorkoutTemplate][]> {
   const workoutTemplates = (await userDocument.current!.workoutTemplates()).docSync()!;
   const startOffset = offset * limit;
   const endOffset = startOffset + limit - 1;
-  const workoutTemplatesById = Object.values(workoutTemplates.workoutTemplatesById).slice(startOffset, endOffset);
+  const workoutTemplateIds = Object.keys(workoutTemplates.workoutTemplatesById).slice(startOffset, endOffset) as AutomergeDocumentId<WorkoutTemplate>[];
   const repo = getRepo();
-  return await Promise.all(workoutTemplatesById.map(async id => (await findDocument(id, repo).doc())!));
+  return await Promise.all(workoutTemplateIds.map(async id => [id, (await findDocument(id, repo).doc())!]));
 }
 
 export async function getWorkoutTemplateById(workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>): Promise<WorkoutTemplate | null> {
@@ -74,7 +73,30 @@ export async function getWorkoutTemplateById(workoutTemplateId: AutomergeDocumen
 
 export async function deleteWorkoutTemplate(workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>) {
   const workoutTemplates = await userDocument.current!.workoutTemplates();
-  workoutTemplates.change((wt) => {
-    delete wt.workoutTemplatesById[workoutTemplateId];
+  workoutTemplates.change((wts) => {
+    delete wts.workoutTemplatesById[workoutTemplateId];
   });
+  deleteDocument(workoutTemplateId);
+}
+
+export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTemplateParams, workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>) {
+  const workoutTemplates = await userDocument.current!.workoutTemplates();
+  let workoutTemplateDocument: DocHandle<WorkoutTemplate>;
+  if (!workoutTemplateId) {
+    workoutTemplateDocument = createDocument<WorkoutTemplate>({
+      createdAt: new Date(),
+    });
+    workoutTemplateId = workoutTemplateDocument.documentId as AutomergeDocumentId<WorkoutTemplate>;
+  } else {
+    workoutTemplateDocument = findDocument(workoutTemplateId)
+  }
+  const documentId = workoutTemplateId;
+  workoutTemplates.change((wts) => {
+    if (!wts.workoutTemplatesById[documentId]) {
+      wts.workoutTemplatesById[documentId] = true;
+    }
+  });
+  workoutTemplateDocument.change(wt => {
+    wt.updatedAt = new Date();
+  })
 }

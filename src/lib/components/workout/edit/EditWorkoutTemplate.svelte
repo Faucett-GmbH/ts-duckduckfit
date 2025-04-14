@@ -2,32 +2,34 @@
 	import { create, test, enforce, only } from 'vest';
 
 	export type WorkoutTemplateProps = {
+		workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>;
 		workoutTemplate?: WorkoutTemplateParams;
 	};
 
-	export type WorkoutTemplateParams = {
-		id?: number;
-		description?: string;
+	export type WorkoutTemplateTranslationParams = {
+		description: string | null;
 		name: string;
+	};
+
+	export type WorkoutTemplateParams = {
+		translations: Record<Locale, WorkoutTemplateTranslationParams>;
 		setGroupTemplates: Array<SetGroupTemplateParams>;
 	};
 
 	const createSuite = () =>
-		create(
-			(data: Partial<WorkoutTemplateParams> = {}, fields: Set<keyof WorkoutTemplateParams>) => {
-				if (!fields.size) {
-					return;
-				}
-				only(Array.from(fields));
-
-				test('name', m.errors_message_required(), () => {
-					enforce(data.name).isNotBlank();
-				});
-				test('setGroupTemplates', m.errors_message_required(), () => {
-					enforce(data.setGroupTemplates?.length).greaterThan(0);
-				});
+		create((data: WorkoutTemplateParams, fields: Set<keyof WorkoutTemplateParams>) => {
+			if (!fields.size) {
+				return;
 			}
-		);
+			only(Array.from(fields));
+
+			test('name', m.errors_message_required(), () => {
+				enforce(data.translations.en.name).isNotBlank();
+			});
+			test('setGroupTemplates', m.errors_message_required(), () => {
+				enforce(data.setGroupTemplates?.length).greaterThan(0);
+			});
+		});
 </script>
 
 <script lang="ts">
@@ -41,13 +43,22 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { getLocalId, unsafeId } from '$lib/util';
+	import { getId, unsafeId } from '$lib/util';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import type { AutomergeDocumentId } from '$lib/repo';
+	import { upsertWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
+	import type { Locale } from '$lib/paraglide/runtime';
 
 	let {
+		workoutTemplateId,
 		workoutTemplate = $bindable({
-			name: '',
+			translations: {
+				en: {
+					name: '',
+					description: null
+				}
+			},
 			setGroupTemplates: []
 		})
 	}: WorkoutTemplateProps = $props();
@@ -86,12 +97,14 @@
 		validate();
 		validate.flush();
 	}
-	function onChange(
+	function onTranslationChange(
 		e: Event & { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }
 	) {
-		const field = e.currentTarget.name as keyof WorkoutTemplateParams;
-		workoutTemplate = { ...workoutTemplate, [field]: e.currentTarget.value };
-		fields.add(field);
+		const field = e.currentTarget.name as keyof WorkoutTemplateTranslationParams;
+		workoutTemplate.translations.en[field] = e.currentTarget.value;
+		if (field === 'name') {
+			fields.add('name' as never);
+		}
 		validate();
 	}
 	function createOnSetGroupTemplateChange(index: number) {
@@ -134,11 +147,7 @@
 			loading = true;
 			validateAll();
 			if (valid) {
-				if (workoutTemplate.id) {
-					console.log('update', workoutTemplate);
-				} else {
-					console.log('create', workoutTemplate);
-				}
+				await upsertWorkoutTemplate(workoutTemplate, workoutTemplateId);
 				await goto(`${base}/workout-templates`);
 			}
 		} catch (error) {
@@ -158,7 +167,7 @@
 			setGroupTemplates: [
 				...workoutTemplate.setGroupTemplates,
 				{
-					localId: unsafeId('set-group-template'),
+					id: unsafeId(),
 					setGroupType: 'straight',
 					setTemplates: []
 				}
@@ -177,7 +186,7 @@
 	}
 
 	onMount(() => {
-		if (workoutTemplate.id) {
+		if (workoutTemplateId) {
 			validateAll();
 		}
 	});
@@ -190,8 +199,8 @@
 		type="text"
 		name="name"
 		placeholder={m.workouts_name_placeholder()}
-		value={workoutTemplate.name}
-		oninput={onChange}
+		value={workoutTemplate.translations.en.name}
+		oninput={onTranslationChange}
 	/>
 	<InputResults name="name" {result} />
 </div>
@@ -201,16 +210,16 @@
 		class="w-full {cn('description')}"
 		name="description"
 		placeholder={m.workouts_description_placeholder()}
-		value={workoutTemplate.description || ''}
-		oninput={onChange}
+		value={workoutTemplate.translations.en.description || ''}
+		oninput={onTranslationChange}
 	></textarea>
 	<InputResults name="description" {result} />
 </div>
 <div role="list">
 	<Sortable
-		id={`set-group-templates-${workoutTemplate.id}`}
+		id={`set-group-templates`}
 		items={workoutTemplate.setGroupTemplates}
-		getKey={getLocalId}
+		getKey={getId}
 		onMove={onMoveSetGroups}
 	>
 		{#snippet children({ item, index, ...props })}
@@ -237,6 +246,6 @@
 		{#if loading}<div class="mr-2 flex flex-row justify-center">
 				<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 			</div>{/if}
-		{#if workoutTemplate.id}{m.workouts_edit_submit()}{:else}{m.workouts_new_submit()}{/if}
+		{#if workoutTemplateId}{m.workouts_edit_submit()}{:else}{m.workouts_new_submit()}{/if}
 	</button>
 </div>

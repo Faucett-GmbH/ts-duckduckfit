@@ -6,8 +6,8 @@ export type ExtractPromise<T extends Promise<any>> = T extends Promise<infer U> 
 
 export const DEFAULT_SIZE = 20;
 
-export function unsafeId(value?: string | number) {
-	return `${Math.random().toString(36).substring(2)}${value ? `-${value}` : ''}`;
+export function unsafeId() {
+	return Math.random().toString(36).substring(2);
 }
 
 export function getOrigin() {
@@ -80,9 +80,6 @@ export function selectElementContents(el: HTMLElement) {
 
 export function getId<T extends { id: string | number }>(value: T) {
 	return value.id;
-}
-export function getLocalId<T extends { localId: string }>(value: T) {
-	return value.localId;
 }
 export function getName<T extends { name: string }>(value: T) {
 	return value.name;

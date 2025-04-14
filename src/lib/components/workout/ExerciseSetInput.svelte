@@ -152,7 +152,7 @@
 		exercise,
 		valid = $bindable(),
 		disabled = $bindable(false),
-		restAfter,
+		restAfter = true,
 		onvalid,
 		oninput
 	}: ExerciseSetInputProps = $props();

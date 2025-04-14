@@ -1,6 +1,6 @@
 import { InternalError } from '$lib/error';
 import { localStorageState } from '$lib/localStorageState.svelte';
-import { findDocument, migrate, getRepo, type AutomergeDocumentId } from '$lib/repo';
+import { findDocument, migrate, getRepo, type AutomergeDocumentId, createDocument } from '$lib/repo';
 import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userMigrations, type User } from './user.svelte';
 import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
@@ -13,9 +13,10 @@ export interface UserDocument {
 
 export const userDocumentMigrations = {
 	1: (userDocument: UserDocument) => {
+		const repo = getRepo();
 		userDocument.version = 1;
-		userDocument.user = getRepo().create<User>().documentId as AutomergeDocumentId<User>;
-		userDocument.workoutTemplates = getRepo().create<WorkoutTemplates>().documentId as AutomergeDocumentId<WorkoutTemplates>;
+		userDocument.user = createDocument<User>({}, repo).documentId as AutomergeDocumentId<User>;
+		userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId as AutomergeDocumentId<WorkoutTemplates>;
 	}
 };
 
@@ -88,7 +89,7 @@ export async function signUp(username: string) {
 	if (state[username]) {
 		throw InternalError.from('errors_name_user', 'errors_message_already_exists');
 	}
-	const userDocument = getRepo().create<UserDocument>();
+	const userDocument = createDocument<UserDocument>();
 	await userDocument.whenReady();
 	await runAllMigrations(userDocument);
 

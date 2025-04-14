@@ -24,6 +24,14 @@ export function findDocument<T>(docId: AutomergeDocumentId<T>, repo = getRepo())
   return repo.find<T>(docId);
 }
 
+export function createDocument<T>(initialValue?: Partial<T>, repo = getRepo()): DocHandle<T> {
+  return repo.create<T>(initialValue as T);
+}
+
+export function deleteDocument<T>(docId: AutomergeDocumentId<T>, repo = getRepo()) {
+  return repo.find<T>(docId).delete();
+}
+
 export function migrate<T extends { version: number }>(docHandle: DocHandle<T>, migrations: Record<number, (doc: T) => (Promise<void> | void)>) {
   docHandle.change(async (doc) => {
     const version = doc.version || 0;

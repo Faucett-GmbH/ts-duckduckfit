@@ -9,18 +9,37 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
-	import { getWorkoutTemplates, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
+	import {
+		deleteWorkoutTemplate,
+		getWorkoutTemplates,
+		type WorkoutTemplate
+	} from '$lib/state/workoutTemplates.svelte';
 	import WorkoutTemplateComponent from '$lib/components/workout/WorkoutTemplate.svelte';
+	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let offset = $state(0);
 	let limit = $state(10);
-	let workoutTemplates = $state<WorkoutTemplate[]>([]);
+	let workoutTemplates = $state<
+		[key: AutomergeDocumentId<WorkoutTemplate>, value: WorkoutTemplate][]
+	>([]);
 
 	$effect(() => {
 		getWorkoutTemplates(offset, limit).then((newWorkoutTemplates) => {
 			workoutTemplates.push(...newWorkoutTemplates);
 		});
 	});
+
+	function createOnDelete(
+		workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>,
+		workoutTemplate: WorkoutTemplate
+	) {
+		return async () => {
+			const index = workoutTemplates.findIndex(([id]) => id === workoutTemplateId);
+			if (index !== -1) {
+				workoutTemplates.splice(index, 1);
+			}
+		};
+	}
 </script>
 
 <svelte:head>
@@ -38,10 +57,14 @@
 			</div>
 		</div>
 		<div class="flex flex-col">
-			{#each workoutTemplates as workoutTemplate}
+			{#each workoutTemplates as [workoutTemplateId, workoutTemplate] (workoutTemplateId)}
 				<div class="mb-4 flex flex-grow flex-col">
 					<div class="card flex flex-shrink flex-col">
-						<WorkoutTemplateComponent {workoutTemplate} />
+						<WorkoutTemplateComponent
+							{workoutTemplateId}
+							{workoutTemplate}
+							onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
+						/>
 					</div>
 				</div>
 			{/each}

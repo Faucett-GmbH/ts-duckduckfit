@@ -24,8 +24,8 @@ export class Numbers {
 			.replace(this.numeral, this.index);
 		return parsed ? +parsed : NaN;
 	}
-	format(x: number, fractionDigits: number = 0) {
-		if (fractionDigits < 1) {
+	format(x: number, fractionDigits?: number) {
+		if (fractionDigits !== undefined && fractionDigits < 1) {
 			return Math.round(x).toString();
 		}
 		if (x % 1 === 0) {

@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	export interface WorkoutTemplateProps {
+		workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>;
 		workoutTemplate: WorkoutTemplate;
 		editReferrer?: string;
 		onDelete?(): Promise<void>;
@@ -19,12 +20,14 @@
 	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import { ExerciseExecutionTypeEnum } from '$lib/openapi/exdb';
+	import type { AutomergeDocumentId } from '$lib/repo';
 
-	let { workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps = $props();
+	let { workoutTemplateId, workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps =
+		$props();
 
 	async function onDeleteInternal() {
 		try {
-			await deleteWorkoutTemplate(workoutTemplate.id);
+			await deleteWorkoutTemplate(workoutTemplateId);
 			deleteOpen = false;
 			if (onDelete) {
 				await onDelete();
@@ -45,13 +48,13 @@
 		<button class="btn danger icon me-2" onclick={onOpenDelete}><Trash /></button>
 		<a
 			class="btn primary icon"
-			href={`${base}/workout-templates/${workoutTemplate.id}/edit${editReferrer ? `?referrer=${encodeURIComponent(editReferrer)}` : ''}`}
+			href={`${base}/workout-templates/${workoutTemplateId}/edit${editReferrer ? `?referrer=${encodeURIComponent(editReferrer)}` : ''}`}
 			><Pencil /></a
 		>
 	</div>
 </div>
 <div class="flex flex-col">
-	{#each workoutTemplate.setGroupTemplates as setGroupTemplate (setGroupTemplate.id)}
+	{#each workoutTemplate.setGroupTemplates as setGroupTemplate}
 		<div class="mb-4 flex flex-col">
 			<div class="mb-2 flex flex-row">
 				<div
@@ -74,7 +77,7 @@
 					class:border-winter-hazel-500={setGroupTemplate.setGroupType === 'superset'}
 				></div>
 				<div class="flex flex-grow flex-col rounded-lg">
-					{#each setGroupTemplate.setTemplates as setTemplate, index (setTemplate.id)}
+					{#each setGroupTemplate.setTemplates as setTemplate, index}
 						{@const position = getRealSetPosition(
 							setGroupTemplate.setTemplates,
 							setTemplate,
