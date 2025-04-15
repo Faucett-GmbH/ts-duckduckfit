@@ -4,6 +4,7 @@ import { findDocument, migrate, getRepo, type AutomergeDocumentId, createDocumen
 import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userMigrations, type User } from './user.svelte';
 import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
+import { lazy } from '$lib/util';
 
 export interface UserDocument {
 	version: number;
@@ -28,10 +29,6 @@ async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
 	}
 	await migrate(findDocument(userDocument.user), userMigrations);
 	await migrate(findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
-}
-
-export interface UserDocumentIds {
-	[username: string]: AutomergeDocumentId<UserDocument>;
 }
 
 export class CurrentUserDocument {
@@ -64,62 +61,28 @@ export class CurrentUserDocument {
 	}
 }
 
-const userDocumentIds = localStorageState<UserDocumentIds>('user-document-ids', {});
-const currentUsername = localStorageState<string | null>('current-username', null);
-const currentUserDocumentId = $derived<AutomergeDocumentId<UserDocument> | null>(userDocumentIds.value[currentUsername.value || ''] || null);
-const currentUserDocument = $derived<CurrentUserDocument | null>(currentUserDocumentId ? new CurrentUserDocument(currentUserDocumentId) : null);
+const currentUserDocumentId = localStorageState<AutomergeDocumentId<UserDocument> | null>('user-document-id', null);
+const currentUserDocument = $derived<CurrentUserDocument | null>(currentUserDocumentId.value ? new CurrentUserDocument(currentUserDocumentId.value) : null);
 
 export const userDocument = {
-	get username() {
-		return currentUsername.value;
-	},
 	get documentId() {
 		return currentUserDocumentId;
 	},
 	get current() {
 		return currentUserDocument;
-	},
-	clear() {
-		currentUsername.value = null;
 	}
 }
 
-export async function signUp(username: string) {
-	const state = userDocumentIds.value;
-	if (state[username]) {
-		throw InternalError.from('errors_name_user', 'errors_message_already_exists');
+export async function initUserDocument() {
+	if (currentUserDocumentId.value == null) {
+		const userDocument = createDocument<UserDocument>();
+		await userDocument.whenReady();
+		await runAllMigrations(userDocument);
+		currentUserDocumentId.value = userDocument.documentId as AutomergeDocumentId<UserDocument>;
+	} else {
+		const userDocument = findDocument(currentUserDocumentId.value);
+		await userDocument.whenReady();
+		await runAllMigrations(userDocument);
 	}
-	const userDocument = createDocument<UserDocument>();
-	await userDocument.whenReady();
-	await runAllMigrations(userDocument);
-
-	const user = findDocument(userDocument.docSync()!.user);
-	await user.whenReady();
-
-	state[username] = userDocument.documentId as AutomergeDocumentId<UserDocument>;
-
-	userDocumentIds.value = state;
-	currentUsername.value = username;
-}
-
-export async function signIn(username: string) {
-	const state = userDocumentIds.value;
-	const userDocumentId = state[username];
-	if (!userDocumentId) {
-		throw InternalError.from('errors_name_user', 'errors_message_invalid_credentials');
-	}
-	const userDocument = findDocument(userDocumentId);
-	await userDocument.whenReady();
-	await runAllMigrations(userDocument);
-	currentUsername.value = username;
-}
-
-export async function signInWithDocumentId(username: string, userDocumentId: AutomergeDocumentId<UserDocument>) {
-	const state = userDocumentIds.value;
-	const userDocument = findDocument(userDocumentId);
-	await userDocument.whenReady();
-	await runAllMigrations(userDocument);
-
-	state[username] = userDocument.documentId as AutomergeDocumentId<UserDocument>;
-	currentUsername.value = username;
+	return currentUserDocument!;
 }

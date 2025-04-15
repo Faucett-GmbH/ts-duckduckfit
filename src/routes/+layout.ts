@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { initAutomerge } from '$lib/repo';
+import { initUserDocument, userDocument } from '$lib/state/userDocument.svelte';
 import type { LayoutLoad } from './$types';
 
 export const prerender = true;
@@ -10,4 +11,9 @@ export const load: LayoutLoad = async (event) => {
 		await initAutomerge();
 	}
 	await event.parent();
+	const currentUserDocument = userDocument.current ?? await initUserDocument();
+	return {
+		currentUserDocument,
+		user: await currentUserDocument.user(),
+	};
 };

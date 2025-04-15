@@ -2,27 +2,17 @@
 	import { m } from '$lib/paraglide/messages';
 	import { base } from '$app/paths';
 	import Dropdown from '$lib/components/Dropdown.svelte';
-	import LogIn from 'lucide-svelte/icons/log-in';
-	import LogOut from 'lucide-svelte/icons/log-out';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import User from 'lucide-svelte/icons/user';
 	import Dumbbell from 'lucide-svelte/icons/dumbbell';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
-	import { userDocument } from '$lib/state/userDocument.svelte';
 	import Logo from './Logo.svelte';
 	import logoHorizontalWEBP from '$lib/assets/logo-horizontal.webp';
-	import { goto } from '$app/navigation';
 
 	let open = $state(false);
 	function onGoto() {
 		open = false;
-	}
-
-	function onSignOut() {
-		userDocument.clear();
-		goto(`${base}/signin`);
-		onGoto();
 	}
 </script>
 
@@ -54,48 +44,28 @@
 						<Menu />
 					</button>
 				{/snippet}
-				{#if userDocument.documentId}
-					<a
-						href={`${base}/profile`}
-						class={{
-							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(authed)/profile'
-						}}
-						class:active={page.route.id === '/(authed)/profile'}
-						onclick={onGoto}
-					>
-						<User /><span class="ms-4">{m.profile_title()}</span>
-					</a>
-					<a
-						href={`${base}/workout-templates`}
-						class={{
-							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(authed)/workout-templates'
-						}}
-						class:active={page.route.id === '/(authed)/workout-templates'}
-						onclick={onGoto}
-					>
-						<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
-					</a>
-					<button
-						class="flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600"
-						onclick={onSignOut}
-					>
-						<LogOut /><span class="ms-4">{m.auth_sign_out()}</span>
-					</button>
-				{:else}
-					<a
-						href={`${base}/signin`}
-						class={{
-							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(authed)/signin'
-						}}
-						class:active={page.route.id === '/(authed)/signin'}
-						onclick={onGoto}
-					>
-						<LogIn /><span class="ms-4">{m.auth_sign_in()}</span>
-					</a>
-				{/if}
+				<a
+					href={`${base}/profile`}
+					class={{
+						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+						'bg-black/10': page.route.id === '/(authed)/profile'
+					}}
+					class:active={page.route.id === '/(authed)/profile'}
+					onclick={onGoto}
+				>
+					<User /><span class="ms-4">{m.profile_title()}</span>
+				</a>
+				<a
+					href={`${base}/workout-templates`}
+					class={{
+						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+						'bg-black/10': page.route.id === '/(authed)/workout-templates'
+					}}
+					class:active={page.route.id === '/(authed)/workout-templates'}
+					onclick={onGoto}
+				>
+					<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
+				</a>
 			</Dropdown>
 		</div>
 	</div>
