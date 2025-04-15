@@ -33,7 +33,7 @@
 	import classNames from 'vest/classnames';
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
-	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
+	import MeasurementInput, { type Units } from '$lib/components/inputs/MeasurementInput.svelte';
 	import type { EventHandler } from 'svelte/elements';
 	import { handleError } from '$lib/error';
 
@@ -65,10 +65,17 @@
 		validate();
 		validate.flush();
 	}
-	const onChange: EventHandler<Event, HTMLSpanElement> = (e) => {
-		fields.add((e.currentTarget as HTMLInputElement).name);
+	function onMeasurementChange(
+		_metricValue: number,
+		_metricUnits: Units<'METRIC', any>,
+		name?: string
+	) {
+		if (!name) {
+			return;
+		}
+		fields.add(name);
 		validate();
-	};
+	}
 
 	async function onInternalSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -96,7 +103,7 @@
 			name="weightInKg"
 			bind:metricValue={weightInKg}
 			metricUnits="kg"
-			oninput={onChange}
+			oninput={onMeasurementChange}
 		/>
 		<InputResults name="weightInKg" {result} />
 	</div>

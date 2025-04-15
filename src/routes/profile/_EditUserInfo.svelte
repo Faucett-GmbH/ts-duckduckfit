@@ -39,7 +39,7 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
-	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
+	import MeasurementInput, { type Units } from '$lib/components/inputs/MeasurementInput.svelte';
 
 	let { birthdate, heightInCm, onUpdate }: EditUserInfoProps = $props();
 
@@ -72,13 +72,21 @@
 		validate();
 		validate.flush();
 	}
-	function onChange(e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }) {
-		fields.add(e.currentTarget.name);
+	function onMeasurementChange(
+		_metricValue: number,
+		_metricUnits: Units<'METRIC', any>,
+		name?: string
+	) {
+		if (!name) {
+			return;
+		}
+		fields.add(name);
 		validate();
 	}
 	function onBirthdateChange(e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }) {
 		birthdate = new Date(birthdateString || '');
-		onChange(e);
+		fields.add(e.currentTarget.name);
+		validate();
 	}
 
 	async function onSubmit(e: SubmitEvent) {
@@ -108,7 +116,7 @@
 			type="distance"
 			metricUnits={'cm'}
 			bind:metricValue={heightInCmValue}
-			oninput={onChange}
+			oninput={onMeasurementChange}
 		/>
 		<InputResults name="heightInCm" {result} />
 	</div>

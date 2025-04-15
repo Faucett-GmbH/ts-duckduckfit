@@ -29,6 +29,13 @@
 	}: AutosizeInputProps = $props();
 
 	let innerText = $state((value ?? '') + '');
+	let lastValue = value;
+	$effect(() => {
+		if (lastValue !== value) {
+			innerText = (value ?? '') + '';
+			lastValue = value;
+		}
+	});
 
 	$effect(() => {
 		value = innerText;

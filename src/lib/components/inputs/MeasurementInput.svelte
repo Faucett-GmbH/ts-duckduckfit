@@ -510,6 +510,8 @@
 				? [valueNumber, units]
 				: toMetric(valueNumber, type, units as Units<'IMPERIAL', T>);
 		[metricValue, metricUnits] = convertMetricUnits(v, type, u as Units<'METRIC', T>, metricUnits);
+		oninput?.call(window, metricValue, metricUnits, name);
+		onchange?.call(window, metricValue, metricUnits, name);
 	});
 
 	const onUnitChange: EventHandler<Event, HTMLSelectElement> = (e) => {
