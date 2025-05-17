@@ -11,6 +11,7 @@
 	import EditUserInfo, { type EditUserInfoForm } from './_EditUserInfo.svelte';
 	import EditUserPreferences, { type EditUserPreferencesForm } from './_EditUserPreferences.svelte';
 	import EditUserWeights from './_EditUserWeights.svelte';
+	import Sync from './_Sync.svelte';
 
 	let { data }: Props = $props();
 
@@ -101,5 +102,12 @@
 				/>
 			</div>
 		{/if}
+	</div>
+	<div class="card flex flex-col">
+		<Sync
+			deviceId={data.deviceId}
+			sync={data.sync}
+			currentUserDocument={data.currentUserDocument}
+		/>
 	</div>
 </div>

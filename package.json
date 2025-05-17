@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@aicacia/hash": "^0.2.3",
+		"@automerge/automerge-repo-network-websocket": "^1.2.1",
 		"@eslint/compat": "^1.2.7",
 		"@eslint/js": "^9.23.0",
 		"@inlang/cli": "^3.0.7",
@@ -52,16 +53,20 @@
 	},
 	"dependencies": {
 		"@aicacia/debounce": "^0.1.23",
+		"@aicacia/keepalivewebsocket": "^0.1.2",
+		"@aicacia/peer": "^0.1.5",
 		"@automerge/automerge": "^2.2.8",
 		"@automerge/automerge-repo": "^1.2.1",
-		"@automerge/automerge-repo-network-websocket": "^1.2.1",
 		"@automerge/automerge-repo-storage-indexeddb": "^1.2.1",
+		"@fingerprintjs/fingerprintjs": "^4.6.2",
 		"@svelte-put/clickoutside": "^4.0.0",
+		"cbor-x": "^1.6.0",
 		"eventemitter3": "^5.0.1",
 		"lucide-svelte": "^0.483.0",
 		"qrcode": "^1.5.4",
 		"svelte-localstorage-writable": "^0.1.3",
 		"svelte-portal": "^2.2.1",
+		"uuid": "^11.1.0",
 		"vest": "^5.4.6"
 	},
 	"pnpm": {

@@ -4,10 +4,10 @@ import { Numbers } from '$lib/Numbers';
 import { baseLocale, locales, setLocale, type Locale } from '$lib/paraglide/runtime';
 
 let browserLanguage = $state(browser && navigator.language ? navigator.language : 'en-US');
-let browserLocale = $derived(browserLanguage.split('-')[0]);
+const browserLocale = $derived.by(() => browserLanguage.split('-')[0]);
 
 const locale = localStorageState<Locale>("locale", locales.includes(browserLocale as Locale) ? browserLocale as Locale : baseLocale);
-let numbers = $derived(new Numbers(locale.value));
+const numbers = $derived.by(() => new Numbers(locale.value));
 
 export const language = {
 	get locale() {

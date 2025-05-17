@@ -85,7 +85,7 @@
 	}
 	function onBirthdateChange(e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }) {
 		birthdate = new Date(birthdateString || '');
-		fields.add(e.currentTarget.name);
+		fields.add('birthdate');
 		validate();
 	}
 

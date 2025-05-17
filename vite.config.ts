@@ -37,7 +37,11 @@ export default defineConfig(async ({ mode }) => {
 		plugins: [
 			tailwindcss(),
 			sveltekit(),
-			paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide', strategy: ['baseLocale', 'preferredLanguage'], }),
+			paraglideVitePlugin({
+				project: './project.inlang',
+				outdir: './src/lib/paraglide',
+				strategy: ['baseLocale', 'preferredLanguage'],
+			}),
 		],
 		build: {
 			target:

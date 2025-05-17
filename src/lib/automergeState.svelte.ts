@@ -1,5 +1,5 @@
 import type { DocHandle, DocHandleChangePayload } from '@automerge/automerge-repo/slim';
-import { findDocument, type AutomergeDocumentId } from './repo';
+import { findDocument, type AutomergeDocHandle, type AutomergeDocumentId } from './repo';
 
 export type AutomergeState<T> = ReturnType<typeof automergeState<T>>;
 
@@ -31,7 +31,7 @@ export function automergeDocHandleState<T>(docHandle: DocHandle<T>) {
       return doc;
     },
     get docHandle() {
-      return docHandle;
+      return docHandle as AutomergeDocHandle<T>;
     },
     change(fn: (d: T) => T) {
       docHandle.change(fn);

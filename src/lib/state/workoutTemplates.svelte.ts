@@ -48,7 +48,7 @@ export interface WorkoutTemplates {
 }
 
 export const workoutTemplatesMigrations = {
-  1: (workoutTemplates: WorkoutTemplates) => {
+  1: () => (workoutTemplates: WorkoutTemplates) => {
     workoutTemplates.version = 1;
     workoutTemplates.workoutTemplatesById = {};
   }
