@@ -26,18 +26,18 @@ export const userDocumentMigrations = {
 
 async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
 	await migrate(userDocumentHandle, userDocumentMigrations);
-	const userDocument = await userDocumentHandle.doc();
+	const userDocument = userDocumentHandle.doc();
 	if (!userDocument) {
 		throw InternalError.from('errors_name_application', 'errors_message_application');
 	}
-	await migrate(findDocument(userDocument.user), userMigrations);
-	await migrate(findDocument(userDocument.sync), syncMigrations);
-	await migrate(findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
+	await migrate(await findDocument(userDocument.user), userMigrations);
+	await migrate(await findDocument(userDocument.sync), syncMigrations);
+	await migrate(await findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
 }
 
 export class CurrentUserDocument {
 	#userDocumentId: AutomergeDocumentId<UserDocument>;
-	#userDocumentDocHandle: DocHandle<UserDocument>;
+	#userDocumentDocHandle: Promise<DocHandle<UserDocument>>;
 
 	constructor(userDocumentId: AutomergeDocumentId<UserDocument>) {
 		this.#userDocumentId = userDocumentId;
@@ -53,11 +53,12 @@ export class CurrentUserDocument {
 	userDocumentId() {
 		return this.#userDocumentId;
 	}
-	userDocumentHandle() {
-		return this.#userDocumentDocHandle;
+	async userDocumentHandle() {
+		return await this.#userDocumentDocHandle;
 	}
 	async userDocument() {
-		const userDocument = await this.#userDocumentDocHandle.doc();
+		const userDocumentHandle = await this.userDocumentHandle();
+		const userDocument = userDocumentHandle.doc();
 		if (!userDocument) {
 			throw InternalError.from('errors_name_application', 'errors_message_application');
 		}
@@ -98,7 +99,7 @@ export async function getOrInitUserDocument() {
 		await runAllMigrations(userDocument);
 		currentUserDocumentId.value = userDocument.documentId;
 	} else {
-		const userDocument = findDocument(currentUserDocumentId.value);
+		const userDocument = await findDocument(currentUserDocumentId.value);
 		await userDocument.whenReady();
 		await runAllMigrations(userDocument);
 	}
@@ -109,7 +110,7 @@ export async function getOrInitUserDocument() {
 
 export async function setUserDocumentId(userDocumentId: AutomergeDocumentId<UserDocument>) {
 	currentUserDocumentId.value = userDocumentId;
-	const userDocument = findDocument(userDocumentId);
+	const userDocument = await findDocument(userDocumentId);
 	await userDocument.whenReady();
 	await runAllMigrations(userDocument);
 	return currentUserDocument!;

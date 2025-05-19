@@ -85,7 +85,7 @@
 						case 'created': {
 							if (newDevice) {
 								const syncHandle = await currentUserDocument.sync();
-								const sync = await syncHandle.doc();
+								const sync = syncHandle.doc();
 								if (sync) {
 									onAdd(newDevice.deviceId, newDevice.userAgent);
 									ws.send(

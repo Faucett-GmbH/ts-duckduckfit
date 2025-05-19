@@ -30,6 +30,7 @@ export type RoomMessage = RoomSignalMessage | RoomPeerMessage;
 
 interface WebRTCClientAdapterInternalEvents {
   init(): void;
+  ready(): void;
 }
 
 export class WebRTCClientAdapter extends NetworkAdapter {
@@ -45,6 +46,16 @@ export class WebRTCClientAdapter extends NetworkAdapter {
   #room?: string;
   #password?: string;
   #deviceId?: string;
+
+  isReady() {
+    return this.#ready;
+  }
+  whenReady() {
+    if (this.#ready) {
+      return Promise.resolve();
+    }
+    return new Promise<void>(resolve => this.#emitter.once("ready", resolve));
+  }
 
   init(deviceId: string, room: string, password: string) {
     this.#deviceId = deviceId;
@@ -142,7 +153,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
         this.#remotePeerIds.set(fromDeviceId, message.senderId);
         if (!this.#ready) {
           this.#ready = true;
-          this.emit("ready", { network: this });
+          this.#emitter.emit("ready");
         }
         this.emit("peer-candidate", {
           peerId: message.senderId,
@@ -155,7 +166,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
         this.#remotePeerIds.set(fromDeviceId, message.senderId);
         if (!this.#ready) {
           this.#ready = true;
-          this.emit("ready", { network: this });
+          this.#emitter.emit("ready");
         }
         this.emit("peer-candidate", {
           peerId: message.senderId,

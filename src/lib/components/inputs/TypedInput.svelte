@@ -42,7 +42,7 @@
 		value = ((value ?? 0) + '').replace(NUMERIC_RE, '');
 		const newValueNumber = language.numbers.parse(value);
 		if (isNaN(newValueNumber)) {
-			value = '';
+			value = '0';
 		}
 		if (lastValueNumber !== newValueNumber) {
 			oninput?.(newValueNumber, name);

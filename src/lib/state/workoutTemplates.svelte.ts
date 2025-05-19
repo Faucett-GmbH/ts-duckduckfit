@@ -60,15 +60,15 @@ export async function getWorkoutTemplates(offset: number, limit: number): Promis
   const endOffset = startOffset + limit - 1;
   const workoutTemplateIds = Object.keys(workoutTemplates.workoutTemplatesById).slice(startOffset, endOffset) as AutomergeDocumentId<WorkoutTemplate>[];
   const repo = getRepo();
-  return await Promise.all(workoutTemplateIds.map(async id => [id, (await findDocument(id, repo).doc())!]));
+  return await Promise.all(workoutTemplateIds.map(async id => [id, (await findDocument(id, repo)).doc()!]));
 }
 
 export async function getWorkoutTemplateById(workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>): Promise<WorkoutTemplate | null> {
-  const workoutTemplateDocHandle = findDocument(workoutTemplateId);
+  const workoutTemplateDocHandle = await findDocument(workoutTemplateId);
   if (!workoutTemplateDocHandle) {
     return null;
   }
-  return await workoutTemplateDocHandle.doc() || null;
+  return workoutTemplateDocHandle.doc() || null;
 }
 
 export async function deleteWorkoutTemplate(workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>) {
@@ -88,7 +88,7 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
     });
     workoutTemplateId = workoutTemplateDocument.documentId as AutomergeDocumentId<WorkoutTemplate>;
   } else {
-    workoutTemplateDocument = findDocument(workoutTemplateId)
+    workoutTemplateDocument = await findDocument(workoutTemplateId)
   }
   const documentId = workoutTemplateId;
   workoutTemplates.change((wts) => {

@@ -59,6 +59,13 @@
 		})
 	);
 
+	$effect(() => {
+		heightInCmValue = heightInCm || heightInCmValue;
+	});
+	$effect(() => {
+		birthdateString = birthdate?.toISOString().substring(0, 10) || birthdateString;
+	});
+
 	const fields = new Set<string>();
 	const validate = debounce(() => {
 		suite({ birthdate, heightInCm: heightInCmValue }, Array.from(fields)).done((r) => {

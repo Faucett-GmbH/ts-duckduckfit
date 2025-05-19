@@ -438,11 +438,17 @@
 	let valueNumber = $state(0);
 	let valueString = $state('0');
 	let units = $state<Units<S, T>>();
+	let metricValueLast = $state(metricValue);
 	let metricUnitsLast = $state(metricUnits);
 	let typeLast = $state(type);
 	let first = $state(true);
 
+	function shouldUpdate() {
+		return metricValueLast !== metricValue || metricUnitsLast !== metricUnits || typeLast !== type;
+	}
+
 	function preventUpdate() {
+		metricValueLast = metricValue;
 		metricUnitsLast = metricUnits;
 		typeLast = type;
 		first = false;
@@ -486,7 +492,7 @@
 	});
 
 	$effect(() => {
-		if (!first && metricUnitsLast === metricUnits && typeLast === type) {
+		if (!first && !shouldUpdate()) {
 			return;
 		}
 		const [v, u] =
@@ -501,7 +507,7 @@
 	});
 
 	$effect(() => {
-		valueNumber = language.numbers.parse(valueString);
+		valueNumber = language.numbers.parse(valueString) || 0;
 	});
 
 	$effect(() => {

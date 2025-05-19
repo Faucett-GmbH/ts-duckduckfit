@@ -1,16 +1,13 @@
 import type { DocHandle, DocHandleChangePayload } from '@automerge/automerge-repo/slim';
-import { findDocument, type AutomergeDocHandle, type AutomergeDocumentId } from './repo';
+import type { AutomergeDocHandle } from './repo';
 
-export type AutomergeState<T> = ReturnType<typeof automergeState<T>>;
-
-export function automergeState<T>(documentId: AutomergeDocumentId<T>) {
-  return automergeDocHandleState(findDocument(documentId));
-}
+export type AutomergeState<T> = ReturnType<typeof automergeDocHandleState<T>>;
 
 export function automergeDocHandleState<T>(docHandle: DocHandle<T>) {
-  let doc = $state(docHandle.docSync());
+  let doc = $state(docHandle.doc());
 
   function onChange(payload: DocHandleChangePayload<T>) {
+    console.log(payload);
     doc = payload.doc;
   }
 
@@ -19,12 +16,6 @@ export function automergeDocHandleState<T>(docHandle: DocHandle<T>) {
   $effect(() => {
     return () => docHandle.removeListener("change", onChange);
   });
-
-  if (!doc) {
-    docHandle.doc().then(d => {
-      doc = d;
-    });
-  }
 
   return {
     get doc() {
