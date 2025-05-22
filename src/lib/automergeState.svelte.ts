@@ -7,7 +7,6 @@ export function automergeDocHandleState<T>(docHandle: DocHandle<T>) {
   let doc = $state(docHandle.doc());
 
   function onChange(payload: DocHandleChangePayload<T>) {
-    console.log(payload);
     doc = payload.doc;
   }
 

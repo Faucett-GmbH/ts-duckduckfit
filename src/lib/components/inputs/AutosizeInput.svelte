@@ -46,7 +46,7 @@
 			e.preventDefault();
 			return;
 		}
-		await waitMS(300);
+		await waitMS(0);
 		if (inputElement) {
 			scrollIntoViewIfNeed(inputElement);
 		}

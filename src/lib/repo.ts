@@ -39,7 +39,7 @@ export async function migrate<T extends { version: number }>(docHandle: DocHandl
     if (migrationFn) {
       const changeFn = await migrationFn(doc);
       docHandle.change(changeFn);
-      doc = await docHandle.docSync()!;
+      doc = await docHandle.doc()!;
     }
   }
 }

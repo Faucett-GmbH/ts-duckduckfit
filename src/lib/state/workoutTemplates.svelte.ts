@@ -55,7 +55,7 @@ export const workoutTemplatesMigrations = {
 };
 
 export async function getWorkoutTemplates(offset: number, limit: number): Promise<[key: AutomergeDocumentId<WorkoutTemplate>, value: WorkoutTemplate][]> {
-  const workoutTemplates = (await userDocument.current!.workoutTemplates()).docSync()!;
+  const workoutTemplates = (await userDocument.current!.workoutTemplates()).doc()!;
   const startOffset = offset * limit;
   const endOffset = startOffset + limit - 1;
   const workoutTemplateIds = Object.keys(workoutTemplates.workoutTemplatesById).slice(startOffset, endOffset) as AutomergeDocumentId<WorkoutTemplate>[];

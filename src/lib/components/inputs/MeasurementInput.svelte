@@ -96,10 +96,10 @@
 		return feet * 0.000189394;
 	}
 	export function feetToInches(feet: number) {
-		return feet * 0.08333333333333333;
+		return feet * 12;
 	}
 	export function inchesToFeet(inches: number) {
-		return inches * 12;
+		return inches * 0.08333333333333333;
 	}
 	export function yardsInFeet(yards: number) {
 		return yards * 0.333333;
@@ -438,26 +438,24 @@
 	let valueNumber = $state(0);
 	let valueString = $state('0');
 	let units = $state<Units<S, T>>();
-	let metricValueLast = $state(metricValue);
-	let metricUnitsLast = $state(metricUnits);
-	let typeLast = $state(type);
-	let first = $state(true);
-
-	function shouldUpdate() {
-		return metricValueLast !== metricValue || metricUnitsLast !== metricUnits || typeLast !== type;
-	}
-
-	function preventUpdate() {
-		metricValueLast = metricValue;
-		metricUnitsLast = metricUnits;
-		typeLast = type;
-		first = false;
-	}
+	let valueNumberLast: typeof valueNumber;
+	let unitsLast: typeof units;
+	let metricValueLast: typeof metricValue;
+	let metricUnitsLast: typeof metricUnits;
+	let typeLast: typeof type;
+	let systemLast: typeof system;
+	let allowConvert = true;
+	let first = true;
 
 	$effect(() => {
-		if (!first && metricUnitsLast === metricUnits && typeLast === type) {
+		if (systemLast === system && typeLast === type) {
 			return;
 		}
+		systemLast = system;
+		typeLast = type;
+		allowConvert = true;
+		first = true;
+
 		if (system === 'METRIC') {
 			if (type === 'any') {
 				unitOptions = BOTH_OPTIONS;
@@ -487,43 +485,70 @@
 		}
 		if (!units || !unitOptions.some((uo) => uo.units === units)) {
 			units = unitOptions[0].units as never;
-			first = true;
 		}
 	});
 
 	$effect(() => {
-		if (!first && !shouldUpdate()) {
+		if (valueNumberLast === valueNumber && unitsLast === units && typeLast === type) {
 			return;
 		}
-		const [v, u] =
-			system === 'METRIC'
-				? first
-					? metricToReadable(metricValue, type, metricUnits)
-					: [metricValue, metricUnits]
-				: toImperial(metricValue, type, metricUnits, first);
-		valueString = language.numbers.format(v, initialFractionDigits);
-		units = u as Units<S, T>;
-		preventUpdate();
-	});
+		valueNumberLast = valueNumber;
+		unitsLast = units;
+		typeLast = type;
 
-	$effect(() => {
-		valueNumber = language.numbers.parse(valueString) || 0;
-	});
-
-	$effect(() => {
 		const [v, u] =
 			system === 'METRIC'
 				? [valueNumber, units]
 				: toMetric(valueNumber, type, units as Units<'IMPERIAL', T>);
-		[metricValue, metricUnits] = convertMetricUnits(v, type, u as Units<'METRIC', T>, metricUnits);
+		const [newMetricValue, newMetricUnits] = convertMetricUnits(
+			v,
+			type,
+			u as Units<'METRIC', T>,
+			metricUnits
+		);
+		metricValue = metricValueLast = newMetricValue;
+		metricUnits = metricUnitsLast = newMetricUnits;
 		oninput?.call(window, metricValue, metricUnits, name);
 		onchange?.call(window, metricValue, metricUnits, name);
 	});
 
+	$effect(() => {
+		if (
+			!first &&
+			metricValueLast === metricValue &&
+			metricUnitsLast === metricUnits &&
+			typeLast === type
+		) {
+			return;
+		}
+		metricValueLast = metricValue;
+		metricUnitsLast = metricUnits;
+		typeLast = type;
+		first = false;
+
+		const [v, u] =
+			system === 'METRIC'
+				? allowConvert
+					? metricToReadable(metricValue, type, metricUnits)
+					: [metricValue, metricUnits]
+				: toImperial(metricValue, type, metricUnits, allowConvert);
+		if (allowConvert) {
+			allowConvert = false;
+			units = u as never;
+		}
+		valueNumber = valueNumberLast = v;
+		valueString = language.numbers.format(v, initialFractionDigits);
+	});
+
+	function onValueNumberChange(value: number, _name?: string) {
+		valueNumber = value;
+		valueString = language.numbers.format(valueNumber, initialFractionDigits);
+	}
+
 	const onUnitChange: EventHandler<Event, HTMLSelectElement> = (e) => {
 		const previousUnits = units;
 		const nextUnits = e.currentTarget.value;
-		const [v, _u] =
+		const [v, u] =
 			system === 'METRIC'
 				? convertMetricUnits(
 						valueNumber,
@@ -537,9 +562,10 @@
 						previousUnits as Units<'IMPERIAL', T>,
 						nextUnits as Units<'IMPERIAL', T>
 					);
-		valueString = language.numbers.format(v, fractionDigits);
-		oninput?.call(window, metricValue, metricUnits, name);
-		onchange?.call(window, metricValue, metricUnits, name);
+		allowConvert = false;
+		valueNumber = v;
+		valueString = language.numbers.format(valueNumber, initialFractionDigits);
+		units = u as never;
 	};
 </script>
 
@@ -549,7 +575,8 @@
 		{id}
 		{name}
 		{disabled}
-		bind:value={valueString}
+		value={valueString}
+		oninput={onValueNumberChange}
 		unit={unitOptions.length === 1 ? unitOptions[0].units : undefined}
 	/>
 	{#if unitOptions.length > 1}<select
@@ -557,7 +584,7 @@
 			aria-label="Units"
 			{disabled}
 			oninput={onUnitChange}
-			bind:value={units}
+			value={units}
 		>
 			{#each unitOptions as unitOption}
 				<option value={unitOption.units} title={unitOption.name}>{unitOption.units}</option>

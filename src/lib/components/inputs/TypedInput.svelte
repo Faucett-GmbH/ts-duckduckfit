@@ -37,23 +37,34 @@
 		selectElementContents(inputElement!);
 	};
 
-	let lastValueNumber = $state<number>();
+	const onChange: EventHandler<Event, HTMLSpanElement> = (e) => {
+		oninput?.(valueNumber, name);
+	};
+
+	const onInput: EventHandler<KeyboardEvent, HTMLSpanElement> = (e) => {
+		onchange?.(valueNumber, name);
+	};
+
+	let valueNumber: number;
 	$effect(() => {
 		value = ((value ?? 0) + '').replace(NUMERIC_RE, '');
 		const newValueNumber = language.numbers.parse(value);
 		if (isNaN(newValueNumber)) {
 			value = '0';
+		} else {
+			valueNumber = newValueNumber;
 		}
-		if (lastValueNumber !== newValueNumber) {
-			oninput?.(newValueNumber, name);
-			onchange?.(newValueNumber, name);
-		}
-		lastValueNumber = newValueNumber;
 	});
 </script>
 
 <span {tabindex} role="textbox" onfocuscapture={onFocus} class="cursor-text {className}"
-	><AutosizeInput bind:inputElement {id} {name} {disabled} bind:value />{#if unit}<span
-			class="badge dark ms-1 inline p-1">{unit}</span
-		>{/if}</span
+	><AutosizeInput
+		bind:inputElement
+		{id}
+		{name}
+		{disabled}
+		bind:value
+		onchange={onChange}
+		oninput={onInput}
+	/>{#if unit}<span class="badge dark ms-1 inline p-1">{unit}</span>{/if}</span
 >
