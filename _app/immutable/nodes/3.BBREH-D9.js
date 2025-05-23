@@ -1,1 +1,0 @@
-import{L as l}from"../chunks/y9Y7vq5x.js";const o=async e=>{const{currentUserDocument:t}=await e.parent();return{workoutTemplates:await t.workoutTemplates()}},r=Object.freeze(Object.defineProperty({__proto__:null,load:o},Symbol.toStringTag,{value:"Module"}));export{l as component,r as universal};

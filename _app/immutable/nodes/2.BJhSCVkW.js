@@ -1,0 +1,1 @@
+import{g as r}from"../chunks/Cu1_8_3a.js";import{L as i}from"../chunks/DMxT9Aax.js";const o=!0,n=!1,a=async t=>{await t.parent();const e=await r();return{currentUserDocument:e,user:await e.user()}},c=Object.freeze(Object.defineProperty({__proto__:null,load:a,prerender:o,ssr:n},Symbol.toStringTag,{value:"Module"}));export{i as component,c as universal};
