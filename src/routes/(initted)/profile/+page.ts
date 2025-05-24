@@ -5,6 +5,6 @@ export const load: PageLoad = async (event) => {
   const { currentUserDocument } = await event.parent();
   return {
     sync: await currentUserDocument.sync(),
-    deviceId: await getDeviceId(),
+    currentDeviceId: await getDeviceId(),
   };
 };

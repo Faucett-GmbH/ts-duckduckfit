@@ -6,7 +6,7 @@ import { webRTCClientAdapter } from "$lib/sync";
 import { debounce } from "@aicacia/debounce";
 
 export interface SyncDevice {
-  userAgent: string;
+  name: string;
   createdAt: Date;
 }
 
@@ -25,7 +25,7 @@ export const syncMigrations = {
       sync.version = 1;
       sync.devices = {};
       sync.devices[deviceId] = {
-        userAgent: navigator.userAgent,
+        name: navigator.userAgent,
         createdAt: new Date()
       };
     }
@@ -66,10 +66,10 @@ export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
   }
 }
 
-export async function addSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string, userAgent: string) {
+export async function addSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string, name: string) {
   docHandle.change((doc) => {
     doc.devices[deviceId] = {
-      userAgent,
+      name,
       createdAt: new Date()
     };
     return doc;
@@ -77,3 +77,17 @@ export async function addSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceI
   webRTCClientAdapter.addDeviceId(deviceId);
 }
 
+export async function updateSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string, name: string) {
+  docHandle.change((doc) => {
+    doc.devices[deviceId].name = name;
+    return doc;
+  });
+}
+
+export function removeSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string) {
+  webRTCClientAdapter.removeDeviceId(deviceId);
+  docHandle.change((doc) => {
+    delete doc.devices[deviceId];
+    return doc;
+  });
+}

@@ -105,7 +105,7 @@
 	</div>
 	<div class="card flex flex-col">
 		<Sync
-			deviceId={data.deviceId}
+			currentDeviceId={data.currentDeviceId}
 			sync={data.sync}
 			currentUserDocument={data.currentUserDocument}
 		/>

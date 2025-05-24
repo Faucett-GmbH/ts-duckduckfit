@@ -7,7 +7,7 @@
 		type: 'device';
 		payload: {
 			deviceId: string;
-			userAgent: string;
+			name: string;
 		};
 	};
 	export type SyncMessageCreated = {
@@ -76,7 +76,7 @@
 					type: 'device',
 					payload: {
 						deviceId,
-						userAgent: navigator.userAgent
+						name: navigator.userAgent
 					}
 				} as SyncMessageDevice)
 			);

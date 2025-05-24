@@ -31,8 +31,6 @@
 	"sync_do_not_allow": "Do not allow",
 	"sync_allow": "Allow",
 	"sync_this_device": "This Device",
-	"sync_device_user_agent_label": "User Agent",
-	"sync_device_created_at": "Created At",
 	"user_info_title": "User Info",
 	"user_info_name_label": "Name",
 	"user_info_name_placeholder": "Enter Name",
@@ -97,5 +95,12 @@
 	"exercises_selector_finish": "Finish",
 	"exercises_selector_remove_title": "Remove Title",
 	"exercises_selector_remove_body": "Are you sure you want to remove this exercise? This is permanent and can not be undone.",
-	"exercises_selector_remove_submit": "Remove"
+	"exercises_selector_remove_submit": "Remove",
+	"sync_remove_device_title": "Remove Device",
+	"sync_remove_device_confirm": "Confirm",
+	"sync_remove_device_content": "Are you sure you want to remove {name}? This is perminant and can not be undone.",
+	"sync_device_name_label": "Name",
+	"sync_device_created_at_label": "Created At",
+	"sync_edit_device_title": "Edit Device",
+	"sync_device_update": "Update"
 }

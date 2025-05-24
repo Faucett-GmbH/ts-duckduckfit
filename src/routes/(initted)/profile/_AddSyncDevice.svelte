@@ -1,8 +1,8 @@
 <script lang="ts" module>
 	export interface AddSyncDeviceProps {
 		currentUserDocument: CurrentUserDocument;
-		deviceId: string;
-		onAdd(newDeviceId: string, userAgent: string): void;
+		currentDeviceId: string;
+		onAdd(newDeviceId: string, name: string): void;
 	}
 
 	export type AddSyncMessageAllowed = {
@@ -18,7 +18,7 @@
 			room: string;
 			password: string;
 			deviceId: string;
-			userAgent: string;
+			name: string;
 		};
 	};
 	export type AddSyncMessage =
@@ -28,6 +28,7 @@
 </script>
 
 <script lang="ts">
+	import EditSyncDeviceForm from './_EditSyncDeviceForm.svelte';
 	import QrCode from '$lib/components/QRCode.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import type { CurrentUserDocument, UserDocument } from '$lib/state/userDocument.svelte';
@@ -38,7 +39,7 @@
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
 
-	let { currentUserDocument, deviceId, onAdd }: AddSyncDeviceProps = $props();
+	let { currentUserDocument, currentDeviceId, onAdd }: AddSyncDeviceProps = $props();
 
 	let room = v7();
 	let roomPassword = v7();
@@ -87,7 +88,7 @@
 								const syncHandle = await currentUserDocument.sync();
 								const sync = syncHandle.doc();
 								if (sync) {
-									onAdd(newDevice.deviceId, newDevice.userAgent);
+									onAdd(newDevice.deviceId, newDevice.name);
 									ws.send(
 										JSON.stringify({
 											type: 'added',
@@ -95,8 +96,8 @@
 												userDocumentId: currentUserDocument.userDocumentId(),
 												room: sync.room,
 												password: sync.password,
-												deviceId: deviceId,
-												userAgent: navigator.userAgent
+												deviceId: currentDeviceId,
+												name: navigator.userAgent
 											}
 										} as AddSyncMessageAdded)
 									);
@@ -117,21 +118,34 @@
 			}
 		};
 	});
+
+	let editSyncDeviceForm = $state<EditSyncDeviceForm>();
+	async function onSubmitNewDevice(e: SubmitEvent) {
+		e.preventDefault();
+		if (!editSyncDeviceForm) {
+			return;
+		}
+		const result = await editSyncDeviceForm.validateAll();
+		if (!result?.isValid()) {
+			return;
+		}
+	}
 </script>
 
 <div class="flex flex-col justify-center items-center">
 	{#if newDevice}
-		<div>
-			<p>{m.sync_add_device({ name: newDevice.userAgent })}</p>
-		</div>
-		<div class="flex flex-row justify-end">
-			<button class="btn danger" onclick={onDoNotAllow}>
-				{m.sync_do_not_allow()}
-			</button>
-			<button class="btn success" onclick={onAllow}>
-				{m.sync_allow()}
-			</button>
-		</div>
+		<form class="flex flex-col" onsubmit={onSubmitNewDevice}>
+			<p>{m.sync_add_device({ name: newDevice.name })}</p>
+			<EditSyncDeviceForm bind:this={editSyncDeviceForm} bind:name={newDevice.name} />
+			<div class="flex flex-row justify-end">
+				<button class="btn danger" onclick={onDoNotAllow}>
+					{m.sync_do_not_allow()}
+				</button>
+				<button class="btn success" onclick={onAllow}>
+					{m.sync_allow()}
+				</button>
+			</div>
+		</form>
 	{:else if url}
 		<QrCode text={url} size={512} />
 	{:else}

@@ -75,6 +75,17 @@ export class WebRTCClientAdapter extends NetworkAdapter {
       }
       newDeviceIds.add(deviceId);
     }
+    for (const deviceId of this.#deviceIds) {
+      if (newDeviceIds.has(deviceId)) {
+        continue;
+      }
+      const peer = this.#remotePeers.get(deviceId);
+      if (peer) {
+        peer.close();
+        this.#remotePeers.delete(deviceId);
+        this.#remotePeerIds.delete(deviceId);
+      }
+    }
     this.#deviceIds = newDeviceIds;
     await this.#join();
   }
@@ -85,6 +96,19 @@ export class WebRTCClientAdapter extends NetworkAdapter {
     this.#deviceIds.add(deviceId);
     this.#newDeviceIds.add(deviceId);
     await this.#join();
+  }
+  removeDeviceId(deviceId: string) {
+    if (this.#deviceId === deviceId) {
+      return;
+    }
+    this.#deviceIds.delete(deviceId);
+    this.#newDeviceIds.delete(deviceId);
+    const peer = this.#remotePeers.get(deviceId);
+    if (peer) {
+      peer.close();
+      this.#remotePeers.delete(deviceId);
+      this.#remotePeerIds.delete(deviceId);
+    }
   }
 
   connect(peerId: PeerId, peerMetadata?: PeerMetadata) {
