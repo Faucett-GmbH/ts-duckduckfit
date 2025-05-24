@@ -46,28 +46,30 @@
 	<title>{m.workout_templates_title()}</title>
 </svelte:head>
 
-<div class="container mx-auto p-4">
-	<div class="card flex flex-col">
-		<div class="flex flex-row justify-between">
-			<h3 class="m-0">{m.workout_templates_title()}</h3>
-			<div class="flex justify-center items-center">
-				<a class="btn success icon sm" href={`${base}/workout-templates/add`}>
-					<Plus />
-				</a>
-			</div>
-		</div>
-		<div class="flex flex-col">
-			{#each workoutTemplates as [workoutTemplateId, workoutTemplate] (workoutTemplateId)}
-				<div class="mb-4 flex flex-grow flex-col">
-					<div class="card flex flex-shrink flex-col">
-						<WorkoutTemplateComponent
-							{workoutTemplateId}
-							{workoutTemplate}
-							onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
-						/>
-					</div>
+<div class="flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+	<div class="container mx-auto p-4">
+		<div class="card flex flex-col">
+			<div class="flex flex-row justify-between">
+				<h3 class="m-0">{m.workout_templates_title()}</h3>
+				<div class="flex justify-center items-center">
+					<a class="btn success icon sm" href={`${base}/workout-templates/add`}>
+						<Plus />
+					</a>
 				</div>
-			{/each}
+			</div>
+			<div class="flex flex-col">
+				{#each workoutTemplates as [workoutTemplateId, workoutTemplate] (workoutTemplateId)}
+					<div class="mb-4 flex flex-grow flex-col">
+						<div class="card flex flex-shrink flex-col">
+							<WorkoutTemplateComponent
+								{workoutTemplateId}
+								{workoutTemplate}
+								onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
+							/>
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>

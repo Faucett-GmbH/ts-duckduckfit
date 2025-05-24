@@ -17,7 +17,7 @@
 </script>
 
 <div
-	class="flex flex-shrink flex-row justify-between border-b border-gray-100 bg-white dark:border-gray-900 dark:bg-gray-800"
+	class="flex flex-shrink flex-row min-h-fit justify-between border-b border-gray-100 bg-white dark:border-gray-900 dark:bg-gray-800"
 >
 	<div class="ms-2 flex flex-shrink flex-row items-center justify-center">
 		<a class="flex flex-row items-center justify-center" href={`${base}/`}>

@@ -70,44 +70,46 @@
 	<title>{m.profile_title()}</title>
 </svelte:head>
 
-<div class="container mx-auto p-4">
-	<div class="card flex flex-col">
-		<div>
-			<h1 class="m-0">{m.profile_title()}</h1>
-			<hr class="mb-2" />
+<div class="flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+	<div class="container mx-auto p-4">
+		<div class="card flex flex-col">
+			<div>
+				<h1 class="m-0">{m.profile_title()}</h1>
+				<hr class="mb-2" />
+			</div>
+			{#if userState.doc}
+				<div class="flex flex-col mb-2">
+					<EditUserWeights
+						heightInCm={userState.doc.heightInCm}
+						weights={userState.doc.weights}
+						onAdd={onAddUserWeight}
+						onEdit={onEditUserWeight}
+						onDelete={onDeleteUserWeight}
+					/>
+				</div>
+				<div class="flex flex-col mb-2">
+					<EditUserInfo
+						birthdate={userState.doc.birthdate}
+						heightInCm={userState.doc.heightInCm}
+						onUpdate={onEditUserInfo}
+					/>
+				</div>
+				<div class="flex flex-col mb-2">
+					<EditUserPreferences
+						weightUnit={userState.doc.weightUnit}
+						distanceUnits={userState.doc.distanceUnits}
+						bodyMeasurementUnit={userState.doc.bodyMeasurementUnit}
+						onUpdate={onEditUserPreferences}
+					/>
+				</div>
+			{/if}
 		</div>
-		{#if userState.doc}
-			<div class="flex flex-col mb-2">
-				<EditUserWeights
-					heightInCm={userState.doc.heightInCm}
-					weights={userState.doc.weights}
-					onAdd={onAddUserWeight}
-					onEdit={onEditUserWeight}
-					onDelete={onDeleteUserWeight}
-				/>
-			</div>
-			<div class="flex flex-col mb-2">
-				<EditUserInfo
-					birthdate={userState.doc.birthdate}
-					heightInCm={userState.doc.heightInCm}
-					onUpdate={onEditUserInfo}
-				/>
-			</div>
-			<div class="flex flex-col mb-2">
-				<EditUserPreferences
-					weightUnit={userState.doc.weightUnit}
-					distanceUnits={userState.doc.distanceUnits}
-					bodyMeasurementUnit={userState.doc.bodyMeasurementUnit}
-					onUpdate={onEditUserPreferences}
-				/>
-			</div>
-		{/if}
-	</div>
-	<div class="card flex flex-col">
-		<Sync
-			currentDeviceId={data.currentDeviceId}
-			sync={data.sync}
-			currentUserDocument={data.currentUserDocument}
-		/>
+		<div class="card flex flex-col">
+			<Sync
+				currentDeviceId={data.currentDeviceId}
+				sync={data.sync}
+				currentUserDocument={data.currentUserDocument}
+			/>
+		</div>
 	</div>
 </div>
