@@ -38,6 +38,9 @@
 	import type { SyncMessage, SyncMessageDevice } from '../../sync/+page.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
+	import { Copy } from 'lucide-svelte';
+	import { copyToClipboard } from '$lib/util';
+	import { createNotification } from '$lib/state/notifications.svelte';
 
 	let { currentUserDocument, currentDeviceId, onAdd }: AddSyncDeviceProps = $props();
 
@@ -64,6 +67,14 @@
 				} as AddSyncMessageAllowed)
 			);
 		}
+	}
+
+	async function onCopyUrl() {
+		if (!url) {
+			return;
+		}
+		await copyToClipboard(url);
+		createNotification(m.copied_to_clipboard(), 'success');
 	}
 
 	let websocket = $state<KeepAliveWebSocket>();
@@ -147,7 +158,13 @@
 			</div>
 		</form>
 	{:else if url}
-		<QrCode text={url} size={512} />
+		<QrCode text={url} size={384} />
+		<div class="flex flex-row flex-grow w-full mt-2">
+			<input class="flex flex-grow" type="text" readonly value={url} />
+			<button class="btn icon primary" onclick={onCopyUrl}>
+				<Copy />
+			</button>
+		</div>
 	{:else}
 		<div class="mr-2 flex flex-row justify-center">
 			<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>

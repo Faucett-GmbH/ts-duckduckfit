@@ -16,10 +16,7 @@
 
 	$effect(() => {
 		loading = true;
-		QRCode.toCanvas(canvas, text, (error) => {
-			if (error) {
-				console.error(error);
-			}
+		QRCode.toCanvas(canvas, text, { width: size }).finally(() => {
 			loading = false;
 		});
 	});

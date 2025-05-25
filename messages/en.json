@@ -104,5 +104,6 @@
 	"sync_edit_device_title": "Edit Device",
 	"sync_device_update": "Update",
 	"sync_device_connected": "{name} Connected",
-	"sync_device_disconnected": "{name} Disconnected"
+	"sync_device_disconnected": "{name} Disconnected",
+	"copied_to_clipboard": "Copied to Clipboard"
 }
