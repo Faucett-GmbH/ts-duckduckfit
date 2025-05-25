@@ -102,5 +102,7 @@
 	"sync_device_name_label": "Name",
 	"sync_device_created_at_label": "Created At",
 	"sync_edit_device_title": "Edit Device",
-	"sync_device_update": "Update"
+	"sync_device_update": "Update",
+	"sync_device_connected": "{name} Connected",
+	"sync_device_disconnected": "{name} Disconnected"
 }

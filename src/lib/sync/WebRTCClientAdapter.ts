@@ -182,7 +182,8 @@ export class WebRTCClientAdapter extends NetworkAdapter {
         this.emit("peer-candidate", {
           peerId: message.senderId,
           peerMetadata: message.peerMetadata,
-        });
+          deviceId: fromDeviceId
+        } as never);
         break;
       }
       case "welcome": {
@@ -195,7 +196,8 @@ export class WebRTCClientAdapter extends NetworkAdapter {
         this.emit("peer-candidate", {
           peerId: message.senderId,
           peerMetadata: message.peerMetadata,
-        });
+          deviceId: fromDeviceId
+        } as never);
         break;
       }
       default: {
@@ -225,7 +227,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
     peer.on("close", () => {
       const peerId = this.#remotePeerIds.get(deviceId) as PeerId;
       if (peerId) {
-        this.emit("peer-disconnected", { peerId });
+        this.emit("peer-disconnected", { peerId, deviceId } as never);
       }
       this.#remotePeers.delete(deviceId);
       this.#remotePeerIds.delete(deviceId);
