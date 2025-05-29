@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/public';
 import { PUBLIC_URL } from '$env/static/public';
 import { building, browser } from '$app/environment';
 
-export type ExtractPromise<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
+export type ExtractPromise<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;
 
 export const DEFAULT_SIZE = 20;
 
@@ -80,6 +80,9 @@ export function selectElementContents(el: HTMLElement) {
 
 export function getId<T extends { id: string | number }>(value: T) {
 	return value.id;
+}
+export function getLocalId<T extends { localId: string | number }>(value: T) {
+	return value.localId;
 }
 export function getName<T extends { name: string }>(value: T) {
 	return value.name;

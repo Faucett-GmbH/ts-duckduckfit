@@ -3,6 +3,8 @@ import type { Locale } from "$lib/paraglide/runtime";
 import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocumentId } from "$lib/repo";
 import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
+import { applyChanges, type GetKeyFn } from "$lib/diff";
+import { getLocalId } from "$lib/util";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
@@ -97,6 +99,7 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
     }
   });
   workoutTemplateDocument.change(wt => {
+    applyChanges(wt, workoutTemplateParams, getLocalId as GetKeyFn);
     wt.updatedAt = new Date();
   })
 }
