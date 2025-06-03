@@ -5,9 +5,11 @@ import { createNotification } from "./notifications.svelte";
 import { ZipReader, BlobReader, TextWriter } from "@zip.js/zip.js";
 import { getUserDocument, userDocument } from "./userDocument.svelte";
 import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocHandle, type AutomergeDocumentId } from "$lib/repo";
-import type { Exercise } from "./exerciseTypes";
+import type { Exercise, ExerciseTranslation } from "./exerciseTypes";
 import { applyChanges, type GetKeyFn } from "$lib/diff";
 import { getLocalId } from "$lib/util";
+import { fuzzyEquals } from '@aicacia/string-fuzzy_equals'
+import { language } from "./language.svelte";
 
 const RELEASES = "https://api.github.com/repos/Faucett-GmbH/exdb_data/releases";
 const CORS_URL = "https://corsproxy.io/?url=";
@@ -31,49 +33,73 @@ export const exercisesMigrations = {
   }
 };
 
-export async function getExercises(offset: number, limit: number): Promise<[key: AutomergeDocumentId<Exercise>, value: Exercise][]> {
+export async function getExercises(offset: number, limit: number, search?: string): Promise<[key: AutomergeDocumentId<Exercise>, value: Exercise][]> {
   const exercises = (await userDocument.current!.exercises()).doc()!;
   const startOffset = offset * limit;
   const endOffset = startOffset + limit - 1;
-  const exerciseIds = Object.values(exercises.exercisesByGuid).slice(startOffset, endOffset) as AutomergeDocumentId<Exercise>[];
   const repo = getRepo();
-  return await Promise.all(exerciseIds.map(async id => [id, (await findDocument(id, repo)).doc()!]));
+  let exerciseGuids = Object.values(exercises.exercisesByGuid) as AutomergeDocumentId<Exercise>[];
+  if (!search) {
+    exerciseGuids = exerciseGuids.slice(startOffset, endOffset);
+  }
+  let exercisesAndIds = await Promise.all(exerciseGuids.map(async id =>
+    [id, (await findDocument(id, repo)).doc()!] as [id: AutomergeDocumentId<Exercise>, exercise: Exercise]
+  ));
+  if (search) {
+    exercisesAndIds = exercisesAndIds
+      .filter(([_id, exercise]) =>
+        exercise.translations.some(t => fuzzyEquals(search, t.name))
+      )
+      .slice(startOffset, endOffset);
+  }
+  return exercisesAndIds;
 }
 
-export async function getExerciseById(exerciseId: AutomergeDocumentId<Exercise>): Promise<Exercise | null> {
-  const exerciseDocHandle = await findDocument(exerciseId);
+export async function getExerciseById(exerciseGuid: AutomergeDocumentId<Exercise>): Promise<Exercise | null> {
+  const exerciseDocHandle = await findDocument(exerciseGuid);
   if (!exerciseDocHandle) {
     return null;
   }
   return exerciseDocHandle.doc() || null;
 }
 
-export async function deleteExercise(exerciseId: AutomergeDocumentId<Exercise>) {
+export async function deleteExercise(exerciseGuid: AutomergeDocumentId<Exercise>) {
   const exercises = await userDocument.current!.exercises();
   exercises.change((wts) => {
-    delete wts.exercisesByGuid[exerciseId];
+    delete wts.exercisesByGuid[exerciseGuid];
   });
-  deleteDocument(exerciseId);
+  deleteDocument(exerciseGuid);
 }
 
-export async function upsertExercise(exercise: Exercise, exerciseId?: AutomergeDocumentId<Exercise>) {
+export async function upsertExercise(exercise: Exercise, exerciseGuid?: AutomergeDocumentId<Exercise>) {
   const exercises = await userDocument.current!.exercises();
   let exerciseDocument: AutomergeDocHandle<Exercise>;
-  if (!exerciseId) {
+  if (!exerciseGuid) {
     exerciseDocument = createDocument<Exercise>(exercise);
-    exerciseId = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
-    const documentId = exerciseId;
+    exerciseGuid = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
+    const documentId = exerciseGuid;
     exercises.change((wts) => {
       wts.exercisesByGuid[exercise.guid] = documentId;
     });
   } else {
-    exerciseDocument = await findDocument(exerciseId);
+    exerciseDocument = await findDocument(exerciseGuid);
     exerciseDocument.change(wt => {
       applyChanges(wt, exercise, getLocalId as GetKeyFn);
     });
   }
 }
 
+export function findTranslation(exercise: Exercise) {
+  const locale = language.locale;
+  let translation: ExerciseTranslation | undefined;
+  for (const t of exercise.translations) {
+    translation = t;
+    if (t.locale === locale) {
+      break;
+    }
+  }
+  return translation;
+}
 
 if (browser) {
   if (lastExerciseRelease.value === null || lastExerciseRelease.value.updatedAt.valueOf() < Date.now() - 24 * 60 * 60 * 1000) {

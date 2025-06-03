@@ -52,10 +52,10 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
 	import Sortable, { type SortableItemProps } from '$lib/components/Sortable.svelte';
-	import { createExercisesById, getRealSetPosition, getUniqueExercises } from '../util';
+	import { createExercisesByGuid, getRealSetPosition, getUniqueExercises } from '../util';
 	import { m } from '$lib/paraglide/messages';
 	import type { SetGroupType, SetType } from '$lib/state/workoutTemplates.svelte';
-	import type { Exercise } from '$lib/openapi/exdb';
+	import type { Exercise } from '$lib/state/exerciseTypes';
 
 	let {
 		setGroupTemplate = $bindable(),
@@ -156,11 +156,11 @@
 		}
 	});
 	function onExercisesChange(newExercies: Exercise[]) {
-		const exercisesById = createExercisesById(newExercies);
+		const exercisesById = createExercisesByGuid(newExercies);
 		setGroupTemplate = {
 			...setGroupTemplate,
 			setTemplates: setGroupTemplate.setTemplates.filter(
-				(setTemplate) => !!exercisesById[setTemplate.exerciseId]
+				(setTemplate) => !!exercisesById[setTemplate.exerciseGuid]
 			)
 		};
 		oninput(setGroupTemplate);
@@ -215,7 +215,7 @@
 		for (const exercise of exercises) {
 			setTemplates.push({
 				id: unsafeId(),
-				exerciseId: exercise.id,
+				exerciseGuid: exercise.guid,
 				exercise: exercise,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
 			});

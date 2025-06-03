@@ -17,22 +17,23 @@
 	import { onMount } from 'svelte';
 	import Sortable from '../Sortable.svelte';
 	import ExerciseSelectorItem from './ExerciseSelectorItem.svelte';
-	import { createExercisesById } from './util';
-	import { exerciseApi } from '$lib/openapi';
-	import { language } from '$lib/state/language.svelte';
-	import type { Exercise, GetExercises200Response } from '$lib/openapi/exdb';
-	import { getId } from '$lib/util';
+	import { createExercisesByGuid } from './util';
+	import { getGuid } from '$lib/util';
+	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { findTranslation, getExercises } from '$lib/state/exercises.svelte';
 
-	let { id = undefined, exercises = $bindable([]), open = $bindable(false), oninput } = $props();
+	let {
+		id = undefined,
+		exercises = $bindable([]),
+		open = $bindable(false),
+		oninput
+	}: ExerciseSelectorProps = $props();
 
 	let search = $state('');
 	let limit = $state(20);
 	let offset = $state(0);
-	let exercisesById = $state<{ [id: number]: Exercise }>({});
-	let results = $state<GetExercises200Response>({ items: [] });
-	$effect(() => {
-		exercisesById = createExercisesById(exercises);
-	});
+	let results = $state<Exercise[]>([]);
+	let exercisesById = $derived(createExercisesByGuid(exercises));
 
 	function onOpen(e: Event) {
 		e.stopPropagation();
@@ -50,7 +51,12 @@
 	});
 	async function onSearch() {
 		try {
-			results = await exerciseApi.getExercises(language.locale, null, search, limit, offset);
+			const exercises = await getExercises(offset, limit, search);
+			const newResults: Exercise[] = [];
+			for (const [_documentId, exercise] of exercises) {
+				newResults.push(exercise);
+			}
+			results = newResults;
 		} catch (e) {
 			await handleError(e);
 		}
@@ -61,7 +67,7 @@
 		debouncedOnSearch();
 	}
 	function onDelete(exercise: Exercise) {
-		const index = exercises.findIndex((e) => e.id === exercise.id);
+		const index = exercises.findIndex((e) => e.guid === exercise.guid);
 		if (index !== -1) {
 			const newExercises = exercises.slice();
 			newExercises.splice(index, 1);
@@ -73,7 +79,7 @@
 	function createOnAdd(exercise: Exercise) {
 		return (e: Event) => {
 			e.stopPropagation();
-			const index = exercises.findIndex((e) => e.id === exercise.id);
+			const index = exercises.findIndex((e) => e.guid === exercise.guid);
 			if (index === -1) {
 				const newExercises = exercises.slice();
 				newExercises.push(exercise);
@@ -85,7 +91,7 @@
 	function createOnRemove(exercise: Exercise) {
 		return (e: Event) => {
 			e.stopPropagation();
-			const index = exercises.findIndex((e) => e.id === exercise.id);
+			const index = exercises.findIndex((e) => e.guid === exercise.guid);
 			if (index !== -1) {
 				const newExercises = exercises.slice();
 				newExercises.splice(index, 1);
@@ -106,8 +112,15 @@
 	onMount(onSearch);
 </script>
 
-<div {id} class="exercise-selector flex flex-row flex-wrap" onclick={onOpen}>
-	<Sortable id={`${id}-exercises`} items={exercises} getKey={getId} onMove={onMoveExercise}>
+<div
+	{id}
+	class="exercise-selector flex flex-row flex-wrap"
+	role="button"
+	tabindex="-1"
+	onkeypress={onOpen}
+	onclick={onOpen}
+>
+	<Sortable id={`${id}-exercises`} items={exercises} getKey={getGuid} onMove={onMoveExercise}>
 		{#snippet children({ item, ...props })}
 			<ExerciseSelectorItem exercise={item} canDrag={exercises.length > 1} {onDelete} {...props} />
 		{/snippet}
@@ -136,26 +149,25 @@
 			oninput={onSearchListener}
 		/>
 		<ul class="h-64 list-none overflow-y-auto overflow-x-hidden p-0">
-			{#if results.items}
-				{#each results.items as exercise, index (exercise.id)}
-					{@const selectedExercise = exercisesById[exercise.id]}
-					<li class="flex flex-row items-center justify-between py-2 pe-1 ps-2">
-						<span>{exercise.translation?.name}</span>
-						{#if selectedExercise}
-							<button class="btn sm danger icon" onclick={createOnRemove(exercise)}>
-								<X size="1rem" />
-							</button>
-						{:else}
-							<button class="btn sm success icon" onclick={createOnAdd(exercise)}>
-								<Plus size="1rem" />
-							</button>
-						{/if}
-					</li>
-					{#if index !== results.items.length - 1}
-						<hr />
+			{#each results as exercise, index (exercise.guid)}
+				{@const selectedExercise = exercisesById[exercise.guid]}
+				{@const translation = findTranslation(exercise)}
+				<li class="flex flex-row items-center justify-between py-2 pe-1 ps-2">
+					<span>{translation?.name}</span>
+					{#if selectedExercise}
+						<button class="btn sm danger icon" onclick={createOnRemove(exercise)}>
+							<X size="1rem" />
+						</button>
+					{:else}
+						<button class="btn sm success icon" onclick={createOnAdd(exercise)}>
+							<Plus size="1rem" />
+						</button>
 					{/if}
-				{/each}
-			{/if}
+				</li>
+				{#if index !== results.length - 1}
+					<hr />
+				{/if}
+			{/each}
 		</ul>
 		<div class="mt-2 flex flex-row justify-end">
 			<button class="btn success" onclick={onClose}>

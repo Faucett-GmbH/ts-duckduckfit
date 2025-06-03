@@ -17,6 +17,9 @@ importers:
       '@aicacia/peer':
         specifier: ^0.1.5
         version: 0.1.5(tslib@2.8.1)
+      '@aicacia/string-fuzzy_equals':
+        specifier: ^0.1.4
+        version: 0.1.4(tslib@2.8.1)
       '@automerge/automerge':
         specifier: ^2.2.9
         version: 2.2.9
@@ -158,6 +161,11 @@ packages:
 
   '@aicacia/peer@0.1.5':
     resolution: {integrity: sha512-ncvWEqeF+Md2ZFRT/ihK++jZUapNs4tbx2GLQp2u8U3NLVzyLEMQdhpKTtzQR0sCLOK/yo3tZcsBQ+tSTLO9jA==}
+    peerDependencies:
+      tslib: '2'
+
+  '@aicacia/string-fuzzy_equals@0.1.4':
+    resolution: {integrity: sha512-jVGSLKJqZM4Zj5qFJbddF3D33+VYEuPGo0QkyRx0G6D7sD2yJ2WtoHSOf3xdCqOgddREiRc5VnPzdNxH8J1Iag==}
     peerDependencies:
       tslib: '2'
 
@@ -2586,6 +2594,10 @@ snapshots:
       eventemitter3: 5.0.1
       tslib: 2.8.1
       uuid: 10.0.0
+
+  '@aicacia/string-fuzzy_equals@0.1.4(tslib@2.8.1)':
+    dependencies:
+      tslib: 2.8.1
 
   '@ampproject/remapping@2.3.0':
     dependencies:

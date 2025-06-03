@@ -10,7 +10,7 @@ export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
-  exerciseId: number;
+  exerciseGuid: string;
   setType: SetType;
   asManyRoundsAsPossible?: boolean;
   distanceInMeters?: number;

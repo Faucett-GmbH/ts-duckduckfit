@@ -11,8 +11,9 @@
 	import Grip from 'lucide-svelte/icons/grip';
 	import Modal from '../Modal.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import type { Exercise } from '$lib/openapi/exdb';
 	import type { SortableItemProps } from '../Sortable.svelte';
+	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { findTranslation } from '$lib/state/exercises.svelte';
 
 	let {
 		canDrag,
@@ -25,6 +26,8 @@
 		onDragLeave,
 		onDragOver
 	}: ExerciseSelectorItemProps = $props();
+
+	let translation = $derived(findTranslation(exercise));
 
 	function onDeleteInternal(e: Event) {
 		e.stopPropagation();
@@ -66,7 +69,7 @@
 			<div class="h-4 w-4"><Grip size="1rem" /></div>
 		</button>
 	{/if}
-	<span class="me-2 text-xs">{exercise.translation?.name}</span>
+	<span class="me-2 text-xs">{translation?.name}</span>
 	<button class="btn sm danger icon" onclick={onOpenDelete}>
 		<X size="1rem" />
 	</button>

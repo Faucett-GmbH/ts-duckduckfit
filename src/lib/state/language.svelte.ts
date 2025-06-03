@@ -1,12 +1,8 @@
-import { browser } from '$app/environment';
 import { localStorageState } from '$lib/localStorageState.svelte';
 import { Numbers } from '$lib/Numbers';
-import { baseLocale, locales, setLocale, type Locale } from '$lib/paraglide/runtime';
+import { getLocale, setLocale, type Locale } from '$lib/paraglide/runtime';
 
-let browserLanguage = $state(browser && navigator.language ? navigator.language : 'en-US');
-const browserLocale = $derived.by(() => browserLanguage.split('-')[0]);
-
-const locale = localStorageState<Locale>("locale", locales.includes(browserLocale as Locale) ? browserLocale as Locale : baseLocale);
+const locale = localStorageState<Locale>("locale", getLocale());
 const numbers = $derived.by(() => new Numbers(locale.value));
 
 export const language = {
@@ -23,9 +19,3 @@ $effect.root(() => {
 		setLocale(locale.value);
 	});
 });
-
-if (browser) {
-	window.addEventListener('languagechange', () => {
-		browserLanguage = navigator.language;
-	});
-}

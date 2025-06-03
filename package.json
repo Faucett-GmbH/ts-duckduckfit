@@ -55,6 +55,7 @@
 		"@aicacia/debounce": "^0.1.25",
 		"@aicacia/keepalivewebsocket": "^0.1.2",
 		"@aicacia/peer": "^0.1.5",
+		"@aicacia/string-fuzzy_equals": "^0.1.4",
 		"@automerge/automerge": "^2.2.9",
 		"@automerge/automerge-repo": "^2.0.0",
 		"@automerge/automerge-repo-storage-indexeddb": "^2.0.0",

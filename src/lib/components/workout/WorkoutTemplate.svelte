@@ -19,8 +19,8 @@
 	import { getRealSetPosition } from './util';
 	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import { ExerciseExecutionTypeEnum } from '$lib/openapi/exdb';
 	import type { AutomergeDocumentId } from '$lib/repo';
+	import { ExerciseExecutionEnum } from '$lib/state/exerciseTypes';
 
 	let { workoutTemplateId, workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps =
 		$props();
@@ -95,10 +95,10 @@
 									<SetTypeComponent setType={setTemplate.setType} {position} />
 								</div>
 								<div class="h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"></div>
-								<p class="mb-0 ms-2">{setTemplate.exerciseId}</p>
+								<p class="mb-0 ms-2">{setTemplate.exerciseGuid}</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
-								<SetAmounts execution={ExerciseExecutionTypeEnum.RepsOnly} set={setTemplate} />
+								<SetAmounts execution={ExerciseExecutionEnum.RepsOnly} set={setTemplate} />
 							</div>
 						</div>
 					{/each}

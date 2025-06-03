@@ -6,7 +6,7 @@ import { userMigrations, type User } from './user.svelte';
 import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
 import { initSync, syncMigrations, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
-import { exercisesMigrations, type Exercises } from './exericese.svelte';
+import { exercisesMigrations, type Exercises } from './exercises.svelte';
 
 export interface UserDocument {
 	version: number;

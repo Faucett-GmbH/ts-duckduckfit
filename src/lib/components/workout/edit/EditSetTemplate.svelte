@@ -17,7 +17,7 @@
 
 	export type SetTemplateParams = ExerciseSetInputParams & {
 		id: string;
-		exerciseId: number;
+		exerciseGuid: string;
 		exercise: Exercise;
 		setType: SetType;
 	};
@@ -32,8 +32,9 @@
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import type { SortableItemProps } from '$lib/components/Sortable.svelte';
-	import type { Exercise } from '$lib/openapi/exdb';
 	import type { SetType } from '$lib/state/workoutTemplates.svelte';
+	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { findTranslation } from '$lib/state/exercises.svelte';
 
 	let {
 		position,
@@ -54,6 +55,7 @@
 	}: EditSetTemplateProps = $props();
 
 	let draggable = $state(false);
+	let translation = $derived(findTranslation(setTemplate.exercise));
 
 	function onDraggable() {
 		draggable = true;
@@ -143,7 +145,7 @@
 			class="mt-1 flex flex-grow flex-row items-center justify-start"
 			class:hidden={!showExercise}
 		>
-			<div class="badge sm light">{setTemplate.exercise.translation?.name}</div>
+			<div class="badge sm light">{translation?.name}</div>
 		</div>
 	</div>
 	{#if showDelete}

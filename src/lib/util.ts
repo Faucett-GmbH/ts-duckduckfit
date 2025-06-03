@@ -81,6 +81,9 @@ export function selectElementContents(el: HTMLElement) {
 export function getId<T extends { id: string | number }>(value: T) {
 	return value.id;
 }
+export function getGuid<T extends { guid: string }>(value: T) {
+	return value.guid;
+}
 export function getLocalId<T extends { localId: string | number }>(value: T) {
 	return value.localId;
 }
