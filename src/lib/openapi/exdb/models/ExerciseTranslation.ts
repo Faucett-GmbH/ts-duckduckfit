@@ -146,20 +146,20 @@ export function ExerciseTranslationFromJSONTyped(json: any, ignoreDiscriminator:
         return json;
     }
     return {
-        
+
         'id': json['id'],
         'guid': json['guid'],
         'uri': json['uri'],
         'name': json['name'],
         'locale': json['locale'],
-        'metadataKeywords': json['metadata_keywords'] == null ? undefined : json['metadata_keywords'],
-        'metadataAuthors': json['metadata_authors'] == null ? undefined : json['metadata_authors'],
-        'alternativeNames': json['alternative_names'] == null ? undefined : json['alternative_names'],
-        'videoUrl': json['video_url'] == null ? undefined : json['video_url'],
-        'description': json['description'] == null ? undefined : json['description'],
-        'summary': json['summary'] == null ? undefined : json['summary'],
-        'instructions': json['instructions'] == null ? undefined : json['instructions'],
-        'tips': json['tips'] == null ? undefined : json['tips'],
+        'metadataKeywords': json['metadata_keywords'] == null ? null : json['metadata_keywords'],
+        'metadataAuthors': json['metadata_authors'] == null ? null : json['metadata_authors'],
+        'alternativeNames': json['alternative_names'] == null ? null : json['alternative_names'],
+        'videoUrl': json['video_url'] == null ? null : json['video_url'],
+        'description': json['description'] == null ? null : json['description'],
+        'summary': json['summary'] == null ? null : json['summary'],
+        'instructions': json['instructions'] == null ? null : json['instructions'],
+        'tips': json['tips'] == null ? null : json['tips'],
         'updatedAt': (new Date(json['updated_at'])),
         'createdAt': (new Date(json['created_at'])),
     };
@@ -175,7 +175,7 @@ export function ExerciseTranslationToJSONTyped(value?: ExerciseTranslation | nul
     }
 
     return {
-        
+
         'id': value['id'],
         'guid': value['guid'],
         'uri': value['uri'],

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-
+import { mapValues } from '../runtime';
 
 /**
  * Validation Exception
@@ -34,10 +34,10 @@ export interface GetExercises400Response {
     detail: string | null;
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: any | undefined; }}
      * @memberof GetExercises400Response
      */
-    extra?: { [key: string]: any; };
+    extra?: { [key: string]: any | undefined; };
 }
 
 /**
@@ -61,7 +61,7 @@ export function GetExercises400ResponseFromJSONTyped(json: any, ignoreDiscrimina
 
         'statusCode': json['status_code'],
         'detail': json['detail'],
-        'extra': json['extra'] == null ? undefined : json['extra'],
+        'extra': json['extra'] == null ? null : json['extra'],
     };
 }
 

@@ -129,7 +129,7 @@
 	<div class="flex flex-grow flex-col overflow-hidden">
 		<input
 			type="text"
-			class="w-100"
+			class="w-full"
 			placeholder={m.exercises_selector_search_placeholder()}
 			bind:this={inputElement}
 			bind:value={search}

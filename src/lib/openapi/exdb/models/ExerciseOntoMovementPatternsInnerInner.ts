@@ -27,9 +27,6 @@ export function ExerciseOntoMovementPatternsInnerInnerFromJSONTyped(json: any, i
     if (json == null) {
         return json;
     }
-    if (instanceOfstring(json)) {
-        return stringFromJSONTyped(json, true);
-    }
 
     return {} as any;
 }
@@ -41,10 +38,6 @@ export function ExerciseOntoMovementPatternsInnerInnerToJSON(json: any): any {
 export function ExerciseOntoMovementPatternsInnerInnerToJSONTyped(value?: ExerciseOntoMovementPatternsInnerInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
-    }
-
-    if (instanceOfstring(value)) {
-        return stringToJSON(value as string);
     }
 
     return {};

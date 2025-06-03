@@ -105,5 +105,6 @@
 	"sync_device_update": "Update",
 	"sync_device_connected": "{name} Connected",
 	"sync_device_disconnected": "{name} Disconnected",
-	"copied_to_clipboard": "Copied to Clipboard"
+	"copied_to_clipboard": "Copied to Clipboard",
+	"errors_message_failed_to_update_exercises": "failed to update exercises"
 }

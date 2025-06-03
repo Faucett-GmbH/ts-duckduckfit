@@ -69,11 +69,11 @@ export function GetExercises200ResponseFromJSONTyped(json: any, ignoreDiscrimina
         return json;
     }
     return {
-        
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(ExerciseFromJSON)),
-        'limit': json['limit'] == null ? undefined : json['limit'],
-        'offset': json['offset'] == null ? undefined : json['offset'],
-        'total': json['total'] == null ? undefined : json['total'],
+
+        'items': json['items'] == null ? null : ((json['items'] as Array<any>).map(ExerciseFromJSON)),
+        'limit': json['limit'] == null ? null : json['limit'],
+        'offset': json['offset'] == null ? null : json['offset'],
+        'total': json['total'] == null ? null : json['total'],
     };
 }
 
@@ -87,8 +87,8 @@ export function GetExercises200ResponseToJSONTyped(value?: GetExercises200Respon
     }
 
     return {
-        
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(ExerciseToJSON)),
+
+        'items': value['items'] == null ? null : ((value['items'] as Array<any>).map(ExerciseToJSON)),
         'limit': value['limit'],
         'offset': value['offset'],
         'total': value['total'],

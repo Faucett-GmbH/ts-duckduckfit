@@ -83,13 +83,13 @@ export function ArticleFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         return json;
     }
     return {
-        
+
         'id': json['id'],
         'key': json['key'],
-        'image': json['image'] == null ? undefined : json['image'],
-        'thumbnailImage': json['thumbnail_image'] == null ? undefined : json['thumbnail_image'],
-        'translation': json['translation'] == null ? undefined : ArticleTranslationFromJSON(json['translation']),
-        'translations': json['translations'] == null ? undefined : ((json['translations'] as Array<any>).map(ArticleTranslationFromJSON)),
+        'image': json['image'] == null ? null : json['image'],
+        'thumbnailImage': json['thumbnail_image'] == null ? null : json['thumbnail_image'],
+        'translation': json['translation'] == null ? null : ArticleTranslationFromJSON(json['translation']),
+        'translations': json['translations'] == null ? null : ((json['translations'] as Array<any>).map(ArticleTranslationFromJSON)),
     };
 }
 
@@ -103,13 +103,13 @@ export function ArticleToJSONTyped(value?: Article | null, ignoreDiscriminator: 
     }
 
     return {
-        
+
         'id': value['id'],
         'key': value['key'],
         'image': value['image'],
         'thumbnail_image': value['thumbnailImage'],
         'translation': ArticleTranslationToJSON(value['translation']),
-        'translations': value['translations'] == null ? undefined : ((value['translations'] as Array<any>).map(ArticleTranslationToJSON)),
+        'translations': value['translations'] == null ? null : ((value['translations'] as Array<any>).map(ArticleTranslationToJSON)),
     };
 }
 

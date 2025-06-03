@@ -6,12 +6,14 @@ import { userMigrations, type User } from './user.svelte';
 import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
 import { initSync, syncMigrations, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
+import { exercisesMigrations, type Exercises } from './exericese.svelte';
 
 export interface UserDocument {
 	version: number;
 	user: AutomergeDocumentId<User>;
 	sync: AutomergeDocumentId<Sync>;
 	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
+	exercises: AutomergeDocumentId<Exercises>;
 }
 
 export const userDocumentMigrations = {
@@ -21,6 +23,7 @@ export const userDocumentMigrations = {
 		userDocument.user = createDocument<User>({}, repo).documentId;
 		userDocument.sync = createDocument<Sync>({}, repo).documentId;
 		userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
+		userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
 	}
 };
 
@@ -33,6 +36,7 @@ async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
 	await migrate(await findDocument(userDocument.user), userMigrations);
 	await migrate(await findDocument(userDocument.sync), syncMigrations);
 	await migrate(await findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
+	await migrate(await findDocument(userDocument.exercises), exercisesMigrations);
 }
 
 export class CurrentUserDocument {
@@ -73,6 +77,9 @@ export class CurrentUserDocument {
 	async workoutTemplates() {
 		return findDocument((await this.userDocument()).workoutTemplates);
 	}
+	async exercises() {
+		return findDocument((await this.userDocument()).exercises);
+	}
 }
 
 const currentUserDocumentId = localStorageState<AutomergeDocumentId<UserDocument> | null>('user-document-id', null);
@@ -87,10 +94,8 @@ export const userDocument = {
 	}
 }
 
-let initted = false;
-
-export async function getOrInitUserDocument() {
-	if (initted && currentUserDocument) {
+async function initUserDocument() {
+	if (currentUserDocument) {
 		return currentUserDocument;
 	}
 	if (currentUserDocumentId.value == null) {
@@ -104,8 +109,16 @@ export async function getOrInitUserDocument() {
 		await runAllMigrations(userDocument);
 	}
 	await initSync(await currentUserDocument!.sync());
-	initted = true;
 	return currentUserDocument!;
+}
+
+let userDocumentPromise: Promise<CurrentUserDocument>;
+
+export async function getUserDocument() {
+	if (!userDocumentPromise) {
+		userDocumentPromise = initUserDocument();
+	}
+	return userDocumentPromise;
 }
 
 export async function setUserDocumentId(userDocumentId: AutomergeDocumentId<UserDocument>) {

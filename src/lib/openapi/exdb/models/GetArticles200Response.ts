@@ -69,11 +69,11 @@ export function GetArticles200ResponseFromJSONTyped(json: any, ignoreDiscriminat
         return json;
     }
     return {
-        
-        'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(ArticleFromJSON)),
-        'limit': json['limit'] == null ? undefined : json['limit'],
-        'offset': json['offset'] == null ? undefined : json['offset'],
-        'total': json['total'] == null ? undefined : json['total'],
+
+        'items': json['items'] == null ? null : ((json['items'] as Array<any>).map(ArticleFromJSON)),
+        'limit': json['limit'] == null ? null : json['limit'],
+        'offset': json['offset'] == null ? null : json['offset'],
+        'total': json['total'] == null ? null : json['total'],
     };
 }
 
@@ -87,8 +87,8 @@ export function GetArticles200ResponseToJSONTyped(value?: GetArticles200Response
     }
 
     return {
-        
-        'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(ArticleToJSON)),
+
+        'items': value['items'] == null ? null : ((value['items'] as Array<any>).map(ArticleToJSON)),
         'limit': value['limit'],
         'offset': value['offset'],
         'total': value['total'],

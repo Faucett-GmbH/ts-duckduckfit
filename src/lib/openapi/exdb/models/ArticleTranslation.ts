@@ -78,13 +78,13 @@ export function ArticleTranslationFromJSONTyped(json: any, ignoreDiscriminator: 
         return json;
     }
     return {
-        
+
         'id': json['id'],
         'uri': json['uri'],
         'title': json['title'],
         'description': json['description'],
         'content': json['content'],
-        'locale': json['locale'] == null ? undefined : json['locale'],
+        'locale': json['locale'] == null ? null : json['locale'],
     };
 }
 
@@ -98,7 +98,7 @@ export function ArticleTranslationToJSONTyped(value?: ArticleTranslation | null,
     }
 
     return {
-        
+
         'id': value['id'],
         'uri': value['uri'],
         'title': value['title'],

@@ -94,7 +94,9 @@ export function diff<A, B>(a: A, b: B, getKey: GetKeyFn) {
 }
 
 export function applyChanges<A, B>(a: A, b: B, getKey: GetKeyFn) {
-  applyDiff(a, diff(a, b, getKey));
+  const differences = diff(a, b, getKey);
+  applyDiff(a, differences);
+  return differences.length > 0;
 }
 
 function differencesInternal(

@@ -86,20 +86,21 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
   let workoutTemplateDocument: DocHandle<WorkoutTemplate>;
   if (!workoutTemplateId) {
     workoutTemplateDocument = createDocument<WorkoutTemplate>({
+      ...workoutTemplateParams,
+      updatedAt: new Date(),
       createdAt: new Date(),
     });
     workoutTemplateId = workoutTemplateDocument.documentId as AutomergeDocumentId<WorkoutTemplate>;
-  } else {
-    workoutTemplateDocument = await findDocument(workoutTemplateId)
-  }
-  const documentId = workoutTemplateId;
-  workoutTemplates.change((wts) => {
-    if (!wts.workoutTemplatesById[documentId]) {
+    const documentId = workoutTemplateId;
+    workoutTemplates.change((wts) => {
       wts.workoutTemplatesById[documentId] = true;
-    }
-  });
-  workoutTemplateDocument.change(wt => {
-    applyChanges(wt, workoutTemplateParams, getLocalId as GetKeyFn);
-    wt.updatedAt = new Date();
-  })
+    });
+  } else {
+    workoutTemplateDocument = await findDocument(workoutTemplateId);
+    workoutTemplateDocument.change(wt => {
+      if (applyChanges(wt, workoutTemplateParams, getLocalId as GetKeyFn)) {
+        wt.updatedAt = new Date();
+      }
+    });
+  }
 }
