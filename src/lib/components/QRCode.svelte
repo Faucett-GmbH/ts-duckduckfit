@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-	import QRCode from 'qrcode';
+	import { toCanvas } from 'qrcode';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let { text, size = 256 }: QRCodeProps = $props();
@@ -16,7 +16,7 @@
 
 	$effect(() => {
 		loading = true;
-		QRCode.toCanvas(canvas, text, { width: size }).finally(() => {
+		toCanvas(canvas, text, { width: size }).finally(() => {
 			loading = false;
 		});
 	});
