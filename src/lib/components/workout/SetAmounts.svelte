@@ -7,15 +7,21 @@
 		weightInKilograms?: number;
 		reps?: number;
 	};
+
+	export type SetAmmountsProps = {
+		execution: Exercise['execution'];
+		set: SetAmounts;
+		unitSystem?: MeasurementSystem;
+	};
 </script>
 
 <script lang="ts">
 	import Measurement from '../inputs/Measurement.svelte';
 	import RepsComponent from './Reps.svelte';
+	import type { Exercise } from '$lib/state/exerciseTypes';
+	import type { MeasurementSystem } from '../inputs/MeasurementInput.svelte';
 
-	export let execution: ExerciseExecutionType;
-	export let set: SetAmounts;
-	export let unitSystem: UnitSystem = UnitSystem.MetricUnitSystem;
+	let { execution, set, unitSystem = 'METRIC' }: SetAmmountsProps = $props();
 </script>
 
 <div class="flex flex-shrink flex-col justify-end sm:flex-row">

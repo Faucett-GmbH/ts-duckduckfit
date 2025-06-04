@@ -68,7 +68,7 @@
 	let suite = $state(createSuite());
 	let result = $state(suite.get());
 	let loading = $state(false);
-	let disabled = $derived(loading || !result.isValid());
+	let disabled = $derived(loading);
 	let cn = $derived(
 		classnames(result, {
 			untested: 'untested',
@@ -80,22 +80,27 @@
 	);
 
 	const fields = new Set<keyof WorkoutTemplateParams>();
-	const validate = debounce(() => {
-		suite(workoutTemplate, fields).done((r) => {
-			result = r;
-			const newValid = result.isValid() && isSetGroupTemplatesValid();
-			if (valid !== newValid) {
-				valid = newValid;
-			}
-		});
-		fields.clear();
-	}, 300);
+	const validate = debounce(
+		() =>
+			new Promise<boolean>((resolve) => {
+				suite(workoutTemplate, fields).done((r) => {
+					result = r;
+					const newValid = result.isValid() && isSetGroupTemplatesValid();
+					if (valid !== newValid) {
+						valid = newValid;
+					}
+					resolve(valid);
+				});
+				fields.clear();
+			}),
+		300
+	);
 	function validateAll() {
 		for (const field of Object.keys(workoutTemplate)) {
 			fields.add(field as keyof WorkoutTemplateParams);
 		}
 		validate();
-		validate.flush();
+		return validate.flush();
 	}
 	function onTranslationChange(
 		e: Event & { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }
@@ -115,6 +120,8 @@
 				...workoutTemplate,
 				setGroupTemplates
 			};
+			fields.add('setGroupTemplates');
+			validate();
 		};
 	}
 	function createOnSetGroupTemplateDelete(index: number) {
@@ -125,6 +132,8 @@
 				...workoutTemplate,
 				setGroupTemplates
 			};
+			fields.add('setGroupTemplates');
+			validate();
 		};
 	}
 	function createOnSetGroupTemplateValid(index: number) {
@@ -145,8 +154,7 @@
 	async function onSubmit() {
 		try {
 			loading = true;
-			validateAll();
-			if (valid) {
+			if (await validateAll()) {
 				await upsertWorkoutTemplate(workoutTemplate, workoutTemplateId);
 				await goto(`${base}/workout-templates`);
 			}
