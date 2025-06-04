@@ -103,13 +103,13 @@ export function findTranslation(exercise: Exercise) {
 
 if (browser) {
   if (lastExerciseRelease.value === null || lastExerciseRelease.value.updatedAt.valueOf() < Date.now() - 24 * 60 * 60 * 1000) {
-    fetch(CORS_URL + encodeURIComponent(RELEASES))
-      .then(async res => {
-        if (!res.ok) {
-          throw res;
+    fetch(`${CORS_URL}${encodeURIComponent(`${RELEASES}?_=${Date.now}`)}`)
+      .then(async releaseResponse => {
+        if (!releaseResponse.ok) {
+          throw releaseResponse;
         }
-        const lastUpdatedAt = lastExerciseRelease.value?.updatedAt ?? new Date(0);
-        const releases = await res.json();
+        let lastUpdatedAt = lastExerciseRelease.value?.updatedAt ?? new Date(0);
+        const releases = await releaseResponse.json();
         let latestRelease;
         for (const release of releases) {
           if (release.draft) {
@@ -119,28 +119,30 @@ if (browser) {
           if (publishedAt < lastUpdatedAt) {
             continue;
           }
+          lastUpdatedAt = publishedAt;
           latestRelease = release;
         }
-        if (latestRelease) {
-          const zipAsset = latestRelease.assets.find((asset: { name: string; }) => asset.name === "exported-files.zip");
-          const res = await fetch(CORS_URL + encodeURIComponent(zipAsset.browser_download_url));
-          if (!res.ok) {
-            throw res;
-          }
-          const reader = new ZipReader(new BlobReader(await res.blob()));
-          const entries = await reader.getEntries();
-          const exercisesJsonEntry = entries.find(entry => entry.filename === "exercises.json");
-          if (!exercisesJsonEntry?.getData) {
-            throw new Error(`Failed to update exercises`);
-          }
-          const exercisesJSON = JSON.parse(await exercisesJsonEntry.getData(new TextWriter("utf-8")));
-          const exercises = await (await (await getUserDocument()).exercises()).doc();
-          await Promise.all(exercisesJSON.map((exerciseJSON: Exercise) => upsertExercise(exerciseJSON, exercises.exercisesByGuid[exerciseJSON.guid])));
-          lastExerciseRelease.value = {
-            updatedAt: new Date(),
-            publishedAt: new Date(latestRelease.published_at),
-          };
+        if (!latestRelease) {
+          return;
         }
+        const zipAsset = latestRelease.assets.find((asset: { name: string; }) => asset.name === "exported-files.zip");
+        const downloadResponse = await fetch(CORS_URL + encodeURIComponent(zipAsset.browser_download_url));
+        if (!downloadResponse.ok) {
+          throw downloadResponse;
+        }
+        const reader = new ZipReader(new BlobReader(await downloadResponse.blob()));
+        const entries = await reader.getEntries();
+        const exercisesJsonEntry = entries.find(entry => entry.filename === "exercises.json");
+        if (!exercisesJsonEntry?.getData) {
+          throw new Error(`Failed to update exercises`);
+        }
+        const exercisesJSON = JSON.parse(await exercisesJsonEntry.getData(new TextWriter("utf-8")));
+        const exercises = await (await (await getUserDocument()).exercises()).doc();
+        await Promise.all(exercisesJSON.map((exerciseJSON: Exercise) => upsertExercise(exerciseJSON, exercises.exercisesByGuid[exerciseJSON.guid])));
+        lastExerciseRelease.value = {
+          updatedAt: new Date(),
+          publishedAt: new Date(latestRelease.published_at),
+        };
       })
       .catch(error => {
         console.error(error);

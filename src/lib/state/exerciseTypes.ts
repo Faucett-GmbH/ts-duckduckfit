@@ -11,7 +11,14 @@ export interface Exercise {
    * url safe unique resource identifier
    */
   uri: string;
-  execution: ExerciseExecution;
+  execution:
+  | "WEIGHT_REPS"
+  | "REPS_ONLY"
+  | "DURATION"
+  | "WEIGHT_DURATION"
+  | "DISTANCE_DURATION"
+  | "DISTANCE"
+  | "WEIGHT_DISTANCE";
   image_url: string | null;
   thumbnail_image_url: string | null;
   translations: ExerciseTranslation[];
@@ -33,14 +40,3 @@ export interface ExerciseTranslation {
   instructions: string;
   tips?: string[];
 }
-
-export const ExerciseExecutionEnum = {
-  WeightReps: 'WEIGHT_REPS',
-  RepsOnly: 'REPS_ONLY',
-  Duration: 'DURATION',
-  WeightDuration: 'WEIGHT_DURATION',
-  DistanceDuration: 'DISTANCE_DURATION',
-  Distance: 'DISTANCE',
-  WeightDistance: 'WEIGHT_DISTANCE'
-} as const;
-export type ExerciseExecution = typeof ExerciseExecutionEnum[keyof typeof ExerciseExecutionEnum];

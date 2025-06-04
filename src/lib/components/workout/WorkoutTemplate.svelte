@@ -20,7 +20,6 @@
 	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
-	import { ExerciseExecutionEnum } from '$lib/state/exerciseTypes';
 
 	let { workoutTemplateId, workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps =
 		$props();
@@ -98,7 +97,7 @@
 								<p class="mb-0 ms-2">{setTemplate.exerciseGuid}</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
-								<SetAmounts execution={ExerciseExecutionEnum.RepsOnly} set={setTemplate} />
+								<SetAmounts execution={'REPS_ONLY'} set={setTemplate} />
 							</div>
 						</div>
 					{/each}

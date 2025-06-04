@@ -46,34 +46,34 @@
 				let reps = false;
 				let weightInKilograms = false;
 				switch (exercise.execution) {
-					case ExerciseExecutionEnum.DistanceDuration: {
+					case 'DISTANCE_DURATION': {
 						distanceInMeters = true;
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionEnum.Distance: {
+					case 'DISTANCE': {
 						distanceInMeters = true;
 						break;
 					}
-					case ExerciseExecutionEnum.Duration: {
+					case 'DURATION': {
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionEnum.RepsOnly: {
+					case 'REPS_ONLY': {
 						reps = true;
 						break;
 					}
-					case ExerciseExecutionEnum.WeightDistance: {
+					case 'WEIGHT_DISTANCE': {
 						weightInKilograms = true;
 						distanceInMeters = true;
 						break;
 					}
-					case ExerciseExecutionEnum.WeightDuration: {
+					case 'WEIGHT_DURATION': {
 						weightInKilograms = true;
 						timeInSeconds = true;
 						break;
 					}
-					case ExerciseExecutionEnum.WeightReps: {
+					case 'WEIGHT_REPS': {
 						weightInKilograms = true;
 						reps = true;
 						break;
@@ -145,7 +145,7 @@
 	import InputResults from '../InputResults.svelte';
 	import MeasurementInput, { type Units } from '../inputs/MeasurementInput.svelte';
 	import RepsInput, { type RepsInputParams, type RepsInputType } from './RepsInput.svelte';
-	import { ExerciseExecutionEnum, type Exercise } from '$lib/state/exerciseTypes';
+	import type { Exercise } from '$lib/state/exerciseTypes';
 
 	let {
 		setInput,
@@ -226,34 +226,34 @@
 		let reps = false;
 		let weightInKilograms = false;
 		switch (exercise.execution) {
-			case ExerciseExecutionEnum.DistanceDuration: {
+			case 'DISTANCE_DURATION': {
 				distanceInMeters = true;
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionEnum.Distance: {
+			case 'DISTANCE': {
 				distanceInMeters = true;
 				break;
 			}
-			case ExerciseExecutionEnum.Duration: {
+			case 'DURATION': {
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionEnum.RepsOnly: {
+			case 'REPS_ONLY': {
 				reps = true;
 				break;
 			}
-			case ExerciseExecutionEnum.WeightDistance: {
+			case 'WEIGHT_DISTANCE': {
 				weightInKilograms = true;
 				distanceInMeters = true;
 				break;
 			}
-			case ExerciseExecutionEnum.WeightDuration: {
+			case 'WEIGHT_DURATION': {
 				weightInKilograms = true;
 				timeInSeconds = true;
 				break;
 			}
-			case ExerciseExecutionEnum.WeightReps: {
+			case 'WEIGHT_REPS': {
 				weightInKilograms = true;
 				reps = true;
 				break;
@@ -284,7 +284,7 @@
 </script>
 
 <div class="flex flex-shrink flex-row">
-	{#if exercise.execution === ExerciseExecutionEnum.DistanceDuration}
+	{#if exercise.execution === 'DISTANCE_DURATION'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="distanceInMeters"
 				>{m.workouts_set_distance_in_meters_label()}</label
@@ -313,7 +313,7 @@
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionEnum.Distance}
+	{:else if exercise.execution === 'DISTANCE'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="distanceInMeters"
 				>{m.workouts_set_distance_in_meters_label()}</label
@@ -329,7 +329,7 @@
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionEnum.Duration}
+	{:else if exercise.execution === 'DURATION'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="timeInSeconds">{m.workouts_set_time_in_seconds_label()}</label>
 			<MeasurementInput
@@ -343,7 +343,7 @@
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionEnum.RepsOnly}
+	{:else if exercise.execution === 'REPS_ONLY'}
 		<RepsInput
 			repsInput={setInput}
 			{cn}
@@ -352,7 +352,7 @@
 			{onInputTypeChange}
 			{result}
 		/>
-	{:else if exercise.execution === ExerciseExecutionEnum.WeightDistance}
+	{:else if exercise.execution === 'WEIGHT_DISTANCE'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
 				>{m.workouts_set_weight_in_kilograms_label()}</label
@@ -383,7 +383,7 @@
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionEnum.WeightDuration}
+	{:else if exercise.execution === 'WEIGHT_DURATION'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="weightInKilograms"
 				>{m.workouts_set_weight_in_kilograms_label()}</label
@@ -412,7 +412,7 @@
 			/>
 			<InputResults name="timeInSeconds" {result} />
 		</div>
-	{:else if exercise.execution === ExerciseExecutionEnum.WeightReps}
+	{:else if exercise.execution === 'WEIGHT_REPS'}
 		<div class="me-1 flex flex-shrink flex-col">
 			<MeasurementInput
 				class={cn('weightInKilograms')}
