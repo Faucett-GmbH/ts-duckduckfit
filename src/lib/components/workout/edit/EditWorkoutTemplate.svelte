@@ -7,24 +7,22 @@
 	};
 
 	export type WorkoutTemplateTranslationParams = {
+		locale: Locale;
 		description: string | null;
 		name: string;
 	};
 
 	export type WorkoutTemplateParams = {
-		translations: Record<Locale, WorkoutTemplateTranslationParams>;
+		translations: WorkoutTemplateTranslationParams[];
 		setGroupTemplates: Array<SetGroupTemplateParams>;
 	};
 
 	const createSuite = () =>
-		create((data: WorkoutTemplateParams, fields: Set<keyof WorkoutTemplateParams>) => {
-			if (!fields.size) {
-				return;
-			}
-			only(Array.from(fields));
+		create((data: WorkoutTemplateParams, fields: string[]) => {
+			only(fields);
 
 			test('name', m.errors_message_required(), () => {
-				enforce(data.translations.en.name).isNotBlank();
+				enforce(data.translations[0].name).isNotBlank();
 			});
 			test('setGroupTemplates', m.errors_message_required(), () => {
 				enforce(data.setGroupTemplates?.length).greaterThan(0);
@@ -53,12 +51,13 @@
 	let {
 		workoutTemplateId,
 		workoutTemplate = $bindable({
-			translations: {
-				en: {
+			translations: [
+				{
+					locale: 'en',
 					name: '',
 					description: null
 				}
-			},
+			],
 			setGroupTemplates: []
 		})
 	}: WorkoutTemplateProps = $props();
@@ -79,11 +78,11 @@
 		})
 	);
 
-	const fields = new Set<keyof WorkoutTemplateParams>();
+	const fields = new Set<string>();
 	const validate = debounce(
 		() =>
 			new Promise<boolean>((resolve) => {
-				suite(workoutTemplate, fields).done((r) => {
+				suite(workoutTemplate, Array.from(fields)).done((r) => {
 					result = r;
 					const newValid = result.isValid() && isSetGroupTemplatesValid();
 					if (valid !== newValid) {
@@ -106,10 +105,8 @@
 		e: Event & { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }
 	) {
 		const field = e.currentTarget.name as keyof WorkoutTemplateTranslationParams;
-		workoutTemplate.translations.en[field] = e.currentTarget.value;
-		if (field === 'name') {
-			fields.add('name' as never);
-		}
+		workoutTemplate.translations[0][field] = e.currentTarget.value as never;
+		fields.add(field);
 		validate();
 	}
 	function createOnSetGroupTemplateChange(index: number) {
@@ -207,7 +204,7 @@
 		type="text"
 		name="name"
 		placeholder={m.workouts_name_placeholder()}
-		value={workoutTemplate.translations.en.name}
+		value={workoutTemplate.translations[0].name}
 		oninput={onTranslationChange}
 	/>
 	<InputResults name="name" {result} />
@@ -218,7 +215,7 @@
 		class="w-full {cn('description')}"
 		name="description"
 		placeholder={m.workouts_description_placeholder()}
-		value={workoutTemplate.translations.en.description || ''}
+		value={workoutTemplate.translations[0].description || ''}
 		oninput={onTranslationChange}
 	></textarea>
 	<InputResults name="description" {result} />

@@ -16,9 +16,6 @@
 
 	const createSuite = () =>
 		create((data: Partial<UserWeightFormForm> = {}, fields: string[]) => {
-			if (!fields.length) {
-				return;
-			}
 			only(fields);
 
 			test('weightInKg', m.errors_message_required(), () => {

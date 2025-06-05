@@ -17,7 +17,7 @@
 
 	export type SetTemplateParams = ExerciseSetInputParams & {
 		id: string;
-		exerciseGuid: string;
+		exerciseGuid: AutomergeDocumentId<Exercise>;
 		exercise: Exercise;
 		setType: SetType;
 	};
@@ -35,6 +35,7 @@
 	import type { SetType } from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { findTranslation } from '$lib/state/exercises.svelte';
+	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let {
 		position,

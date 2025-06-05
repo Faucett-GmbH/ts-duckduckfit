@@ -4,13 +4,15 @@ import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDo
 import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
 import { applyChanges, type GetKeyFn } from "$lib/diff";
-import { getLocalId } from "$lib/util";
+import { getId } from "$lib/util";
+import { language } from "./language.svelte";
+import type { Exercise } from "./exerciseTypes";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
-  exerciseGuid: string;
+  exerciseGuid: AutomergeDocumentId<Exercise>;
   setType: SetType;
   asManyRoundsAsPossible?: boolean;
   distanceInMeters?: number;
@@ -33,12 +35,13 @@ export interface SetGroupTemplate {
 
 export interface WorkoutTemplateTranslation {
   name: string;
+  locale: Locale;
   description: string | null;
 }
 
 
 export interface WorkoutTemplate {
-  translations: Record<Locale, WorkoutTemplateTranslation>;
+  translations: WorkoutTemplateTranslation[];
   setGroupTemplates: SetGroupTemplate[];
   updatedAt: Date;
   createdAt: Date;
@@ -98,9 +101,24 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
   } else {
     workoutTemplateDocument = await findDocument(workoutTemplateId);
     workoutTemplateDocument.change(wt => {
-      if (applyChanges(wt, workoutTemplateParams, getLocalId as GetKeyFn)) {
+      if (applyChanges(wt, workoutTemplateParams, getId as GetKeyFn)) {
         wt.updatedAt = new Date();
       }
     });
   }
+}
+
+export function findTranslation(workoutTemplate: WorkoutTemplate) {
+  const locale = language.locale;
+  let translation: WorkoutTemplateTranslation | undefined;
+  for (const t of workoutTemplate.translations) {
+    if (t.locale === locale) {
+      translation = t;
+      break;
+    }
+    if (t.locale === 'en' && !translation) {
+      translation = t;
+    }
+  }
+  return translation!;
 }
