@@ -17,50 +17,27 @@
 
 	const userState = automergeDocHandleState(data.user);
 
-	function onEditUserInfo({ birthdate, heightInCm }: EditUserInfoForm) {
+	console.log(userState.doc);
+
+	function onEditUserInfo({ birthdate, sex, height }: EditUserInfoForm) {
 		userState.change((user) => {
-			if (user.heightInCm !== heightInCm) {
-				user.heightInCm = heightInCm;
+			if (user.info.height !== height) {
+				user.info.height = height;
 			}
-			if (user.birthdate?.getTime() !== birthdate?.getTime()) {
-				user.birthdate = birthdate;
+			if (user.info.birthdate?.getTime() !== birthdate?.getTime()) {
+				user.info.birthdate = birthdate;
 			}
-			return user;
-		});
-	}
-	function onEditUserPreferences({
-		weightUnit,
-		distanceUnits,
-		bodyMeasurementUnit
-	}: EditUserPreferencesForm) {
-		userState.change((user) => {
-			if (user.weightUnit !== weightUnit) {
-				user.weightUnit = weightUnit;
-			}
-			if (user.distanceUnits !== distanceUnits) {
-				user.distanceUnits = distanceUnits;
-			}
-			if (user.bodyMeasurementUnit !== bodyMeasurementUnit) {
-				user.bodyMeasurementUnit = bodyMeasurementUnit;
+			if (user.info.sex != sex) {
+				user.info.sex = sex;
 			}
 			return user;
 		});
 	}
-	function onEditUserWeight(index: number, weightInKg: number) {
+	function onEditUserPreferences({ measurementSystem }: EditUserPreferencesForm) {
 		userState.change((user) => {
-			user.weights[index].weightInKg = weightInKg;
-			return user;
-		});
-	}
-	function onAddUserWeight(weightInKg: number) {
-		userState.change((user) => {
-			user.weights.push({ weightInKg, createdAt: new Date() });
-			return user;
-		});
-	}
-	function onDeleteUserWeight(index: number) {
-		userState.change((user) => {
-			user.weights.splice(index, 1);
+			if (user.measurementSystem !== measurementSystem) {
+				user.measurementSystem = measurementSystem;
+			}
 			return user;
 		});
 	}
@@ -79,26 +56,13 @@
 			</div>
 			{#if userState.doc}
 				<div class="flex flex-col mb-2">
-					<EditUserWeights
-						heightInCm={userState.doc.heightInCm}
-						weights={userState.doc.weights}
-						onAdd={onAddUserWeight}
-						onEdit={onEditUserWeight}
-						onDelete={onDeleteUserWeight}
-					/>
-				</div>
-				<div class="flex flex-col mb-2">
-					<EditUserInfo
-						birthdate={userState.doc.birthdate}
-						heightInCm={userState.doc.heightInCm}
-						onUpdate={onEditUserInfo}
-					/>
+					<!-- 
+					<EditUserInfo info={userState.doc.info} onUpdate={onEditUserInfo} />
+					-->
 				</div>
 				<div class="flex flex-col mb-2">
 					<EditUserPreferences
-						weightUnit={userState.doc.weightUnit}
-						distanceUnits={userState.doc.distanceUnits}
-						bodyMeasurementUnit={userState.doc.bodyMeasurementUnit}
+						measurementSystem={userState.doc.measurementSystem}
 						onUpdate={onEditUserPreferences}
 					/>
 				</div>

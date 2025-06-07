@@ -2,14 +2,14 @@
 	import { create, test, enforce, only, omitWhen } from 'vest';
 
 	export type EditUserInfoProps = {
-		birthdate: Date | null;
-		heightInCm: number | null;
+		info: UserInformation | null;
 		onUpdate(updates: EditUserInfoForm): void;
 	};
 
 	export type EditUserInfoForm = {
-		heightInCm: number | null;
 		birthdate: Date | null;
+		sex: 'male' | 'female' | null;
+		height: number | null;
 	};
 
 	const createSuite = () =>
@@ -24,9 +24,14 @@
 					enforce(data.birthdate).isNotBlank();
 				});
 			});
-			omitWhen(!data.heightInCm, () => {
-				test('heightInCm', m.errors_message_required(), () => {
-					enforce(data.heightInCm).isNotBlank();
+			omitWhen(!data.height, () => {
+				test('height', m.errors_message_required(), () => {
+					enforce(data.height).isNotBlank();
+				});
+			});
+			omitWhen(!data.sex, () => {
+				test('sex', m.errors_message_required(), () => {
+					enforce(data.sex).isNotBlank();
 				});
 			});
 		});
@@ -40,11 +45,13 @@
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
 	import MeasurementInput, { type Units } from '$lib/components/inputs/MeasurementInput.svelte';
+	import type { UserInformation } from '$lib/state/user.svelte';
 
-	let { birthdate, heightInCm, onUpdate }: EditUserInfoProps = $props();
+	let { info, onUpdate }: EditUserInfoProps = $props();
 
-	let birthdateString = $state(birthdate?.toISOString().substring(0, 10));
-	let heightInCmValue = $state(heightInCm || 0);
+	let birthdateString = $state(info?.birthdate?.toISOString().substring(0, 10));
+	let heightValue = $state(info?.height || 0);
+	let sex = $state(info?.sex || 'male');
 	let suite = createSuite();
 	let result = $state(suite.get());
 	let loading = $state(false);
@@ -63,7 +70,7 @@
 		heightInCmValue = heightInCm || heightInCmValue;
 	});
 	$effect(() => {
-		birthdateString = birthdate?.toISOString().substring(0, 10) || birthdateString;
+		birthdateString = info?.birthdate?.toISOString().substring(0, 10) || birthdateString;
 	});
 
 	const fields = new Set<string>();
@@ -75,7 +82,7 @@
 	}, 300);
 	export function validateAll() {
 		fields.add('birthdate');
-		fields.add('heightInCm');
+		fields.add('height');
 		validate();
 		validate.flush();
 	}
@@ -122,7 +129,7 @@
 			name="heightInCm"
 			type="distance"
 			metricUnits={'cm'}
-			bind:metricValue={heightInCmValue}
+			bind:metricValue={heightValue}
 			oninput={onMeasurementChange}
 		/>
 		<InputResults name="heightInCm" {result} />

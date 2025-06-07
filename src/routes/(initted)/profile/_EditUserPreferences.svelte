@@ -2,16 +2,12 @@
 	import { create, test, enforce, only, omitWhen } from 'vest';
 
 	export type EditUserPreferencesProps = {
-		weightUnit: 'kg' | 'lbs' | null;
-		distanceUnits: 'km' | 'mi' | null;
-		bodyMeasurementUnit: 'cm' | 'in' | null;
+		measurementSystem: 'metric' | 'imperial' | null;
 		onUpdate(updates: EditUserPreferencesForm): void;
 	};
 
 	export type EditUserPreferencesForm = {
-		weightUnit: 'kg' | 'lbs' | null;
-		distanceUnits: 'km' | 'mi' | null;
-		bodyMeasurementUnit: 'cm' | 'in' | null;
+		measurementSystem: 'metric' | 'imperial' | null;
 	};
 
 	const createSuite = () =>
@@ -21,19 +17,9 @@
 			}
 			only(fields);
 
-			omitWhen(!data.weightUnit, () => {
-				test('weightUnit', m.errors_message_required(), () => {
-					enforce(data.weightUnit).isNotBlank();
-				});
-			});
-			omitWhen(!data.distanceUnits, () => {
-				test('distanceUnits', m.errors_message_required(), () => {
-					enforce(data.distanceUnits).isNotBlank();
-				});
-			});
-			omitWhen(!data.bodyMeasurementUnit, () => {
-				test('bodyMeasurementUnit', m.errors_message_required(), () => {
-					enforce(data.bodyMeasurementUnit).isNotBlank();
+			omitWhen(!data.measurementSystem, () => {
+				test('measurementSystem', m.errors_message_required(), () => {
+					enforce(data.measurementSystem).isNotBlank();
 				});
 			});
 		});
@@ -47,8 +33,7 @@
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
 
-	let { weightUnit, distanceUnits, bodyMeasurementUnit, onUpdate }: EditUserPreferencesProps =
-		$props();
+	let { measurementSystem, onUpdate }: EditUserPreferencesProps = $props();
 
 	let suite = createSuite();
 	let result = $state(suite.get());
@@ -66,18 +51,17 @@
 
 	const fields = new Set<string>();
 	const validate = debounce(() => {
-		suite({ weightUnit, distanceUnits, bodyMeasurementUnit }, Array.from(fields)).done((r) => {
+		suite({ measurementSystem }, Array.from(fields)).done((r) => {
 			result = r;
 		});
 		fields.clear();
 	}, 300);
 	export function validateAll() {
-		fields.add('weightUnit');
-		fields.add('distanceUnits');
-		fields.add('bodyMeasurementUnit');
+		fields.add('measurementSystem');
 		validate();
 		validate.flush();
 	}
+
 	function onChange(e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }) {
 		fields.add(e.currentTarget.name);
 		validate();
@@ -89,7 +73,7 @@
 			loading = true;
 			validateAll();
 			if (result.isValid()) {
-				onUpdate({ weightUnit, distanceUnits, bodyMeasurementUnit } as never);
+				onUpdate({ measurementSystem } as never);
 				suite.reset();
 				result = suite.get();
 			}
@@ -104,46 +88,38 @@
 <h3>{m.user_preferences_title()}</h3>
 <form class="flex flex-col" onsubmit={onSubmit}>
 	<div class="mb-2">
-		<label for="weightUnit">{m.weight_units_label()}</label>
+		<label for="measurementSystem">{m.measurement_system_label()}</label>
 		<select
-			class="w-full {cn('weightUnit')}"
-			name="weightUnit"
-			bind:value={weightUnit}
+			class="w-full {cn('measurementSystem')}"
+			name="measurementSystem"
+			bind:value={measurementSystem}
 			oninput={onChange}
 		>
-			<option value={null}>{m.weight_units_placeholder()}</option>
-			<option value="kg">{m.weight_units_kilograms_label()}</option>
-			<option value="lbs">{m.weight_units_pounds_label()}</option>
+			<option value={null}>{m.measurement_system_placeholder()}</option>
+			<option value="metric">{m.measurement_system_metric()}</option>
+			<option value="imperial">{m.measurement_system_imperial()}</option>
 		</select>
-		<InputResults name="weightUnit" {result} />
+		<InputResults name="measurementSystem" {result} />
 	</div>
 	<div class="mb-2">
 		<label for="distanceUnits">{m.distance_units_label()}</label>
-		<select
-			class="w-full {cn('distanceUnits')}"
-			name="distanceUnits"
-			bind:value={distanceUnits}
-			oninput={onChange}
-		>
-			<option value={null}>{m.distance_units_placeholder()}</option>
-			<option value="km">{m.distance_units_kilometers_label()}</option>
-			<option value="m">{m.distance_units_miles_label()}</option>
-		</select>
-		<InputResults name="distanceUnits" {result} />
+		{#if measurementSystem == 'metric'}
+			{m.distance_units_kilometers_label()}
+		{:else if measurementSystem == 'imperial'}
+			{m.distance_units_miles_label()}
+		{:else}
+			<!-- noop -->
+		{/if}
 	</div>
 	<div class="mb-2">
-		<label for="bodyMeasurementUnit">{m.body_measurement_units_label()}</label>
-		<select
-			class="w-full {cn('bodyMeasurementUnit')}"
-			name="bodyMeasurementUnit"
-			bind:value={bodyMeasurementUnit}
-			oninput={onChange}
-		>
-			<option value={null}>{m.body_measurement_units_placeholder()}</option>
-			<option value="cm">{m.body_measurement_units_centimeters_unit()}</option>
-			<option value="in">{m.body_measurement_units_inches_unit()}</option>
-		</select>
-		<InputResults name="bodyMeasurementUnit" {result} />
+		<label for="weightUnit">{m.weight_units_label()}: </label>
+		{#if measurementSystem == 'metric'}
+			{m.weight_units_kilograms_label()}
+		{:else if measurementSystem == 'imperial'}
+			{m.weight_units_pounds_label()}
+		{:else}
+			<!-- noop -->
+		{/if}
 	</div>
 	<div class="flex flex-row ms-2 justify-end">
 		<button type="submit" class="btn primary flex flex-shrink" {disabled}>
