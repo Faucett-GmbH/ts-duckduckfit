@@ -15,7 +15,7 @@ export interface UserInformation {
 
 export interface User {
   version: number;
-  username: string;
+  username: string | null;
   info: UserInformation;
   weightUnit: 'kg' | 'lbs' | null;
   distanceUnits: 'km' | 'mi' | null;
@@ -27,6 +27,7 @@ export interface User {
 export const userMigrations = {
   1: async () => (user: User) => {
     user.version = 1;
+    user.username = null;
     user.info = {
       birthdate: null,
       fullName: null,
