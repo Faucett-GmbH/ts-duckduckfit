@@ -3,24 +3,25 @@ export interface UserWeightMeasurement {
   measuredAt: Date;
 }
 
+export interface UserAnthropometry {
+  height: number | null;
+}
+
+export type Sex = "male" | "female";
 export type MeasurementSystem = "metric" | "imperial";
 
 export interface UserInformation {
   fullName: string | null;
   bio: string | null;
   birthdate: Date | null;
-  height: number | null;
-  measurementSystem: MeasurementSystem;
+  sex: Sex;
 }
 
 export interface User {
   version: number;
   username: string | null;
   info: UserInformation;
-  weightUnit: 'kg' | 'lbs' | null;
-  distanceUnits: 'km' | 'mi' | null;
-  bodyMeasurementUnit: 'cm' | 'in' | null;
-  heightInCm: number | null;
+  anthropometry: UserAnthropometry;
   bodyWeightMeasurements: UserWeightMeasurement[];
 }
 
@@ -32,7 +33,9 @@ export const userMigrations = {
       birthdate: null,
       fullName: null,
       bio: null,
-      measurementSystem: "metric",
+      sex: "male",
+    };
+    user.anthropometry = {
       height: null
     };
     user.bodyWeightMeasurements = [];

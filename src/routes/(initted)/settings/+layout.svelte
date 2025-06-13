@@ -23,6 +23,7 @@
 				</a>
 			</h2>
 			<ul>
+				<!-- user profile settings -->
 				<li>
 					<a
 						href={`${base}/settings/profile`}
@@ -34,6 +35,21 @@
 						onclick={() => {}}
 					>
 						<span class="ms-4">{m.profile_title()}</span>
+					</a>
+				</li>
+
+				<!-- application settings -->
+				<li>
+					<a
+						href={`${base}/settings/application`}
+						class={{
+							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+							'bg-black/10': page.route.id === '/(initted)/settings/application'
+						}}
+						class:active={page.route.id === '/(initted)/settings/application'}
+						onclick={() => {}}
+					>
+						<span class="ms-4">{m.application_settings_title()}</span>
 					</a>
 				</li>
 			</ul>

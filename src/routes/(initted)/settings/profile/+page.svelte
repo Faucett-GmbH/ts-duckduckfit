@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { automergeDocHandleState } from '$lib/automergeState.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import { onMount } from 'svelte';
 	import type { PageProps } from '../$types';
 	import EditUserInfo, { type EditUserInfoForm } from './_EditUserInfo.svelte';
 
@@ -9,7 +8,7 @@
 
 	const userState = automergeDocHandleState(data.user);
 
-	function onEditUserInfo({ fullName, bio, username }: EditUserInfoForm) {
+	function onEditUserInfo({ fullName, bio, username, sex, birthdate, height }: EditUserInfoForm) {
 		userState.change((user) => {
 			if (user.info.fullName !== fullName) {
 				user.info.fullName = fullName;
@@ -20,13 +19,19 @@
 			if (user.username !== username) {
 				user.username = username;
 			}
+			if (user.info.sex !== sex) {
+				user.info.sex = sex;
+			}
+			if (user.info.birthdate !== birthdate) {
+				user.info.birthdate = birthdate;
+			}
+
+			if (user.anthropometry.height !== height) {
+				user.anthropometry.height = height;
+			}
 			return user;
 		});
 	}
-
-	onMount(() => {
-		console.log(userState.doc);
-	});
 </script>
 
 <div class="form">
@@ -36,6 +41,9 @@
 			fullName={userState.doc.info.fullName}
 			bio={userState.doc.info.bio}
 			username={userState.doc.username}
+			birthdate={userState.doc.info.birthdate}
+			sex={userState.doc.info.sex}
+			height={userState.doc.anthropometry.height}
 			onUpdate={onEditUserInfo}
 		/>
 	{/if}

@@ -1,10 +1,14 @@
 <script lang="ts" module>
+	import { type Sex } from '$lib/state/user.svelte';
 	import { create, test, enforce, only, omitWhen } from 'vest';
 
 	export type EditUserInfoProps = {
 		username: string | null;
 		fullName: string | null;
 		bio: string | null;
+		birthdate: Date | null;
+		sex: Sex;
+		height: number | null;
 		onUpdate(updates: EditUserInfoForm): void;
 	};
 
@@ -12,6 +16,9 @@
 		username: string | null;
 		fullName: string | null;
 		bio: string | null;
+		birthdate: Date | null;
+		sex: Sex;
+		height: number | null;
 	};
 
 	const createSuite = () =>
@@ -47,6 +54,26 @@
 					enforce(data.bio).isNotBlank();
 				});
 			});
+
+			omitWhen(!data.sex, () => {
+				test('sex', m.errors_message_required(), () => {
+					enforce(data.sex).isNotBlank();
+					enforce(data.sex).inside(['male', 'female']);
+				});
+			});
+
+			omitWhen(!data.birthdate, () => {
+				test('birthdate', m.errors_message_required(), () => {
+					enforce(data.birthdate).isNotBlank();
+				});
+			});
+
+			omitWhen(!data.height, () => {
+				test('height', m.errors_message_required(), () => {
+					enforce(data.height).isNotBlank();
+					enforce(data.height).greaterThan(0.0);
+				});
+			});
 		});
 </script>
 
@@ -57,8 +84,9 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
+	import NumericInputWithUnits from '$lib/components/inputs/NumericInputWithUnits.svelte';
 
-	let { fullName, bio, username, onUpdate }: EditUserInfoProps = $props();
+	let { fullName, bio, username, birthdate, sex, height, onUpdate }: EditUserInfoProps = $props();
 
 	let suite = createSuite();
 	let result = $state(suite.get());
@@ -74,10 +102,15 @@
 		})
 	);
 
+	let birthdateString = $state(birthdate?.toISOString().substring(0, 10));
+	$effect(() => {
+		birthdateString = birthdate?.toISOString().substring(0, 10) || birthdateString;
+	});
+
 	const fields = new Set<string>();
 
 	const validate = debounce(() => {
-		suite({ fullName, bio, username }, Array.from(fields)).done((r) => {
+		suite({ fullName, bio, username, birthdate, sex, height }, Array.from(fields)).done((r) => {
 			result = r;
 		});
 		fields.clear();
@@ -87,6 +120,9 @@
 		fields.add('fullName');
 		fields.add('bio');
 		fields.add('username');
+		fields.add('birthdate');
+		fields.add('sex');
+		fields.add('height');
 		validate();
 		validate.flush();
 	}
@@ -110,13 +146,34 @@
 		validate();
 	};
 
+	const onChangeSex = async (
+		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
+	) => {
+		fields.add('sex');
+		validate();
+	};
+
+	const onBirthdateChange = async (
+		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
+	) => {
+		birthdate = new Date(birthdateString || '');
+		fields.add('birthdate');
+		validate();
+	};
+
+	const onChangeHeight = async (metricHeightValue: number) => {
+		height = metricHeightValue;
+		fields.add('height');
+		validate();
+	};
+
 	async function onSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		try {
 			loading = true;
 			validateAll();
 			if (result.isValid()) {
-				onUpdate({ fullName, bio, username });
+				onUpdate({ fullName, bio, username, birthdate, sex, height });
 				suite.reset();
 				result = suite.get();
 			}
@@ -168,6 +225,41 @@
 			oninput={onBioChange}
 		></textarea>
 		<InputResults name="bio" {result} />
+	</div>
+
+	<!-- Sex -->
+	<div class="mb-2">
+		<label for="sex">{m.user_info_sex_label()}</label>
+		<select class="w-full {cn('sex')}" name="sex" bind:value={sex} oninput={onChangeSex}>
+			<option value="male">{m.user_info_sex_select_option_male()}</option>
+			<option value="female">{m.user_info_sex_select_option_female()}</option>
+		</select>
+		<InputResults name="sex" {result} />
+	</div>
+
+	<!-- Birthdate -->
+	<div class="flex flex-col flex-grow mb-2">
+		<label for="birthdate">{m.user_info_birthdate_label()}</label>
+		<input
+			class="w-full {cn('birthdate')}"
+			type="date"
+			name="birthdate"
+			autocomplete="bday"
+			bind:value={birthdateString}
+			oninput={onBirthdateChange}
+		/>
+		<InputResults name="birthdate" {result} />
+	</div>
+
+	<!-- height -->
+	<div class="flex flex-col flex-grow mb-2">
+		<label for="height">{m.user_info_height_label()}</label>
+		<NumericInputWithUnits
+			unitType="height"
+			metricValue={height || 0.0}
+			onChange={onChangeHeight}
+		/>
+		<InputResults name="height" {result} />
 	</div>
 
 	<div class="flex flex-row flex-shrink justify-end">
