@@ -9,23 +9,26 @@
 
 	const userState = automergeDocHandleState(data.user);
 
-	function onEditUserInfo({ fullName }: EditUserInfoForm) {
+	function onEditUserInfo({ fullName, bio }: EditUserInfoForm) {
 		userState.change((user) => {
 			if (user.info.fullName !== fullName) {
 				user.info.fullName = fullName;
 			}
+			if (user.info.bio !== bio) {
+				user.info.bio = bio;
+			}
 			return user;
 		});
 	}
-
-	onMount(() => {
-		console.log(userState.doc);
-	});
 </script>
 
 <div class="form">
 	{#if userState.doc}
 		<h2>{m.profile_title()}</h2>
-		<EditUserInfo onUpdate={onEditUserInfo} fullName={userState.doc.info.fullName} />
+		<EditUserInfo
+			fullName={userState.doc.info.fullName}
+			bio={userState.doc.info.bio}
+			onUpdate={onEditUserInfo}
+		/>
 	{/if}
 </div>

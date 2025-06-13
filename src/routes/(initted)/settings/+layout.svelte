@@ -3,12 +3,12 @@
 	import { base } from '$app/paths';
 	import { m } from '$lib/paraglide/messages';
 
-	let { children }: Props = $props();
+	let { children } = $props();
 </script>
 
 <div class="mx-auto container">
-	<div class="flex">
-		<div class="col-2 px-2">
+	<div class="grid grid-cols-12 gap-2">
+		<div class="col-span-2">
 			<h2>
 				<a
 					href={`${base}/settings`}
@@ -38,7 +38,7 @@
 				</li>
 			</ul>
 		</div>
-		<div class="col-10 px-2">
+		<div class="col-span-10">
 			{@render children()}
 		</div>
 	</div>
