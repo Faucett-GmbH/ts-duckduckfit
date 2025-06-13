@@ -1,26 +1,39 @@
-export interface UserWeight {
-  weightInKg: number;
-  createdAt: Date;
+export interface UserWeightMeasurement {
+  weight: number;
+  measuredAt: Date;
+}
+
+export type MeasurementSystem = "metric" | "imperial";
+
+export interface UserInformation {
+  fullName: string | null;
+  bio: string | null;
+  birthdate: Date | null;
+  height: number | null;
+  measurementSystem: MeasurementSystem;
 }
 
 export interface User {
   version: number;
-  birthdate: Date | null;
+  username: string;
+  info: UserInformation;
   weightUnit: 'kg' | 'lbs' | null;
   distanceUnits: 'km' | 'mi' | null;
   bodyMeasurementUnit: 'cm' | 'in' | null;
   heightInCm: number | null;
-  weights: UserWeight[];
+  bodyWeightMeasurements: UserWeightMeasurement[];
 }
 
 export const userMigrations = {
   1: async () => (user: User) => {
     user.version = 1;
-    user.birthdate = null;
-    user.weightUnit = null;
-    user.distanceUnits = null;
-    user.bodyMeasurementUnit = null;
-    user.heightInCm = null;
-    user.weights = [];
+    user.info = {
+      birthdate: null,
+      fullName: null,
+      bio: null,
+      measurementSystem: "metric",
+      height: null
+    };
+    user.bodyWeightMeasurements = [];
   }
 };
