@@ -8,7 +8,6 @@ export interface UserAnthropometry {
 }
 
 export type Sex = "male" | "female";
-export type MeasurementSystem = "metric" | "imperial";
 
 export interface UserInformation {
   fullName: string | null;
