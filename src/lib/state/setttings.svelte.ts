@@ -1,12 +1,14 @@
 import { localStorageState } from '$lib/localStorageState.svelte';
+import { locales } from '$lib/paraglide/runtime';
 
+export const MEASUREMENT_SYSTEMS = ["metric", "imperial"];
 export type MeasurementSystem = "metric" | "imperial";
 export type AppTheme = "dark" | "light";
-export type SupportedLanguages = "en" | "de";
+export type AvailableLocales = typeof locales[number];
 
 export interface Settings {
   theme: AppTheme
-  language: SupportedLanguages
+  language: AvailableLocales
   measurementSystem: MeasurementSystem
 }
 
