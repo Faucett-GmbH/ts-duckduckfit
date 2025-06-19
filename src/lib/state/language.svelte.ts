@@ -1,13 +1,12 @@
-import { localStorageState } from '$lib/localStorageState.svelte';
 import { Numbers } from '$lib/Numbers';
 import { getLocale, setLocale, type Locale } from '$lib/paraglide/runtime';
 
-const locale = localStorageState<Locale>("locale", getLocale());
-const numbers = $derived.by(() => new Numbers(locale.value));
+const locale = $state<Locale>(getLocale());
+const numbers = $derived.by(() => new Numbers(locale));
 
 export const language = {
 	get locale() {
-		return locale.value;
+		return locale;
 	},
 	get numbers() {
 		return numbers;
@@ -16,6 +15,6 @@ export const language = {
 
 $effect.root(() => {
 	$effect(() => {
-		setLocale(locale.value);
+		setLocale(locale);
 	});
 });
