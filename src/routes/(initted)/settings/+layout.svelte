@@ -52,6 +52,21 @@
 						<span class="ms-4">{m.application_settings_title()}</span>
 					</a>
 				</li>
+
+				<!-- data syncing -->
+				<li>
+					<a
+						href={`${base}/settings/sync`}
+						class={{
+							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+							'bg-black/10': page.route.id === '/(initted)/settings/sync'
+						}}
+						class:active={page.route.id === '/(initted)/settings/sync'}
+						onclick={() => {}}
+					>
+						<span class="ms-4">{m.sync_title()}</span>
+					</a>
+				</li>
 			</ul>
 		</div>
 		<div class="col-span-10">
