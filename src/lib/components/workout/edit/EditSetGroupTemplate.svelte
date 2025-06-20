@@ -56,6 +56,7 @@
 	import { m } from '$lib/paraglide/messages';
 	import type { SetGroupType, SetType } from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
+	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let {
 		setGroupTemplate = $bindable(),
@@ -215,7 +216,7 @@
 		for (const exercise of exercises) {
 			setTemplates.push({
 				id: unsafeId(),
-				exerciseGuid: exercise.guid,
+				exerciseGuid: exercise.guid as AutomergeDocumentId<Exercise>,
 				exercise: exercise,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
 			});

@@ -11,9 +11,6 @@
 
 	const createSuite = () =>
 		create((data: Partial<EditSyncDeviceForm> = {}, fields: string[]) => {
-			if (!fields.length) {
-				return;
-			}
 			only(fields);
 
 			test('name', m.errors_message_required(), () => {

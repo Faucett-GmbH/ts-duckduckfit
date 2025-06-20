@@ -14,9 +14,6 @@
 
 	const createSuite = () =>
 		create((data: Partial<EditUserInfoForm> = {}, fields: string[]) => {
-			if (!fields.length) {
-				return;
-			}
 			only(fields);
 
 			omitWhen(!data.birthdate, () => {

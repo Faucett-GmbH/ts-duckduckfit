@@ -7,7 +7,7 @@ import { getUserDocument, userDocument } from "./userDocument.svelte";
 import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocHandle, type AutomergeDocumentId } from "$lib/repo";
 import type { Exercise, ExerciseTranslation } from "./exerciseTypes";
 import { applyChanges, type GetKeyFn } from "$lib/diff";
-import { getLocalId } from "$lib/util";
+import { getId } from "$lib/util";
 import { fuzzyEquals } from '@aicacia/string-fuzzy_equals'
 import { language } from "./language.svelte";
 
@@ -84,7 +84,7 @@ export async function upsertExercise(exercise: Exercise, exerciseGuid?: Automerg
   } else {
     exerciseDocument = await findDocument(exerciseGuid);
     exerciseDocument.change(wt => {
-      applyChanges(wt, exercise, getLocalId as GetKeyFn);
+      applyChanges(wt, exercise, getId as GetKeyFn);
     });
   }
 }
@@ -93,12 +93,15 @@ export function findTranslation(exercise: Exercise) {
   const locale = language.locale;
   let translation: ExerciseTranslation | undefined;
   for (const t of exercise.translations) {
-    translation = t;
     if (t.locale === locale) {
+      translation = t;
       break;
     }
+    if (t.locale === 'en' && !translation) {
+      translation = t;
+    }
   }
-  return translation;
+  return translation!;
 }
 
 if (browser) {
@@ -108,25 +111,32 @@ if (browser) {
         if (!releaseResponse.ok) {
           throw releaseResponse;
         }
-        let lastUpdatedAt = lastExerciseRelease.value?.updatedAt ?? new Date(0);
         const releases = await releaseResponse.json();
+        let latestPublishedAt = lastExerciseRelease.value?.publishedAt ?? new Date(0);
         let latestRelease;
         for (const release of releases) {
-          if (release.draft) {
+          if (release.draft || !release.published_at) {
             continue;
           }
           const publishedAt = new Date(release.published_at);
-          if (publishedAt < lastUpdatedAt) {
+          if (publishedAt < latestPublishedAt) {
             continue;
           }
-          lastUpdatedAt = publishedAt;
+          latestPublishedAt = publishedAt;
           latestRelease = release;
         }
         if (!latestRelease) {
           return;
         }
         const zipAsset = latestRelease.assets.find((asset: { name: string; }) => asset.name === "exported-files.zip");
-        const downloadResponse = await fetch(CORS_URL + encodeURIComponent(zipAsset.browser_download_url));
+        if (!zipAsset) {
+          return;
+        }
+        const downloadResponse = await fetch(CORS_URL + encodeURIComponent(zipAsset.browser_download_url), {
+          headers: {
+            "Accept": "application/octet-stream"
+          }
+        });
         if (!downloadResponse.ok) {
           throw downloadResponse;
         }
@@ -141,12 +151,12 @@ if (browser) {
         await Promise.all(exercisesJSON.map((exerciseJSON: Exercise) => upsertExercise(exerciseJSON, exercises.exercisesByGuid[exerciseJSON.guid])));
         lastExerciseRelease.value = {
           updatedAt: new Date(),
-          publishedAt: new Date(latestRelease.published_at),
+          publishedAt: latestPublishedAt,
         };
       })
       .catch(error => {
         console.error(error);
         createNotification(m.errors_message_failed_to_update_exercises());
-      });
+      });;
   }
 }

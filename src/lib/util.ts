@@ -84,9 +84,6 @@ export function getId<T extends { id: string | number }>(value: T) {
 export function getGuid<T extends { guid: string }>(value: T) {
 	return value.guid;
 }
-export function getLocalId<T extends { localId: string | number }>(value: T) {
-	return value.localId;
-}
 export function getName<T extends { name: string }>(value: T) {
 	return value.name;
 }

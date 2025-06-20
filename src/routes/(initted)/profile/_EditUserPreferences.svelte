@@ -16,9 +16,6 @@
 
 	const createSuite = () =>
 		create((data: Partial<EditUserPreferencesForm> = {}, fields: string[]) => {
-			if (!fields.length) {
-				return;
-			}
 			only(fields);
 
 			omitWhen(!data.weightUnit, () => {
