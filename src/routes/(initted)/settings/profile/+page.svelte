@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { automergeDocHandleState } from '$lib/automergeState.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import type { PageProps } from '../$types';
+	import type { PageProps } from './$types';
 	import EditUserInfo, { type EditUserInfoForm } from './_EditUserInfo.svelte';
 
 	let { data }: PageProps = $props();
@@ -34,7 +34,7 @@
 	}
 </script>
 
-<div class="form">
+<div class="card flex flex-col">
 	{#if userState.doc}
 		<h2>{m.profile_title()}</h2>
 		<EditUserInfo

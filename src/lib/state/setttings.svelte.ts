@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { localStorageState } from '$lib/localStorageState.svelte';
 import { locales } from '$lib/paraglide/runtime';
 
@@ -13,7 +14,7 @@ export interface Settings {
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  theme: "light",
+  theme: browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light",
   language: "en",
   measurementSystem: "metric"
 }

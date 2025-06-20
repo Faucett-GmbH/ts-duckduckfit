@@ -51,19 +51,17 @@
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
 						'bg-black/10': page.route.id === '/(initted)/workout-templates'
 					}}
-					class:active={page.route.id === '/(initted)/workout-templates'}
 					onclick={onGoto}
 				>
 					<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
 				</a>
 
 				<a
-					href={`${base}/settings`}
+					href={`${base}/settings/profile`}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(initted)/settings'
+						'bg-black/10': page.route.id?.startsWith('/(initted)/settings')
 					}}
-					class:active={page.route.id === '/(initted)/settings'}
 					onclick={onGoto}
 				>
 					<Settings /><span class="ms-4">{m.settings_title()}</span>

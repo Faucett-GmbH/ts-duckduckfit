@@ -3,7 +3,7 @@
 	import { settings } from '$lib/state/setttings.svelte';
 
 	let bodyElement: HTMLBodyElement | null = null;
-	let isDark = settings.value.theme == 'dark' ? true : false;
+	let isDark = $derived(settings.value.theme === 'dark' ? true : false);
 
 	onMount(() => {
 		bodyElement = document.querySelector('body');
@@ -11,9 +11,8 @@
 	});
 
 	function toggleDarkMode() {
-		isDark = !isDark;
 		settings.update((s) => {
-			s.theme = isDark ? 'dark' : 'light';
+			s.theme = isDark ? 'light' : 'dark';
 			return s;
 		});
 		updateTheme();
@@ -29,6 +28,6 @@
 </script>
 
 <label>Enable Mode: </label>
-<button on:click={toggleDarkMode} class="p-2 bg-gray-300 dark:bg-gray-700 rounded cursor-pointer">
+<button onclick={toggleDarkMode} class="btn primary">
 	{isDark ? 'Light' : 'Dark'} Mode
 </button>

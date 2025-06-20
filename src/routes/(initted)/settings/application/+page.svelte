@@ -38,7 +38,7 @@
 	};
 </script>
 
-<div class="form">
+<div class="card">
 	{#if userState.doc}
 		<h2>{m.application_settings_title()}</h2>
 
