@@ -25,13 +25,13 @@
 	"body_measurement_units_placeholder": "Select Body Measurement Unit",
 	"body_measurement_units_centimeters_unit": "Centimeters (cm)",
 	"body_measurement_units_inches_unit": "Inches (in)",
-	"settings_title": "Settings",
-	"profile_title": "Profile",
-	"application_settings_title": "Application",
+	"settings_title": "Einstellungen",
+	"profile_title": "Profil",
+	"application_settings_title": "Anwendung",
 	"application_settings_theme_mode": "UI Theme",
-	"application_settings_language": "Interface Language",
-	"application_settings_measurement_system": "Measurement System",
-	"anthropometry_title": "Anthropometry",
+	"application_settings_language": "Sprache",
+	"application_settings_measurement_system": "Maßsystem",
+	"anthropometry_title": "Anthropometrie",
 	"sync_title": "Sync",
 	"sync_syncing_device": "Syncing Device",
 	"sync_add_device_title": "Add Device",
@@ -123,6 +123,5 @@
 	"sync_device_connected": "{name} Connected",
 	"sync_device_disconnected": "{name} Disconnected",
 	"copied_to_clipboard": "Copied to Clipboard",
-	"errors_message_failed_to_update_exercises": "failed to update exercises",
-	"workouts_back": "Back"
+	"errors_message_failed_to_update_exercises": "failed to update exercises"
 }

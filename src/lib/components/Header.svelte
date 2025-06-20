@@ -3,7 +3,7 @@
 	import { base } from '$app/paths';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
-	import User from 'lucide-svelte/icons/user';
+	import { Settings } from 'lucide-svelte';
 	import Dumbbell from 'lucide-svelte/icons/dumbbell';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
@@ -44,27 +44,27 @@
 						<Menu />
 					</button>
 				{/snippet}
-				<a
-					href={`${base}/profile`}
-					class={{
-						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(authed)/profile'
-					}}
-					class:active={page.route.id === '/(authed)/profile'}
-					onclick={onGoto}
-				>
-					<User /><span class="ms-4">{m.profile_title()}</span>
-				</a>
+
 				<a
 					href={`${base}/workout-templates`}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(authed)/workout-templates'
+						'bg-black/10': page.route.id === '/(initted)/workout-templates'
 					}}
-					class:active={page.route.id === '/(authed)/workout-templates'}
 					onclick={onGoto}
 				>
 					<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
+				</a>
+
+				<a
+					href={`${base}/settings/profile`}
+					class={{
+						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+						'bg-black/10': page.route.id?.startsWith('/(initted)/settings')
+					}}
+					onclick={onGoto}
+				>
+					<Settings /><span class="ms-4">{m.settings_title()}</span>
 				</a>
 			</Dropdown>
 		</div>
