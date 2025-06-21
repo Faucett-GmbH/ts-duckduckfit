@@ -20,6 +20,12 @@ export default defineConfig(async ({ mode }) => {
 
 	const config: UserConfig = {
 		clearScreen: false,
+		resolve: process.env.VITEST ? {
+			conditions: ['browser']
+		} : undefined,
+		test: {
+			environment: 'jsdom'
+		},
 		server: {
 			host: host || '0.0.0.0',
 			port: 5173,

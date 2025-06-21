@@ -1,4 +1,10 @@
-export function cmToFeetInches(cm: number): { feet: number; inches: number } {
+
+export type FeetInches = {
+  feet: number;
+  inches: number;
+}
+
+export function cmToFeetInches(cm: number): FeetInches {
   const totalInches = cm / 2.54;
   return {
     feet: Math.floor(totalInches / 12),
@@ -6,8 +12,8 @@ export function cmToFeetInches(cm: number): { feet: number; inches: number } {
   };
 }
 
-export function feetInchesToCm(feet: number, inches: number): number {
-  return Math.round((feet * 12 + inches) * 2.54);
+export function feetInchesToCm(feetInches: FeetInches): number {
+  return Math.round((feetInches.feet * 12 + feetInches.inches) * 2.54);
 }
 
 export function kgToLbs(kg: number): number {

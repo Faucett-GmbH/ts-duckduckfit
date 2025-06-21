@@ -126,5 +126,8 @@
 	"errors_message_failed_to_update_exercises": "failed to update exercises",
 	"workouts_back": "Back",
 	"metric_system": "Metric",
-	"imperial_system": "Imperial"
+	"imperial_system": "Imperial",
+	"components_inputs_height_input_cm" : "cm",
+	"components_inputs_height_input_in" : "in",
+	"components_inputs_height_input_ft" : "ft"
 }

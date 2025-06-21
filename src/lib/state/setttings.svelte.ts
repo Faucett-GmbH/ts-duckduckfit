@@ -4,11 +4,13 @@ import { userDocument } from './userDocument.svelte';
 
 let theme = $state<'dark' | 'light'>(browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light");
 
+export type MeasurementSystemType = "metric" | "imperial";
+
 export interface Settings {
   version: number;
   theme: "dark" | "light";
   language: Locale;
-  measurementSystem: "metric" | "imperial";
+  measurementSystem: MeasurementSystemType;
 }
 
 export const settingsConfig = {

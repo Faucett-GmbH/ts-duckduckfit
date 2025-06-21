@@ -9,6 +9,7 @@
 		birthdate: Date | null;
 		sex: Sex;
 		height: number | null;
+		measurementSystem: MeasurementSystemType;
 		onUpdate(updates: EditUserInfoForm): void;
 	};
 
@@ -84,9 +85,19 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
-	import NumericInputWithUnits from '$lib/components/inputs/NumericInputWithUnits.svelte';
+	import HeightInput from '$lib/components/inputs/HeightInput.svelte';
+	import type { MeasurementSystemType } from '$lib/state/setttings.svelte';
 
-	let { fullName, bio, username, birthdate, sex, height, onUpdate }: EditUserInfoProps = $props();
+	let {
+		fullName,
+		bio,
+		username,
+		birthdate,
+		sex,
+		height,
+		measurementSystem,
+		onUpdate
+	}: EditUserInfoProps = $props();
 
 	let suite = createSuite();
 	let result = $state(suite.get());
@@ -254,11 +265,8 @@
 	<!-- height -->
 	<div class="flex flex-col flex-grow mb-2">
 		<label for="height">{m.user_info_height_label()}</label>
-		<NumericInputWithUnits
-			unitType="height"
-			metricValue={height || 0.0}
-			onChange={onChangeHeight}
-		/>
+
+		<HeightInput value={height} system={measurementSystem} onChange={onChangeHeight} />
 		<InputResults name="height" {result} />
 	</div>
 

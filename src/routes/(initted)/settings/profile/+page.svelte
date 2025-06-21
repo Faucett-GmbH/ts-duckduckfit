@@ -7,6 +7,7 @@
 	let { data }: PageProps = $props();
 
 	const userState = automergeDocHandleState(data.user);
+	const settingsState = automergeDocHandleState(data.settings);
 
 	function onEditUserInfo({ fullName, bio, username, sex, birthdate, height }: EditUserInfoForm) {
 		userState.change((user) => {
@@ -44,6 +45,7 @@
 			birthdate={userState.doc.info.birthdate}
 			sex={userState.doc.info.sex}
 			height={userState.doc.anthropometry.height}
+			measurementSystem={settingsState.doc.measurementSystem}
 			onUpdate={onEditUserInfo}
 		/>
 	{/if}
