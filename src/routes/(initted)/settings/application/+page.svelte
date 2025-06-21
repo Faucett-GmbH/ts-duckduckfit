@@ -4,66 +4,75 @@
 	import { m } from '$lib/paraglide/messages';
 	import type { PageProps } from './$types';
 	import { setLocale, type Locale, locales } from '$lib/paraglide/runtime';
-	import { language } from '$lib/state/language.svelte';
-	import {
-		MEASUREMENT_SYSTEMS,
-		settings,
-		type MeasurementSystem
-	} from '$lib/state/setttings.svelte';
+	import type { ChangeEventHandler } from 'svelte/elements';
 
 	let { data }: PageProps = $props();
 
-	const userState = automergeDocHandleState(data.user);
-	let currentLocale: Locale = $state(language.locale);
-	let currentMeasurementSystem: MeasurementSystem = $state(settings.value.measurementSystem);
+	const settingsState = automergeDocHandleState(data.settings);
 
-	const onChangeLocale = (e: Event) => {
-		if (currentLocale == null) {
-			return;
-		}
-
-		setLocale(currentLocale);
-
-		settings.update((k) => {
-			k.language = currentLocale;
-			return k;
+	function onThemeChange(theme: 'dark' | 'light') {
+		settingsState.change((settings) => {
+			settings.theme = theme;
+			return settings;
 		});
+	}
+
+	const onLanguageChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+		const language = e.currentTarget.value as Locale;
+		settingsState.change((settings) => {
+			settings.language = language;
+			return settings;
+		});
+		setLocale(language);
 	};
 
-	const onUpdateMeasurementSystem = (e: Event) => {
-		settings.update((k) => {
-			k.measurementSystem = currentMeasurementSystem;
-			return k;
+	const onMeasurementSystemChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+		const measurementSystem = e.currentTarget.value as 'metric' | 'imperial';
+		settingsState.change((settings) => {
+			settings.measurementSystem = measurementSystem;
+			return settings;
 		});
 	};
 </script>
 
-<div class="card">
-	{#if userState.doc}
-		<h2>{m.application_settings_title()}</h2>
+<form class="card flex flex-col">
+	<h2>{m.application_settings_title()}</h2>
+	{#if settingsState.doc}
+		<div class="flex flex-row items-center flex-grow mb-2">
+			<label for="theme" class="me-2">{m.application_settings_theme_mode()}</label>
+			<ThemeModeToggle name="theme" theme={settingsState.doc.theme} onchange={onThemeChange} />
+		</div>
 
-		<h4>{m.application_settings_theme_mode()}</h4>
+		<div class="flex flex-row items-center flex-grow mb-2">
+			<label for="language">{m.application_settings_language()}</label>
+			<select
+				name="language"
+				class="ms-2"
+				value={settingsState.doc.language}
+				onchange={onLanguageChange}
+			>
+				{#each locales as locale (locale)}
+					<option value={locale} selected={settingsState.doc.language == locale}>{locale}</option>
+				{/each}
+			</select>
+		</div>
 
-		<ThemeModeToggle />
-
-		<h4>{m.application_settings_language()}</h4>
-
-		<select bind:value={currentLocale} onchange={onChangeLocale}>
-			{#each locales as locale}
-				<option value={locale} selected={currentLocale == locale ? true : false}>{locale}</option>
-			{/each}
-		</select>
-
-		<h4>{m.application_settings_measurement_system()}</h4>
-
-		<select bind:value={currentMeasurementSystem} onchange={onUpdateMeasurementSystem}>
-			{#each MEASUREMENT_SYSTEMS as measurement_system}
-				<option
-					value={measurement_system}
-					selected={currentMeasurementSystem == measurement_system ? true : false}
-					>{measurement_system}</option
-				>
-			{/each}
-		</select>
+		<div class="flex flex-row items-center flex-grow mb-2">
+			<label for="measurementSystem">{m.application_settings_measurement_system()}</label>
+			<select
+				class="ms-2"
+				name="measurementSystem"
+				value={settingsState.doc.measurementSystem}
+				onchange={onMeasurementSystemChange}
+			>
+				{#each ['metric', 'imperial'] as measurementSystem}
+					<option
+						value={measurementSystem}
+						selected={settingsState.doc.measurementSystem == measurementSystem}
+						>{m[`${measurementSystem}_system`]()}</option
+					>
+				{/each}
+			</select>
+		</div>
 	{/if}
-</div>
+</form>

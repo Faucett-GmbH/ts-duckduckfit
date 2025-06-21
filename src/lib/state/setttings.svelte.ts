@@ -1,22 +1,18 @@
 import { browser } from '$app/environment';
-import { localStorageState } from '$lib/localStorageState.svelte';
-import { locales } from '$lib/paraglide/runtime';
-
-export const MEASUREMENT_SYSTEMS = ["metric", "imperial"];
-export type MeasurementSystem = "metric" | "imperial";
-export type AppTheme = "dark" | "light";
-export type AvailableLocales = typeof locales[number];
+import type { Locale } from '$lib/paraglide/runtime';
 
 export interface Settings {
-  theme: AppTheme
-  language: AvailableLocales
-  measurementSystem: MeasurementSystem
+  version: number;
+  theme: "dark" | "light";
+  language: Locale;
+  measurementSystem: "metric" | "imperial";
 }
 
-const DEFAULT_SETTINGS: Settings = {
-  theme: browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light",
-  language: "en",
-  measurementSystem: "metric"
-}
-
-export const settings = localStorageState<Settings>("settings", DEFAULT_SETTINGS);
+export const settingsMigrations = {
+  1: async () => (settings: Settings) => {
+    settings.version = 1;
+    settings.theme = browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light";
+    settings.language = "en";
+    settings.measurementSystem = "metric";
+  }
+};

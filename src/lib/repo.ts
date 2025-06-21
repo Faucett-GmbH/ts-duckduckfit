@@ -33,9 +33,8 @@ export async function deleteDocument<T>(docId: AutomergeDocumentId<T>, repo = ge
 
 export async function migrate<T extends { version: number }>(docHandle: DocHandle<T>, migrations: Record<number, (doc: Doc<T>) => (Promise<ChangeFn<T>> | ChangeFn<T>)>) {
   let doc = docHandle.doc() as Doc<T>;
-  const version = doc.version || 0;
-  for (let i = version + 1; i <= Object.keys(migrations).length; i++) {
-    const migrationFn = migrations[i];
+  for (let version = (doc.version || 0) + 1; version <= Object.keys(migrations).length; version++) {
+    const migrationFn = migrations[version];
     if (migrationFn) {
       const changeFn = await migrationFn(doc);
       docHandle.change(changeFn);

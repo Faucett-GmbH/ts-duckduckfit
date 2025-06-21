@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	import { type Sex } from '$lib/state/user.svelte';
-	import { create, test, enforce, only, omitWhen } from 'vest';
+	import { create, test, enforce, omitWhen } from 'vest';
 
 	export type EditUserInfoProps = {
 		username: string | null;

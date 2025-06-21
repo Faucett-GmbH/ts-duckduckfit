@@ -5,6 +5,8 @@ import type { AutomergeDocumentId } from '$lib/repo';
 import type { Exercise } from '$lib/state/exerciseTypes';
 import { getExerciseById } from '$lib/state/exercises.svelte';
 
+export const prerender = false;
+
 export const load: PageLoad = async (event) => {
 	await event.parent();
 	const workoutTemplateId = event.params.id as unknown as AutomergeDocumentId<WorkoutTemplate>;

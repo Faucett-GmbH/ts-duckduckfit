@@ -1,33 +1,32 @@
-<script lang="ts">
-	import { onMount } from 'svelte';
-	import { settings } from '$lib/state/setttings.svelte';
-
-	let bodyElement: HTMLBodyElement | null = null;
-	let isDark = $derived(settings.value.theme === 'dark' ? true : false);
-
-	onMount(() => {
-		bodyElement = document.querySelector('body');
-		updateTheme();
-	});
-
-	function toggleDarkMode() {
-		settings.update((s) => {
-			s.theme = isDark ? 'light' : 'dark';
-			return s;
-		});
-		updateTheme();
-	}
-
-	function updateTheme() {
-		if (isDark) {
-			bodyElement?.classList.add('dark');
-		} else {
-			bodyElement?.classList.remove('dark');
-		}
+<script lang="ts" module>
+	export interface ThemeModeToggleProps {
+		name?: string;
+		theme: 'dark' | 'light';
+		onchange?(value: 'dark' | 'light'): void;
 	}
 </script>
 
-<label>Enable Mode: </label>
-<button onclick={toggleDarkMode} class="btn primary">
-	{isDark ? 'Light' : 'Dark'} Mode
-</button>
+<script lang="ts">
+	import Toggle from './inputs/Toggle.svelte';
+	import Sun from 'lucide-svelte/icons/sun';
+	import Moon from 'lucide-svelte/icons/moon';
+
+	let { name, theme = $bindable('dark'), onchange }: ThemeModeToggleProps = $props();
+
+	let checked = $state(theme === 'light' ? true : false);
+
+	$effect(() => {
+		if (checked) {
+			theme = 'light';
+			document.body.classList.remove('dark');
+		} else {
+			theme = 'dark';
+			document.body.classList.add('dark');
+		}
+		onchange?.(theme);
+	});
+</script>
+
+<Toggle {name} bind:checked
+	>{#if checked}<Sun />{:else}<Moon />{/if}</Toggle
+>

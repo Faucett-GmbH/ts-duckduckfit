@@ -29,7 +29,7 @@
 	"profile_title": "Profile",
 	"application_settings_title": "Application",
 	"application_settings_theme_mode": "UI Theme",
-	"application_settings_language": "Interface Language",
+	"application_settings_language": "Language",
 	"application_settings_measurement_system": "Measurement System",
 	"anthropometry_title": "Anthropometry",
 	"sync_title": "Sync",
@@ -124,5 +124,7 @@
 	"sync_device_disconnected": "{name} Disconnected",
 	"copied_to_clipboard": "Copied to Clipboard",
 	"errors_message_failed_to_update_exercises": "failed to update exercises",
-	"workouts_back": "Back"
+	"workouts_back": "Back",
+	"metric_system": "Metric",
+	"imperial_system": "Imperial"
 }

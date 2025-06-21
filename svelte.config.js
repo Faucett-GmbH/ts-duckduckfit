@@ -12,8 +12,8 @@ const config = {
 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter({
-			fallback: 'index.html',
-			precompress: true
+			precompress: true,
+			strict: true,
 		}),
 		paths: {
 			base: process.env.USE_BASE_PATH ? '/ts-duckduckfit' : ''

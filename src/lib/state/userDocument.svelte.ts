@@ -7,9 +7,11 @@ import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemp
 import { initSync, syncMigrations, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesMigrations, type Exercises } from './exercises.svelte';
+import { settingsMigrations, type Settings } from './setttings.svelte';
 
 export interface UserDocument {
 	version: number;
+	settings: AutomergeDocumentId<Settings>;
 	user: AutomergeDocumentId<User>;
 	sync: AutomergeDocumentId<Sync>;
 	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
@@ -20,6 +22,7 @@ export const userDocumentMigrations = {
 	1: () => (userDocument: UserDocument) => {
 		const repo = getRepo();
 		userDocument.version = 1;
+		userDocument.settings = createDocument<Settings>({}, repo).documentId;
 		userDocument.user = createDocument<User>({}, repo).documentId;
 		userDocument.sync = createDocument<Sync>({}, repo).documentId;
 		userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
@@ -33,6 +36,7 @@ async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
 	if (!userDocument) {
 		throw InternalError.from('errors_name_application', 'errors_message_application');
 	}
+	await migrate(await findDocument(userDocument.settings), settingsMigrations);
 	await migrate(await findDocument(userDocument.user), userMigrations);
 	await migrate(await findDocument(userDocument.sync), syncMigrations);
 	await migrate(await findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
@@ -67,6 +71,9 @@ export class CurrentUserDocument {
 			throw InternalError.from('errors_name_application', 'errors_message_application');
 		}
 		return userDocument;
+	}
+	async settings() {
+		return findDocument((await this.userDocument()).settings);
 	}
 	async user() {
 		return findDocument((await this.userDocument()).user);

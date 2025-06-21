@@ -31,7 +31,6 @@
 	import { debounce } from '@aicacia/debounce';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import MeasurementInput, { type Units } from '$lib/components/inputs/MeasurementInput.svelte';
-	import type { EventHandler } from 'svelte/elements';
 	import { handleError } from '$lib/error';
 
 	let { weightInKg = 0, onSubmit }: UserWeightFormProps = $props();

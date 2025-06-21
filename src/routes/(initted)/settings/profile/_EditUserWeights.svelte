@@ -4,7 +4,7 @@
 	export type EditUserWeightsProps = {
 		timeFrame?: TimeFrame;
 		heightInCm: number | null;
-		weights: UserWeight[];
+		weights: UserWeightMeasurement[];
 		onAdd(weightInKg: number): void;
 		onEdit(index: number, weightInKg: number): void;
 		onDelete(index: number): void;
@@ -15,7 +15,7 @@
 	import { m } from '$lib/paraglide/messages';
 	import Plus from 'lucide-svelte/icons/plus';
 	import Pencil from 'lucide-svelte/icons/pencil';
-	import type { UserWeight } from '$lib/state/user.svelte';
+	import type { UserWeightMeasurement } from '$lib/state/user.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Measurement from '$lib/components/inputs/Measurement.svelte';
 	import UserWeightForm, { type UserWeightFormValid } from './_UserWeightForm.svelte';
@@ -35,11 +35,11 @@
 	}
 	let weight = $derived(weights[weights.length - 1]);
 	let todaysWeight = $derived(
-		weight?.createdAt.toISOString().substring(0, 10) === new Date().toISOString().substring(0, 10)
+		weight?.measuredAt.toISOString().substring(0, 10) === new Date().toISOString().substring(0, 10)
 			? weight
 			: null
 	);
-	let bmi = $derived(weight && heightInCm ? weight.weightInKg / (heightInCm / 100) ** 2 : null);
+	let bmi = $derived(weight && heightInCm ? weight.weight / (heightInCm / 100) ** 2 : null);
 	let weightsByTime = $derived.by(() => {
 		let lookBackDate: Date;
 		switch (timeFrame) {
@@ -56,10 +56,10 @@
 				lookBackDate = new Date(Date.now() - 365.25 * 24 * 60 * 60 * 1000);
 				break;
 		}
-		const newWeights: UserWeight[] = [];
+		const newWeights: UserWeightMeasurement[] = [];
 		for (let i = weights.length - 1; i >= 0; i--) {
 			const weight = weights[i];
-			if (weight.createdAt > lookBackDate) {
+			if (weight.measuredAt > lookBackDate) {
 				newWeights.push(weight);
 			}
 		}
@@ -67,7 +67,7 @@
 	});
 
 	let editWeightOpen = $state(false);
-	let editWeight = $state<UserWeight>();
+	let editWeight = $state<UserWeightMeasurement>();
 	let editWeightIndex = $state(-1);
 	let addWeightOpen = $state(false);
 	function onAddEditWeight() {
@@ -127,7 +127,7 @@
 		{#if timeFrame === '1d'}
 			<div class="flex flex-col flex-grow justify-center items-center">
 				{#if weight}
-					<p class="m-0 p-2"><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></p>
+					<p class="m-0 p-2"><Measurement metricValue={weight.weight} metricUnits="kg" /></p>
 				{:else}
 					<p class="m-0 p-2">{m.user_weights_no_weight()}</p>
 				{/if}
@@ -136,11 +136,11 @@
 			<div class="flex flex-col flex-grow justify-center items-center">
 				<div class="flex flex-col flex-grow">
 					{#if weightsByTime.length}
-						{#each weightsByTime as weight (weight.createdAt)}
+						{#each weightsByTime as weight (weight.measuredAt)}
 							<p class="m-0 p-0">
-								<span>{weight.createdAt.toLocaleDateString()}</span>
+								<span>{weight.measuredAt.toLocaleDateString()}</span>
 								<span class="ms-2"
-									><Measurement metricValue={weight.weightInKg} metricUnits="kg" /></span
+									><Measurement metricValue={weight.weight} metricUnits="kg" /></span
 								>
 							</p>
 						{/each}
@@ -156,7 +156,7 @@
 		{#if weight}
 			<p class="m-0">
 				{m.user_weights_weight_label()}:
-				<Measurement metricValue={weight.weightInKg} metricUnits="kg" />
+				<Measurement metricValue={weight.weight} metricUnits="kg" />
 			</p>
 		{/if}
 		{#if bmi}
@@ -176,7 +176,7 @@
 		<h1>{m.user_weights_edit_weight_title()}</h1>
 	{/snippet}
 	{#if editWeight}
-		<UserWeightForm weightInKg={editWeight.weightInKg} onSubmit={onEditWeight} />
+		<UserWeightForm weightInKg={editWeight.weight} onSubmit={onEditWeight} />
 	{/if}
 </Modal>
 
@@ -184,5 +184,5 @@
 	{#snippet title()}
 		<h1>{m.user_weights_weigh_in_title()}</h1>
 	{/snippet}
-	<UserWeightForm weightInKg={todaysWeight?.weightInKg || 0} onSubmit={onAddWeight} />
+	<UserWeightForm weightInKg={todaysWeight?.weight || 0} onSubmit={onAddWeight} />
 </Modal>
