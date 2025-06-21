@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { automergeDocHandleState } from '$lib/automergeState.svelte';
-	import ThemeModeToggle from '$lib/components/ThemeModeToggle.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { PageProps } from './$types';
 	import { setLocale, type Locale, locales } from '$lib/paraglide/runtime';
 	import type { ChangeEventHandler } from 'svelte/elements';
+	import Toggle from '$lib/components/inputs/Toggle.svelte';
+	import Moon from 'lucide-svelte/icons/moon';
+	import Sun from 'lucide-svelte/icons/sun';
+	import { setTheme } from '$lib/state/setttings.svelte';
 
 	let { data }: PageProps = $props();
 
 	const settingsState = automergeDocHandleState(data.settings);
 
-	function onThemeChange(theme: 'dark' | 'light') {
-		settingsState.change((settings) => {
-			settings.theme = theme;
-			return settings;
-		});
-	}
+	const onThemeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+		setTheme(e.currentTarget.checked ? 'light' : 'dark');
+	};
 
 	const onLanguageChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
 		const language = e.currentTarget.value as Locale;
@@ -40,7 +40,9 @@
 	{#if settingsState.doc}
 		<div class="flex flex-row items-center flex-grow mb-2">
 			<label for="theme" class="me-2">{m.application_settings_theme_mode()}</label>
-			<ThemeModeToggle name="theme" theme={settingsState.doc.theme} onchange={onThemeChange} />
+			<Toggle name="theme" checked={settingsState.doc.theme === 'light'} onchange={onThemeChange}
+				>{#if settingsState.doc.theme === 'light'}<Sun />{:else}<Moon />{/if}</Toggle
+			>
 		</div>
 
 		<div class="flex flex-row items-center flex-grow mb-2">

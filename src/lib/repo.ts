@@ -31,14 +31,29 @@ export async function deleteDocument<T>(docId: AutomergeDocumentId<T>, repo = ge
   return (await findDocument(docId, repo)).delete();
 }
 
-export async function migrate<T extends { version: number }>(docHandle: DocHandle<T>, migrations: Record<number, (doc: Doc<T>) => (Promise<ChangeFn<T>> | ChangeFn<T>)>) {
-  let doc = docHandle.doc() as Doc<T>;
+export type Migrations<T> = Record<number, (doc: Doc<T>) => (Promise<ChangeFn<T>> | ChangeFn<T>)>;
+
+export async function migrate<T extends { version: number }>(docHandle: AutomergeDocHandle<T>, migrations: Migrations<T>) {
+  let doc = docHandle.doc();
   for (let version = (doc.version || 0) + 1; version <= Object.keys(migrations).length; version++) {
     const migrationFn = migrations[version];
     if (migrationFn) {
       const changeFn = await migrationFn(doc);
       docHandle.change(changeFn);
-      doc = await docHandle.doc()!;
+      docHandle.change((state) => {
+        state.version = version;
+      });
+      doc = docHandle.doc();
     }
   }
+}
+
+export interface RepoConfig<T> {
+  migrations: Migrations<T>;
+  onReady?(doc: Doc<T>): void;
+}
+
+export async function initDocument<T extends { version: number }>(docHandle: AutomergeDocHandle<T>, config: RepoConfig<T>) {
+  await migrate(docHandle, config.migrations);
+  config.onReady?.(docHandle.doc());
 }

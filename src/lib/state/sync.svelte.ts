@@ -17,17 +17,18 @@ export interface Sync {
   devices: { [deviceId: string]: SyncDevice };
 }
 
-export const syncMigrations = {
-  1: async () => {
-    const deviceId = await getDeviceId();
+export const syncConfig = {
+  migrations: {
+    1: async () => {
+      const deviceId = await getDeviceId();
 
-    return (sync: Sync) => {
-      sync.version = 1;
-      sync.devices = {};
-      sync.devices[deviceId] = {
-        name: navigator.userAgent,
-        createdAt: new Date()
-      };
+      return (sync: Sync) => {
+        sync.devices = {};
+        sync.devices[deviceId] = {
+          name: navigator.userAgent,
+          createdAt: new Date()
+        };
+      }
     }
   }
 };

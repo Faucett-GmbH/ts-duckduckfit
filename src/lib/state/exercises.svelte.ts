@@ -26,10 +26,12 @@ export interface Exercises {
   exercisesByGuid: Record<string, AutomergeDocumentId<Exercise>>;
 }
 
-export const exercisesMigrations = {
-  1: () => (exercises: Exercises) => {
-    exercises.version = 1;
-    exercises.exercisesByGuid = {};
+export const exercisesConfig = {
+  migrations: {
+    1: () => (exercises: Exercises) => {
+      exercises.version = 1;
+      exercises.exercisesByGuid = {};
+    }
   }
 };
 

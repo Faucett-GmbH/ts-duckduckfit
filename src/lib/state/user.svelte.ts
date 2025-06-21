@@ -24,19 +24,20 @@ export interface User {
   bodyWeightMeasurements: UserWeightMeasurement[];
 }
 
-export const userMigrations = {
-  1: async () => (user: User) => {
-    user.version = 1;
-    user.username = null;
-    user.info = {
-      birthdate: null,
-      fullName: null,
-      bio: null,
-      sex: "male",
-    };
-    user.anthropometry = {
-      height: null
-    };
-    user.bodyWeightMeasurements = [];
+export const userConfig = {
+  migrations: {
+    1: async () => (user: User) => {
+      user.username = null;
+      user.info = {
+        birthdate: null,
+        fullName: null,
+        bio: null,
+        sex: "male",
+      };
+      user.anthropometry = {
+        height: null
+      };
+      user.bodyWeightMeasurements = [];
+    }
   }
 };

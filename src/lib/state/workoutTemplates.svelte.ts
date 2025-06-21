@@ -52,10 +52,11 @@ export interface WorkoutTemplates {
   workoutTemplatesById: Record<AutomergeDocumentId<WorkoutTemplate>, boolean>;
 }
 
-export const workoutTemplatesMigrations = {
-  1: () => (workoutTemplates: WorkoutTemplates) => {
-    workoutTemplates.version = 1;
-    workoutTemplates.workoutTemplatesById = {};
+export const workoutTemplatesConfig = {
+  migrations: {
+    1: () => (workoutTemplates: WorkoutTemplates) => {
+      workoutTemplates.workoutTemplatesById = {};
+    }
   }
 };
 

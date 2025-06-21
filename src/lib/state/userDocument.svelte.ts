@@ -1,13 +1,13 @@
 import { InternalError } from '$lib/error';
 import { localStorageState } from '$lib/localStorageState.svelte';
-import { findDocument, migrate, getRepo, createDocument, type AutomergeDocumentId } from '$lib/repo';
+import { findDocument, getRepo, createDocument, type AutomergeDocumentId, initDocument, type AutomergeDocHandle } from '$lib/repo';
 import type { DocHandle } from '@automerge/automerge-repo/slim';
-import { userMigrations, type User } from './user.svelte';
-import { workoutTemplatesMigrations, type WorkoutTemplates } from './workoutTemplates.svelte';
-import { initSync, syncMigrations, type Sync } from './sync.svelte';
+import { userConfig, type User } from './user.svelte';
+import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplates.svelte';
+import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
-import { exercisesMigrations, type Exercises } from './exercises.svelte';
-import { settingsMigrations, type Settings } from './setttings.svelte';
+import { exercisesConfig, type Exercises } from './exercises.svelte';
+import { settingsConfig, type Settings } from './setttings.svelte';
 
 export interface UserDocument {
 	version: number;
@@ -18,29 +18,30 @@ export interface UserDocument {
 	exercises: AutomergeDocumentId<Exercises>;
 }
 
-export const userDocumentMigrations = {
-	1: () => (userDocument: UserDocument) => {
-		const repo = getRepo();
-		userDocument.version = 1;
-		userDocument.settings = createDocument<Settings>({}, repo).documentId;
-		userDocument.user = createDocument<User>({}, repo).documentId;
-		userDocument.sync = createDocument<Sync>({}, repo).documentId;
-		userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
-		userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
+export const userDocumentConfig = {
+	migrations: {
+		1: () => (userDocument: UserDocument) => {
+			const repo = getRepo();
+			userDocument.settings = createDocument<Settings>({}, repo).documentId;
+			userDocument.user = createDocument<User>({}, repo).documentId;
+			userDocument.sync = createDocument<Sync>({}, repo).documentId;
+			userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
+			userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
+		}
 	}
 };
 
-async function runAllMigrations(userDocumentHandle: DocHandle<UserDocument>) {
-	await migrate(userDocumentHandle, userDocumentMigrations);
+async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocument>) {
+	await initDocument(userDocumentHandle, userDocumentConfig);
 	const userDocument = userDocumentHandle.doc();
 	if (!userDocument) {
 		throw InternalError.from('errors_name_application', 'errors_message_application');
 	}
-	await migrate(await findDocument(userDocument.settings), settingsMigrations);
-	await migrate(await findDocument(userDocument.user), userMigrations);
-	await migrate(await findDocument(userDocument.sync), syncMigrations);
-	await migrate(await findDocument(userDocument.workoutTemplates), workoutTemplatesMigrations);
-	await migrate(await findDocument(userDocument.exercises), exercisesMigrations);
+	await initDocument(await findDocument(userDocument.settings), settingsConfig);
+	await initDocument(await findDocument(userDocument.user), userConfig);
+	await initDocument(await findDocument(userDocument.sync), syncConfig);
+	await initDocument(await findDocument(userDocument.workoutTemplates), workoutTemplatesConfig);
+	await initDocument(await findDocument(userDocument.exercises), exercisesConfig);
 }
 
 export class CurrentUserDocument {
@@ -102,18 +103,15 @@ export const userDocument = {
 }
 
 async function initUserDocument() {
-	if (currentUserDocument) {
-		return currentUserDocument;
-	}
 	if (currentUserDocumentId.value == null) {
 		const userDocument = createDocument<UserDocument>();
 		await userDocument.whenReady();
-		await runAllMigrations(userDocument);
+		await initAllDocuments(userDocument);
 		currentUserDocumentId.value = userDocument.documentId;
 	} else {
 		const userDocument = await findDocument(currentUserDocumentId.value);
 		await userDocument.whenReady();
-		await runAllMigrations(userDocument);
+		await initAllDocuments(userDocument);
 	}
 	await initSync(await currentUserDocument!.sync());
 	return currentUserDocument!;
@@ -132,6 +130,6 @@ export async function setUserDocumentId(userDocumentId: AutomergeDocumentId<User
 	currentUserDocumentId.value = userDocumentId;
 	const userDocument = await findDocument(userDocumentId);
 	await userDocument.whenReady();
-	await runAllMigrations(userDocument);
+	await initAllDocuments(userDocument);
 	return currentUserDocument!;
 }

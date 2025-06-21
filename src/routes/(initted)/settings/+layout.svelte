@@ -10,46 +10,35 @@
 	<div class="grid grid-cols-12 gap-4">
 		<div class="col-span-2">
 			<ul class="list-none">
-				<!-- user profile settings -->
 				<li>
 					<a
 						href={`${base}/settings/profile`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(initted)/settings/profile'
+							'bg-black/20': page.route.id === '/(initted)/settings/profile'
 						}}
-						class:active={page.route.id === '/(initted)/settings/profile'}
-						onclick={() => {}}
 					>
 						<span class="ms-4">{m.profile_title()}</span>
 					</a>
 				</li>
-
-				<!-- application settings -->
 				<li>
 					<a
 						href={`${base}/settings/application`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(initted)/settings/application'
+							'bg-black/20': page.route.id === '/(initted)/settings/application'
 						}}
-						class:active={page.route.id === '/(initted)/settings/application'}
-						onclick={() => {}}
 					>
 						<span class="ms-4">{m.application_settings_title()}</span>
 					</a>
 				</li>
-
-				<!-- data syncing -->
 				<li>
 					<a
 						href={`${base}/settings/sync`}
 						class={{
 							'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-							'bg-black/10': page.route.id === '/(initted)/settings/sync'
+							'bg-black/20': page.route.id === '/(initted)/settings/sync'
 						}}
-						class:active={page.route.id === '/(initted)/settings/sync'}
-						onclick={() => {}}
 					>
 						<span class="ms-4">{m.sync_title()}</span>
 					</a>
