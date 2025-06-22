@@ -21,7 +21,7 @@
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import type { MeasurementSystem } from '../inputs/MeasurementInput.svelte';
 
-	let { execution, set, unitSystem = 'METRIC' }: SetAmmountsProps = $props();
+	let { execution, set, unitSystem = 'metric' }: SetAmmountsProps = $props();
 </script>
 
 <div class="flex flex-shrink flex-col justify-end sm:flex-row">

@@ -63,7 +63,7 @@
 	}
 	function onMeasurementChange(
 		_metricValue: number,
-		_metricUnits: Units<'METRIC', any>,
+		_metricUnits: Units<'metric', any>,
 		name?: string
 	) {
 		if (!name) {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { LayoutProps } from './$types';
-	import { getTheme } from '$lib/state/setttings.svelte';
+	import { getTheme } from '$lib/state/settings.svelte';
 
 	let { children }: LayoutProps = $props();
 

@@ -13,13 +13,13 @@
 
 	export interface ExerciseSetInputParams extends RepsInputParams {
 		distanceInMeters?: number;
-		distanceUnits?: Units<'METRIC', 'distance'>;
+		distanceUnits?: Units<'metric', 'distance'>;
 		restAfterInSeconds?: number;
-		restAfterUnits?: Units<'METRIC', 'duration'>;
+		restAfterUnits?: Units<'metric', 'duration'>;
 		timeInSeconds?: number;
-		timeUnits?: Units<'METRIC', 'duration'>;
+		timeUnits?: Units<'metric', 'duration'>;
 		weightInKilograms?: number;
-		weightUnits?: Units<'METRIC', 'mass'>;
+		weightUnits?: Units<'metric', 'mass'>;
 	}
 
 	const createSuite = () =>
@@ -185,7 +185,7 @@
 	}, 300);
 	function onMeasurementChange(
 		metricValue: number,
-		_metricUnits: Units<'METRIC', any>,
+		_metricUnits: Units<'metric', any>,
 		name?: string
 	) {
 		const field = name as keyof ExerciseSetInputParams;

@@ -120,12 +120,17 @@
 
 	const fields = new Set<string>();
 
-	const validate = debounce(() => {
-		suite({ fullName, bio, username, birthdate, sex, height }, Array.from(fields)).done((r) => {
-			result = r;
-		});
-		fields.clear();
-	}, 300);
+	const validate = debounce(
+		() =>
+			new Promise<boolean>((resolve) => {
+				suite({ fullName, bio, username, birthdate, sex, height }, Array.from(fields)).done((r) => {
+					result = r;
+					resolve(r.isValid());
+				});
+				fields.clear();
+			}),
+		300
+	);
 
 	export function validateAll() {
 		fields.add('fullName');
@@ -135,55 +140,33 @@
 		fields.add('sex');
 		fields.add('height');
 		validate();
-		validate.flush();
+		return validate.flush();
 	}
 
-	const onChangeUsername = async (
-		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
-	) => {
-		fields.add('username');
+	const onFieldChange: ChangeEventHandler<
+		HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+	> = (e) => {
+		fields.add(e.currentTarget.name);
 		validate();
 	};
 
-	const onFullNameChange = async (
-		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
-	) => {
-		fields.add('fullName');
-		validate();
-	};
-
-	const onBioChange = async (e: Event & { currentTarget: HTMLTextAreaElement }) => {
-		fields.add('bio');
-		validate();
-	};
-
-	const onChangeSex = async (
-		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
-	) => {
-		fields.add('sex');
-		validate();
-	};
-
-	const onBirthdateChange = async (
-		e: Event & { currentTarget: HTMLInputElement | HTMLSelectElement }
-	) => {
+	const onBirthdateChange: ChangeEventHandler<HTMLInputElement> = () => {
 		birthdate = new Date(birthdateString || '');
 		fields.add('birthdate');
 		validate();
 	};
 
-	const onChangeHeight = async (metricHeightValue: number) => {
+	function onChangeHeight(metricHeightValue: number) {
 		height = metricHeightValue;
 		fields.add('height');
 		validate();
-	};
+	}
 
 	async function onSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		try {
 			loading = true;
-			validateAll();
-			if (result.isValid()) {
+			if (await validateAll()) {
 				onUpdate({ fullName, bio, username, birthdate, sex, height });
 				suite.reset();
 				result = suite.get();
@@ -206,7 +189,7 @@
 			name="username"
 			placeholder={m.user_info_username_placeholder()}
 			bind:value={username}
-			oninput={onChangeUsername}
+			oninput={onFieldChange}
 		/>
 		<InputResults name="username" {result} />
 	</div>
@@ -220,7 +203,7 @@
 			name="fullName"
 			placeholder={m.user_info_full_name_placeholder()}
 			bind:value={fullName}
-			oninput={onFullNameChange}
+			oninput={onFieldChange}
 		/>
 		<InputResults name="fullName" {result} />
 	</div>
@@ -233,7 +216,7 @@
 			name="bio"
 			placeholder={m.user_info_bio_placeholder()}
 			bind:value={bio}
-			oninput={onBioChange}
+			oninput={onFieldChange}
 		></textarea>
 		<InputResults name="bio" {result} />
 	</div>
@@ -241,7 +224,7 @@
 	<!-- Sex -->
 	<div class="mb-2">
 		<label for="sex">{m.user_info_sex_label()}</label>
-		<select class="w-full {cn('sex')}" name="sex" bind:value={sex} oninput={onChangeSex}>
+		<select class="w-full {cn('sex')}" name="sex" bind:value={sex} oninput={onFieldChange}>
 			<option value="male">{m.user_info_sex_select_option_male()}</option>
 			<option value="female">{m.user_info_sex_select_option_female()}</option>
 		</select>

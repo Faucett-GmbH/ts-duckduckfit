@@ -9,7 +9,7 @@
 
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { language } from '$lib/state/language.svelte';
+	import { getLocale } from '$lib/state/settings.svelte';
 	import Trash from 'lucide-svelte/icons/trash';
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import Modal from '../Modal.svelte';
@@ -17,7 +17,11 @@
 	import SetAmounts from './SetAmounts.svelte';
 	import SetTypeComponent from './SetType.svelte';
 	import { getRealSetPosition } from './util';
-	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
+	import {
+		deleteWorkoutTemplate,
+		findTranslation,
+		type WorkoutTemplate
+	} from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
 
@@ -42,7 +46,7 @@
 </script>
 
 <div class="flex flex-row flex-wrap items-center justify-between">
-	<h3 class="m-0">{workoutTemplate.translations[language.locale].name}</h3>
+	<h3 class="m-0">{findTranslation(workoutTemplate).name}</h3>
 	<div class="flex flex-row">
 		<button class="btn danger icon me-2" onclick={onOpenDelete}><Trash /></button>
 		<a
@@ -111,7 +115,7 @@
 	{#snippet title()}
 		<h5>
 			{m.workouts_template_delete_title({
-				name: workoutTemplate.translations[language.locale].name
+				name: findTranslation(workoutTemplate).name
 			})}
 		</h5>
 	{/snippet}

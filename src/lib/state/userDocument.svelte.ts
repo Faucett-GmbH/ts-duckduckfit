@@ -7,7 +7,7 @@ import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplate
 import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
-import { settingsConfig, type Settings } from './setttings.svelte';
+import { settingsConfig, type Settings } from './settings.svelte';
 
 export interface UserDocument {
 	version: number;

@@ -9,7 +9,7 @@ import type { Exercise, ExerciseTranslation } from "./exerciseTypes";
 import { applyChanges, type GetKeyFn } from "$lib/diff";
 import { getId } from "$lib/util";
 import { fuzzyEquals } from '@aicacia/string-fuzzy_equals'
-import { language } from "./language.svelte";
+import { getLocale } from "./settings.svelte";
 
 const RELEASES = "https://api.github.com/repos/Faucett-GmbH/exdb_data/releases";
 const CORS_URL = "https://corsproxy.io/?url=";
@@ -92,7 +92,7 @@ export async function upsertExercise(exercise: Exercise, exerciseGuid?: Automerg
 }
 
 export function findTranslation(exercise: Exercise) {
-  const locale = language.locale;
+  const locale = getLocale();
   let translation: ExerciseTranslation | undefined;
   for (const t of exercise.translations) {
     if (t.locale === locale) {

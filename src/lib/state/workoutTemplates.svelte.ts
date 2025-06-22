@@ -5,7 +5,7 @@ import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
 import { applyChanges, type GetKeyFn } from "$lib/diff";
 import { getId } from "$lib/util";
-import { language } from "./language.svelte";
+import { getLocale } from "./settings.svelte";
 import type { Exercise } from "./exerciseTypes";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
@@ -110,7 +110,7 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
 }
 
 export function findTranslation(workoutTemplate: WorkoutTemplate) {
-  const locale = language.locale;
+  const locale = getLocale();
   let translation: WorkoutTemplateTranslation | undefined;
   for (const t of workoutTemplate.translations) {
     if (t.locale === locale) {

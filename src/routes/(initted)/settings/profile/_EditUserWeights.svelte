@@ -19,7 +19,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import Measurement from '$lib/components/inputs/Measurement.svelte';
 	import UserWeightForm, { type UserWeightFormValid } from './_UserWeightForm.svelte';
-	import { language } from '$lib/state/language.svelte';
+	import { getNumbers } from '$lib/state/settings.svelte';
 
 	let {
 		timeFrame = '1d',
@@ -162,7 +162,7 @@
 		{#if bmi}
 			<p class="m-0">
 				{m.user_weights_bmi_label()}:
-				{language.numbers.format(bmi, 1)}
+				{getNumbers().format(bmi, 1)}
 			</p>
 		{/if}
 	</div>

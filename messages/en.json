@@ -127,7 +127,7 @@
 	"workouts_back": "Back",
 	"metric_system": "Metric",
 	"imperial_system": "Imperial",
-	"components_inputs_height_input_cm" : "cm",
-	"components_inputs_height_input_in" : "in",
-	"components_inputs_height_input_ft" : "ft"
+	"components_inputs_height_input_cm": "cm",
+	"components_inputs_height_input_in": "in",
+	"components_inputs_height_input_ft": "ft"
 }

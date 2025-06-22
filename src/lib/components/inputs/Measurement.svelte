@@ -1,14 +1,13 @@
 <script lang="ts" module>
 	export interface MeasurementProps<S extends MeasurementSystem, T extends MeasurementType> {
 		metricValue?: number;
-		system?: S;
 		type?: T;
-		metricUnits?: Units<'METRIC', T>;
+		metricUnits?: Units<'metric', T>;
 	}
 </script>
 
 <script lang="ts" generics="S extends MeasurementSystem, T extends MeasurementType">
-	import { language } from '$lib/state/language.svelte';
+	import { getMeasurementSystem, getNumbers } from '$lib/state/settings.svelte';
 	import {
 		initialFractionDigits,
 		metricToReadable,
@@ -20,9 +19,8 @@
 
 	let {
 		metricValue = $bindable(0),
-		system = 'IMPERIAL' as S,
 		type = 'mass' as T,
-		metricUnits = (system === 'IMPERIAL'
+		metricUnits = (getMeasurementSystem() === 'imperial'
 			? type === 'mass'
 				? 'oz'
 				: 'fl.oz'
@@ -35,10 +33,10 @@
 	let units = $state() as Units<S, T>;
 	$effect(() => {
 		const [v, u] =
-			system === 'METRIC'
+			getMeasurementSystem() === 'metric'
 				? metricToReadable(metricValue, type, metricUnits)
 				: toImperial(metricValue, type, metricUnits, true);
-		value = language.numbers.format(v, initialFractionDigits);
+		value = getNumbers().format(v, initialFractionDigits);
 		units = u as Units<S, T>;
 	});
 </script>

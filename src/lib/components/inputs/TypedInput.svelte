@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-	import { language } from '$lib/state/language.svelte';
+	import { getNumbers } from '$lib/state/settings.svelte';
 	import { selectElementContents } from '$lib/util';
 	import type { EventHandler } from 'svelte/elements';
 	import AutosizeInput from './AutosizeInput.svelte';
@@ -48,7 +48,7 @@
 	let valueNumber: number;
 	$effect(() => {
 		value = ((value ?? 0) + '').replace(NUMERIC_RE, '');
-		const newValueNumber = language.numbers.parse(value);
+		const newValueNumber = getNumbers().parse(value);
 		if (isNaN(newValueNumber)) {
 			value = '0';
 		} else {

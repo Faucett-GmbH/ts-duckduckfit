@@ -12,14 +12,14 @@
 	import { unsafeId } from '$lib/util';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageData } from './$types';
-	import { language } from '$lib/state/language.svelte';
+	import { getLocale } from '$lib/state/settings.svelte';
 	import { findTranslation } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 
 	let { data }: Props = $props();
 
 	let translation = $derived(findTranslation(data.workoutTemplate));
-	let backUrl = $derived(data.referrer || `${base}/${language.locale}/workout-templates`);
+	let backUrl = $derived(data.referrer || `${base}/${getLocale()}/workout-templates`);
 	let workoutTemplate = $derived<WorkoutTemplateParams>({
 		translations: data.workoutTemplate.translations,
 		setGroupTemplates:

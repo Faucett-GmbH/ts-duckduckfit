@@ -2,12 +2,12 @@
 	import { automergeDocHandleState } from '$lib/automergeState.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { PageProps } from './$types';
-	import { setLocale, type Locale, locales } from '$lib/paraglide/runtime';
+	import { type Locale, locales } from '$lib/paraglide/runtime';
 	import type { ChangeEventHandler } from 'svelte/elements';
 	import Toggle from '$lib/components/inputs/Toggle.svelte';
 	import Moon from 'lucide-svelte/icons/moon';
 	import Sun from 'lucide-svelte/icons/sun';
-	import { setTheme } from '$lib/state/setttings.svelte';
+	import { setLocale, setMeasurementSystem, setTheme } from '$lib/state/settings.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -18,20 +18,11 @@
 	};
 
 	const onLanguageChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-		const language = e.currentTarget.value as Locale;
-		settingsState.change((settings) => {
-			settings.language = language;
-			return settings;
-		});
-		setLocale(language);
+		setLocale(e.currentTarget.value as Locale);
 	};
 
 	const onMeasurementSystemChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-		const measurementSystem = e.currentTarget.value as 'metric' | 'imperial';
-		settingsState.change((settings) => {
-			settings.measurementSystem = measurementSystem;
-			return settings;
-		});
+		setMeasurementSystem(e.currentTarget.value as 'metric' | 'imperial');
 	};
 </script>
 
@@ -50,11 +41,11 @@
 			<select
 				name="language"
 				class="ms-2"
-				value={settingsState.doc.language}
+				value={settingsState.doc.locale}
 				onchange={onLanguageChange}
 			>
 				{#each locales as locale (locale)}
-					<option value={locale} selected={settingsState.doc.language == locale}>{locale}</option>
+					<option value={locale} selected={settingsState.doc.locale == locale}>{locale}</option>
 				{/each}
 			</select>
 		</div>

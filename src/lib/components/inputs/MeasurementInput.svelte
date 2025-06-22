@@ -8,12 +8,12 @@
 		type: 'mass' | 'distance' | 'duration' | 'any';
 	};
 
-	export const IMPERIAL_MASS_OPTIONS: UnitOption[] = [
+	export const imperial_MASS_OPTIONS: UnitOption[] = [
 		{ name: 'pounds', units: 'lb', type: 'mass' }
 	];
 	export const MASS_OPTIONS: UnitOption[] = [{ name: 'kilograms', units: 'kg', type: 'mass' }];
 
-	export const IMPERIAL_DISTANCE_OPTIONS: UnitOption[] = [
+	export const imperial_DISTANCE_OPTIONS: UnitOption[] = [
 		{ name: 'miles', units: 'm', type: 'distance' },
 		{ name: 'yards', units: 'yd', type: 'distance' },
 		{ name: 'feet', units: 'ft', type: 'distance' },
@@ -31,14 +31,14 @@
 		{ name: 'seconds', units: 's', type: 'duration' }
 	];
 
-	export const IMPERIAL_BOTH_OPTIONS = [
-		...IMPERIAL_MASS_OPTIONS,
-		...IMPERIAL_DISTANCE_OPTIONS,
+	export const imperial_BOTH_OPTIONS = [
+		...imperial_MASS_OPTIONS,
+		...imperial_DISTANCE_OPTIONS,
 		...DURATION_OPTIONS
 	];
 	export const BOTH_OPTIONS = [...MASS_OPTIONS, ...DISTANCE_OPTIONS, ...DURATION_OPTIONS];
 
-	export type MeasurementSystem = 'METRIC' | 'IMPERIAL';
+	export type MeasurementSystem = 'metric' | 'imperial';
 
 	export const MEASUREMENT_TYPES = ['mass', 'distance', 'duration', 'any'] as const;
 	export type MeasurementType = (typeof MEASUREMENT_TYPES)[number];
@@ -46,14 +46,14 @@
 	export const MASS_UNITS = ['kg'] as const;
 	export type WeightUnit = (typeof MASS_UNITS)[number];
 
-	export const IMPERIAL_MASS_UNITS = ['lb'] as const;
-	export type ImperialWeightUnit = (typeof IMPERIAL_MASS_UNITS)[number];
+	export const imperial_MASS_UNITS = ['lb'] as const;
+	export type ImperialWeightUnit = (typeof imperial_MASS_UNITS)[number];
 
 	export const DISTANCE_UNITS = ['km', 'm', 'cm'] as const;
 	export type DistanceUnit = (typeof DISTANCE_UNITS)[number];
 
-	export const IMPERIAL_DISTANCE_UNITS = ['m', 'yd', 'ft', 'in'] as const;
-	export type ImperialDistanceUnit = (typeof IMPERIAL_DISTANCE_UNITS)[number];
+	export const imperial_DISTANCE_UNITS = ['m', 'yd', 'ft', 'in'] as const;
+	export type ImperialDistanceUnit = (typeof imperial_DISTANCE_UNITS)[number];
 
 	export const DURATION_UNITS = ['hr', 'm', 's'] as const;
 	export type DurationUnit = (typeof DURATION_UNITS)[number];
@@ -61,7 +61,7 @@
 	export type ImperialUnit = ImperialWeightUnit | ImperialDistanceUnit | DurationUnit;
 	export type Unit = WeightUnit | DistanceUnit | DurationUnit;
 
-	export type Units<S, T> = S extends 'METRIC'
+	export type Units<S, T> = S extends 'metric'
 		? T extends 'any'
 			? Unit
 			: T extends 'mass'
@@ -116,19 +116,19 @@
 
 	export function toImperial<
 		T extends MeasurementType,
-		U extends Units<'METRIC', T>,
-		R extends Units<'IMPERIAL', T>
+		U extends Units<'metric', T>,
+		R extends Units<'imperial', T>
 	>(value: number, type: T, units: U, allowConvert = true): [value: number, units: R] {
 		switch (type) {
 			case 'mass':
-				const massUnits = units as Units<'METRIC', 'mass'>;
+				const massUnits = units as Units<'metric', 'mass'>;
 				switch (massUnits) {
 					case 'kg':
 						return [kilogramsToPounds(value), 'lb' as R];
 				}
 				break;
 			case 'distance':
-				const distanceUnits = units as Units<'METRIC', 'distance'>;
+				const distanceUnits = units as Units<'metric', 'distance'>;
 				switch (distanceUnits) {
 					case 'km':
 						return [feetToMiles(metersToFeet(value / 1000)), 'm' as R];
@@ -142,7 +142,7 @@
 				}
 				break;
 			case 'duration':
-				const durationUnits = units as Units<'METRIC', 'duration'>;
+				const durationUnits = units as Units<'metric', 'duration'>;
 				switch (durationUnits) {
 					case 'hr':
 						if (allowConvert && value < 1) {
@@ -164,19 +164,19 @@
 
 	export function toMetric<
 		T extends MeasurementType,
-		U extends Units<'IMPERIAL', T>,
-		R extends Units<'METRIC', T>
+		U extends Units<'imperial', T>,
+		R extends Units<'metric', T>
 	>(value: number, type: T, units: U): [value: number, units: R] {
 		switch (type) {
 			case 'mass':
-				const massUnits = units as Units<'IMPERIAL', 'mass'>;
+				const massUnits = units as Units<'imperial', 'mass'>;
 				switch (massUnits) {
 					case 'lb':
 						return [poundsToKilograms(value), 'kg' as R];
 				}
 				break;
 			case 'distance':
-				const distanceUnits = units as Units<'IMPERIAL', 'distance'>;
+				const distanceUnits = units as Units<'imperial', 'distance'>;
 				switch (distanceUnits) {
 					case 'm':
 						return [feetToMeters(milesToFeet(value)) / 1000, 'km' as R];
@@ -194,14 +194,14 @@
 
 	export function metricToReadable<
 		T extends MeasurementType,
-		U extends Units<'METRIC', T>,
-		R extends Units<'METRIC', T>
+		U extends Units<'metric', T>,
+		R extends Units<'metric', T>
 	>(value: number, type: T, units: U): [value: number, units: R] {
 		switch (type) {
 			case 'mass':
 				break;
 			case 'distance':
-				const distanceUnits = units as Units<'METRIC', 'distance'>;
+				const distanceUnits = units as Units<'metric', 'distance'>;
 				switch (distanceUnits) {
 					case 'km':
 						if (value < 1) {
@@ -216,7 +216,7 @@
 				}
 				break;
 			case 'duration':
-				const durationUnits = units as Units<'METRIC', 'duration'>;
+				const durationUnits = units as Units<'metric', 'duration'>;
 				switch (durationUnits) {
 					case 'hr':
 						if (value < 0.1) {
@@ -247,15 +247,15 @@
 
 	export function convertImperialUnits<
 		T extends MeasurementType,
-		U extends Units<'IMPERIAL', T>,
-		R extends Units<'METRIC', T>
+		U extends Units<'imperial', T>,
+		R extends Units<'metric', T>
 	>(value: number, type: T, previousUnits: U, nextUnits: U): [value: number, units: R] {
 		switch (type) {
 			case 'mass':
 				break;
 			case 'distance':
-				const distancePreviousUnits = previousUnits as Units<'IMPERIAL', 'distance'>;
-				const distanceNextUnits = nextUnits as Units<'IMPERIAL', 'distance'>;
+				const distancePreviousUnits = previousUnits as Units<'imperial', 'distance'>;
+				const distanceNextUnits = nextUnits as Units<'imperial', 'distance'>;
 				switch (distancePreviousUnits) {
 					case 'm':
 						switch (distanceNextUnits) {
@@ -301,8 +301,8 @@
 			case 'duration':
 				return convertDurationUnits(
 					value,
-					previousUnits as Units<'METRIC', 'duration'>,
-					nextUnits as Units<'METRIC', 'duration'>
+					previousUnits as Units<'metric', 'duration'>,
+					nextUnits as Units<'metric', 'duration'>
 				) as [value: number, units: R];
 		}
 		return [value, nextUnits as never];
@@ -310,15 +310,15 @@
 
 	export function convertMetricUnits<
 		T extends MeasurementType,
-		U extends Units<'METRIC', T>,
-		R extends Units<'METRIC', T>
+		U extends Units<'metric', T>,
+		R extends Units<'metric', T>
 	>(value: number, type: T, previousUnits: U, nextUnits: U): [value: number, units: R] {
 		switch (type) {
 			case 'mass':
 				break;
 			case 'distance':
-				const distancePreviousUnits = previousUnits as Units<'METRIC', 'distance'>;
-				const distanceNextUnits = nextUnits as Units<'METRIC', 'distance'>;
+				const distancePreviousUnits = previousUnits as Units<'metric', 'distance'>;
+				const distanceNextUnits = nextUnits as Units<'metric', 'distance'>;
 				switch (distancePreviousUnits) {
 					case 'km':
 						switch (distanceNextUnits) {
@@ -346,16 +346,16 @@
 			case 'duration':
 				return convertDurationUnits(
 					value,
-					previousUnits as Units<'METRIC', 'duration'>,
-					nextUnits as Units<'METRIC', 'duration'>
+					previousUnits as Units<'metric', 'duration'>,
+					nextUnits as Units<'metric', 'duration'>
 				) as [value: number, units: R];
 		}
 		return [value, nextUnits as never];
 	}
 
 	export function convertDurationUnits<
-		U extends Units<'METRIC', 'duration'>,
-		R extends Units<'METRIC', 'duration'>
+		U extends Units<'metric', 'duration'>,
+		R extends Units<'metric', 'duration'>
 	>(value: number, previousUnits: U, nextUnits: R): [value: number, units: R] {
 		switch (previousUnits) {
 			case 'hr':
@@ -389,47 +389,33 @@
 	export interface MeasurementInputProps<S extends MeasurementSystem, T extends MeasurementType> {
 		class?: string;
 		id?: string;
-		system?: S;
 		type?: T;
 		name?: string;
 		disabled?: boolean;
 		metricValue?: number;
-		metricUnits?: Units<'METRIC', T>;
+		metricUnits?: Units<'metric', T>;
 		metricUnitOptions?: UnitOption[];
 		imperialUnitOptions?: UnitOption[];
-		oninput?(metricValue: number, metricUnits: Units<'METRIC', T>, name?: string): void;
-		onchange?(metricValue: number, metricUnits: Units<'METRIC', T>, name?: string): void;
+		oninput?(metricValue: number, metricUnits: Units<'metric', T>, name?: string): void;
+		onchange?(metricValue: number, metricUnits: Units<'metric', T>, name?: string): void;
 	}
 </script>
 
 <script lang="ts" generics="S extends MeasurementSystem, T extends MeasurementType">
-	import { language } from '$lib/state/language.svelte';
+	import { getMeasurementSystem, getNumbers } from '$lib/state/settings.svelte';
 	import type { EventHandler } from 'svelte/elements';
 	import TypedInput from './TypedInput.svelte';
 
 	let {
 		class: className = '',
 		id,
-		system = 'IMPERIAL' as S,
 		type = 'mass' as T,
 		name,
 		disabled,
 		metricValue = $bindable(0),
-		metricUnits = $bindable(
-			system === 'IMPERIAL'
-				? type === 'mass'
-					? 'lb'
-					: type === 'distance'
-						? 'km'
-						: 'hr'
-				: type === 'mass'
-					? 'kg'
-					: type === 'distance'
-						? 'km'
-						: 'hr'
-		) as never,
+		metricUnits = $bindable(type === 'mass' ? 'kg' : type === 'distance' ? 'km' : 'hr') as never,
 		metricUnitOptions = BOTH_OPTIONS,
-		imperialUnitOptions = IMPERIAL_BOTH_OPTIONS,
+		imperialUnitOptions = imperial_BOTH_OPTIONS,
 		oninput,
 		onchange
 	}: MeasurementInputProps<S, T> = $props();
@@ -443,20 +429,20 @@
 	let metricValueLast: typeof metricValue;
 	let metricUnitsLast: typeof metricUnits;
 	let typeLast: typeof type;
-	let systemLast: typeof system;
+	let systemLast: MeasurementSystem;
 	let allowConvert = true;
 	let first = true;
 
 	$effect(() => {
-		if (systemLast === system && typeLast === type) {
+		if (systemLast === getMeasurementSystem() && typeLast === type) {
 			return;
 		}
-		systemLast = system;
+		systemLast = getMeasurementSystem();
 		typeLast = type;
 		allowConvert = true;
 		first = true;
 
-		if (system === 'METRIC') {
+		if (getMeasurementSystem() === 'metric') {
 			if (type === 'any') {
 				unitOptions = BOTH_OPTIONS;
 			} else if (type === 'mass') {
@@ -469,19 +455,30 @@
 			unitOptions = unitOptions.filter((unit) =>
 				metricUnitOptions.some((u) => unit.units === u.units)
 			);
+			if (!units && unitOptions.some((u) => u.units === metricUnits)) {
+				units = metricUnits as never;
+			}
+			valueNumber = metricValue;
+			valueString = metricValue.toString();
 		} else {
 			if (type === 'any') {
-				unitOptions = IMPERIAL_BOTH_OPTIONS;
+				unitOptions = imperial_BOTH_OPTIONS;
 			} else if (type === 'mass') {
-				unitOptions = IMPERIAL_MASS_OPTIONS;
+				unitOptions = imperial_MASS_OPTIONS;
 			} else if (type === 'distance') {
-				unitOptions = IMPERIAL_DISTANCE_OPTIONS;
+				unitOptions = imperial_DISTANCE_OPTIONS;
 			} else {
 				unitOptions = DURATION_OPTIONS;
 			}
 			unitOptions = unitOptions.filter((unit) =>
 				imperialUnitOptions.some((u) => unit.units === u.units)
 			);
+			if (!units) {
+				const [newValue, newUnits] = toImperial(metricValue, type, metricUnits);
+				valueNumber = newValue;
+				valueString = newValue.toString();
+				units = newUnits as never;
+			}
 		}
 		if (!units || !unitOptions.some((uo) => uo.units === units)) {
 			units = unitOptions[0].units as never;
@@ -497,13 +494,13 @@
 		typeLast = type;
 
 		const [v, u] =
-			system === 'METRIC'
+			getMeasurementSystem() === 'metric'
 				? [valueNumber, units]
-				: toMetric(valueNumber, type, units as Units<'IMPERIAL', T>);
+				: toMetric(valueNumber, type, units as Units<'imperial', T>);
 		const [newMetricValue, newMetricUnits] = convertMetricUnits(
 			v,
 			type,
-			u as Units<'METRIC', T>,
+			u as Units<'metric', T>,
 			metricUnits
 		);
 		metricValue = metricValueLast = newMetricValue;
@@ -527,7 +524,7 @@
 		first = false;
 
 		const [v, u] =
-			system === 'METRIC'
+			getMeasurementSystem() === 'metric'
 				? allowConvert
 					? metricToReadable(metricValue, type, metricUnits)
 					: [metricValue, metricUnits]
@@ -537,34 +534,34 @@
 			units = u as never;
 		}
 		valueNumber = valueNumberLast = v;
-		valueString = language.numbers.format(v, initialFractionDigits);
+		valueString = getNumbers().format(v, initialFractionDigits);
 	});
 
 	function onValueNumberChange(value: number, _name?: string) {
 		valueNumber = value;
-		valueString = language.numbers.format(valueNumber, initialFractionDigits);
+		valueString = getNumbers().format(valueNumber, initialFractionDigits);
 	}
 
 	const onUnitChange: EventHandler<Event, HTMLSelectElement> = (e) => {
 		const previousUnits = units;
 		const nextUnits = e.currentTarget.value;
 		const [v, u] =
-			system === 'METRIC'
+			getMeasurementSystem() === 'metric'
 				? convertMetricUnits(
 						valueNumber,
 						type,
-						previousUnits as Units<'METRIC', T>,
-						nextUnits as Units<'METRIC', T>
+						previousUnits as Units<'metric', T>,
+						nextUnits as Units<'metric', T>
 					)
 				: convertImperialUnits(
 						valueNumber,
 						type,
-						previousUnits as Units<'IMPERIAL', T>,
-						nextUnits as Units<'IMPERIAL', T>
+						previousUnits as Units<'imperial', T>,
+						nextUnits as Units<'imperial', T>
 					);
 		allowConvert = false;
 		valueNumber = v;
-		valueString = language.numbers.format(valueNumber, initialFractionDigits);
+		valueString = getNumbers().format(valueNumber, initialFractionDigits);
 		units = u as never;
 	};
 </script>

@@ -17,7 +17,7 @@
 	import { m } from '$lib/paraglide/messages';
 	import { onMount } from 'svelte';
 	import type { RepsInputType } from './RepsInput.svelte';
-	import { language } from '$lib/state/language.svelte';
+	import { getNumbers } from '$lib/state/settings.svelte';
 
 	let { reps, inputType }: RepsProps = $props();
 
@@ -41,7 +41,7 @@
 		>{m.workouts_set_as_many_rounds_as_possible_acronym()}</span
 	>
 {:else if inputType === 'percentOfOneRepMax'}
-	<span>{language.numbers.format(reps.percentOfOneRepMax || 0, 1)}%</span>
+	<span>{getNumbers().format(reps.percentOfOneRepMax || 0, 1)}%</span>
 {:else if inputType === 'repRange'}
 	<span
 		>{reps.repRangeLow || 0} - {reps.repRangeHigh || 0}
