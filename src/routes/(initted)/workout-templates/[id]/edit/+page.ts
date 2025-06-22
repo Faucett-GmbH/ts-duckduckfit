@@ -22,7 +22,6 @@ export const load: PageLoad = async (event) => {
 		}
 		return exercises;
 	}, {} as { [id: string]: Exercise });
-	console.log(exerciseByGuid);
 	return {
 		referrer: event.url.searchParams.get('referrer'),
 		exerciseByGuid,
