@@ -9,23 +9,35 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
-	import {
-		deleteWorkoutTemplate,
-		getWorkoutTemplates,
-		type WorkoutTemplate
-	} from '$lib/state/workoutTemplates.svelte';
+	import { getWorkoutTemplates, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import WorkoutTemplateComponent from '$lib/components/workout/WorkoutTemplate.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
+	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { getExerciseByGuid } from '$lib/state/exercises.svelte';
 
 	let offset = $state(0);
 	let limit = $state(10);
 	let workoutTemplates = $state<
 		[key: AutomergeDocumentId<WorkoutTemplate>, value: WorkoutTemplate][]
 	>([]);
+	let exerciseByGuid = $state<{ [exerciseGuid: string]: Exercise }>({});
 
 	$effect(() => {
-		getWorkoutTemplates(offset, limit).then((newWorkoutTemplates) => {
+		getWorkoutTemplates(offset, limit).then(async (newWorkoutTemplates) => {
 			workoutTemplates.push(...newWorkoutTemplates);
+			const exercisGuids = newWorkoutTemplates.flatMap(([_, workoutTemplate]) =>
+				workoutTemplate.setGroupTemplates.flatMap((setGroupTemplate) =>
+					setGroupTemplate.setTemplates.map((setTemplate) => setTemplate.exerciseGuid)
+				)
+			);
+			const uniqueExercisGuids = [...new Set(exercisGuids)];
+			for (const exercise of await Promise.all(
+				uniqueExercisGuids.map((exercisGuid) => getExerciseByGuid(exercisGuid))
+			)) {
+				if (exercise) {
+					exerciseByGuid[exercise.guid] = exercise;
+				}
+			}
 		});
 	});
 
@@ -64,6 +76,7 @@
 							<WorkoutTemplateComponent
 								{workoutTemplateId}
 								{workoutTemplate}
+								{exerciseByGuid}
 								onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
 							/>
 						</div>

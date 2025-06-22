@@ -52,7 +52,7 @@
 			</div>
 			<div class="flex flex-grow flex-col">
 				<div class="card flex flex-shrink flex-col">
-					<EditWorkoutTemplate {workoutTemplate} />
+					<EditWorkoutTemplate workoutTemplateId={data.workoutTemplateId} {workoutTemplate} />
 				</div>
 			</div>
 		</div>

@@ -101,9 +101,10 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
     });
   } else {
     workoutTemplateDocument = await findDocument(workoutTemplateId);
-    workoutTemplateDocument.change(wt => {
-      if (applyChanges(wt, workoutTemplateParams, getId as GetKeyFn)) {
-        wt.updatedAt = new Date();
+    workoutTemplateDocument.change(workoutTemplate => {
+      const workoutTemplateWithUpdates = { ...workoutTemplate, ...workoutTemplateParams };
+      if (applyChanges(workoutTemplate, workoutTemplateWithUpdates, getId as GetKeyFn)) {
+        workoutTemplate.updatedAt = new Date();
       }
     });
   }

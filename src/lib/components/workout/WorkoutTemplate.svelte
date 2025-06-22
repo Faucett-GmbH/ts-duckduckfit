@@ -2,6 +2,7 @@
 	export interface WorkoutTemplateProps {
 		workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>;
 		workoutTemplate: WorkoutTemplate;
+		exerciseByGuid: { [exerciseGuid: string]: Exercise };
 		editReferrer?: string;
 		onDelete?(): Promise<void>;
 	}
@@ -9,7 +10,6 @@
 
 <script lang="ts">
 	import { base } from '$app/paths';
-	import { getLocale } from '$lib/state/settings.svelte';
 	import Trash from 'lucide-svelte/icons/trash';
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import Modal from '../Modal.svelte';
@@ -22,11 +22,18 @@
 		findTranslation,
 		type WorkoutTemplate
 	} from '$lib/state/workoutTemplates.svelte';
+	import { findTranslation as findExerciseTranslation } from '$lib/state/exercises.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
+	import type { Exercise } from '$lib/state/exerciseTypes';
 
-	let { workoutTemplateId, workoutTemplate, editReferrer, onDelete }: WorkoutTemplateProps =
-		$props();
+	let {
+		workoutTemplateId,
+		workoutTemplate,
+		exerciseByGuid,
+		editReferrer,
+		onDelete
+	}: WorkoutTemplateProps = $props();
 
 	async function onDeleteInternal() {
 		try {
@@ -86,6 +93,7 @@
 							setTemplate,
 							index
 						)}
+						{@const exercise = exerciseByGuid[setTemplate.exerciseGuid]}
 						<div
 							class={{
 								'flex flex-row justify-between bg-black p-1': true,
@@ -98,7 +106,7 @@
 									<SetTypeComponent setType={setTemplate.setType} {position} />
 								</div>
 								<div class="h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"></div>
-								<p class="mb-0 ms-2">{setTemplate.exerciseGuid}</p>
+								<p class="mb-0 ms-2">{findExerciseTranslation(exercise).name}</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
 								<SetAmounts execution={'REPS_ONLY'} set={setTemplate} />

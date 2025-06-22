@@ -21,7 +21,7 @@
 		create((data: WorkoutTemplateParams, fields: string[]) => {
 			only(fields);
 
-			test('name', m.errors_message_required(), () => {
+			test('translations', m.errors_message_required(), () => {
 				enforce(data.translations[0].name).isNotBlank();
 			});
 			test('setGroupTemplates', m.errors_message_required(), () => {
