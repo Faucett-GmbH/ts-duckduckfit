@@ -61,12 +61,12 @@ export const workoutTemplatesConfig = {
 };
 
 export async function getWorkoutTemplates(offset: number, limit: number): Promise<[key: AutomergeDocumentId<WorkoutTemplate>, value: WorkoutTemplate][]> {
-  const workoutTemplates = (await userDocument.current!.workoutTemplates()).doc()!;
+  const workoutTemplates = (await userDocument.current!.workoutTemplates()).doc();
   const startOffset = offset * limit;
   const endOffset = startOffset + limit - 1;
   const workoutTemplateIds = Object.keys(workoutTemplates.workoutTemplatesById).slice(startOffset, endOffset) as AutomergeDocumentId<WorkoutTemplate>[];
   const repo = getRepo();
-  return await Promise.all(workoutTemplateIds.map(async id => [id, (await findDocument(id, repo)).doc()!]));
+  return await Promise.all(workoutTemplateIds.map(async id => [id, (await findDocument(id, repo)).doc()]));
 }
 
 export async function getWorkoutTemplateById(workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>): Promise<WorkoutTemplate | null> {

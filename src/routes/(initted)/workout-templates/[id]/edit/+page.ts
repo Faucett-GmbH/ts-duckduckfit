@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import type { AutomergeDocumentId } from '$lib/repo';
 import type { Exercise } from '$lib/state/exerciseTypes';
-import { getExerciseById } from '$lib/state/exercises.svelte';
+import { getExerciseByGuid } from '$lib/state/exercises.svelte';
 
 export const prerender = false;
 
@@ -16,12 +16,13 @@ export const load: PageLoad = async (event) => {
 	}
 	const exerciseGuids = workoutTemplate.setGroupTemplates.flatMap(setGroupTemplate => setGroupTemplate.setTemplates.map(setTemplate => setTemplate.exerciseGuid));
 	const uniqueExerciseGuids = [...new Set<AutomergeDocumentId<Exercise>>(exerciseGuids)];
-	const exerciseByGuid = (await Promise.all(uniqueExerciseGuids.map(exerciseGuid => getExerciseById(exerciseGuid)))).reduce((exercises, exercise) => {
+	const exerciseByGuid = (await Promise.all(uniqueExerciseGuids.map(exerciseGuid => getExerciseByGuid(exerciseGuid)))).reduce((exercises, exercise) => {
 		if (exercise) {
 			exercises[exercise.guid] = exercise;
 		}
 		return exercises;
 	}, {} as { [id: string]: Exercise });
+	console.log(exerciseByGuid);
 	return {
 		referrer: event.url.searchParams.get('referrer'),
 		exerciseByGuid,
