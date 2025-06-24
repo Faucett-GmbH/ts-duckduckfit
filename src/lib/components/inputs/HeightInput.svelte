@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	import { m } from '$lib/paraglide/messages';
-	import type { MeasurementSystemType } from '$lib/state/setttings.svelte';
+	import type { MeasurementSystemType } from '$lib/state/settings.svelte';
 
 	export interface HumanLengthProps {
 		value: number | null;
@@ -42,7 +42,7 @@
 			id="cm"
 			type="number"
 			class="w-20 text-right"
-			bind:value
+			bind:value={cmValue}
 			min="0"
 			max="400"
 			step="0.1"

@@ -8,11 +8,13 @@ let measurementSystem = $state<'metric' | 'imperial'>("metric");
 let locale = $state<Locale>(getParaglideLocale());
 const numbers = $derived.by(() => new Numbers(locale));
 
+export type MeasurementSystemType = "metric" | "imperial";
+
 export interface Settings {
   version: number;
   theme: "dark" | "light";
   locale: Locale;
-  measurementSystem: "metric" | "imperial";
+  measurementSystem: MeasurementSystemType;
 }
 
 export const settingsConfig = {

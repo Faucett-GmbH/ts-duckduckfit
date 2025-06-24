@@ -86,7 +86,8 @@
 	import InputResults from '$lib/components/InputResults.svelte';
 	import { handleError } from '$lib/error';
 	import HeightInput from '$lib/components/inputs/HeightInput.svelte';
-	import type { MeasurementSystemType } from '$lib/state/setttings.svelte';
+	import type { MeasurementSystemType } from '$lib/state/settings.svelte';
+	import type { ChangeEventHandler } from 'svelte/elements';
 
 	let {
 		fullName,
