@@ -32,6 +32,9 @@ importers:
       '@fingerprintjs/fingerprintjs':
         specifier: ^4.6.2
         version: 4.6.2
+      '@svelte-plugins/datepicker':
+        specifier: ^1.0.11
+        version: 1.0.11
       '@svelte-put/clickoutside':
         specifier: ^4.0.0
         version: 4.0.0(svelte@5.33.1)
@@ -41,6 +44,9 @@ importers:
       cbor-x:
         specifier: ^1.6.0
         version: 1.6.0
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.1
@@ -698,6 +704,9 @@ packages:
     resolution: {integrity: sha512-hI6twvUkzOmyGZhQMza1gpfqErZxXRw6JEsiVjUbo7tFanVD+8Oil0Ih3l2nGzHdxPI41zFmfUQG7GHqhciKZQ==}
     hasBin: true
 
+  '@svelte-plugins/datepicker@1.0.11':
+    resolution: {integrity: sha512-Tqc07QLyRkCpc3Glg6oRLTUApLtCrOh52d6vJ7L32QI17HrwvcDDjaH3LF3X1SBm3CWdMrnqfJp3xjUZmB4wzw==}
+
   '@svelte-put/clickoutside@4.0.0':
     resolution: {integrity: sha512-36lLICc+RB6t/Kw0L6fZKU/y/yAAx3P+SsI2BtYM1GUBaYytSFHBWMw1c3TQEWj7Y8SgY6H3JsfEd2flbNWhqA==}
     peerDependencies:
@@ -1261,6 +1270,9 @@ packages:
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@4.4.1:
     resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
@@ -3176,6 +3188,8 @@ snapshots:
 
   '@sqlite.org/sqlite-wasm@3.48.0-build4': {}
 
+  '@svelte-plugins/datepicker@1.0.11': {}
+
   '@svelte-put/clickoutside@4.0.0(svelte@5.33.1)':
     dependencies:
       svelte: 5.33.1
@@ -3750,6 +3764,8 @@ snapshots:
   date-fns@2.30.0:
     dependencies:
       '@babel/runtime': 7.27.4
+
+  date-fns@4.1.0: {}
 
   debug@4.4.1:
     dependencies:
