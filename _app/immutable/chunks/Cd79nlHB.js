@@ -1,0 +1,1 @@
+function o(n){const t=n/2.54;return{feet:Math.floor(t/12),inches:Math.round(t%12)}}function e(n){return Math.round((n.feet*12+n.inches)*2.54)}function r(n){return Math.round(n*2.20462*10)/10}function u(n){return Math.round(n/2.20462*10)/10}export{o as c,e as f,r as k,u as l};
