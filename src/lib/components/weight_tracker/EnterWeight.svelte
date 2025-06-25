@@ -10,7 +10,6 @@
 	import { m } from '$lib/paraglide/messages';
 	import WeightInput from '../inputs/WeightInput.svelte';
 	import type { UserWeightMeasurement } from '$lib/state/user.svelte';
-	import { getMeasurementSystem } from '$lib/state/settings.svelte';
 
 	let { onAdd }: EnterWeightProps = $props();
 

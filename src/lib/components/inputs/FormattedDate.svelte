@@ -1,5 +1,4 @@
 <script lang="ts" module>
-	import { type Locale } from '$lib/paraglide/runtime';
 	export interface FormattedDateProps {
 		date: Date;
 	}
