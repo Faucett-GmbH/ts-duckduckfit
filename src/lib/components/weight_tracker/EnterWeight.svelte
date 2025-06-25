@@ -1,8 +1,5 @@
 <script lang="ts" module>
-	import type { MeasurementSystemType } from '$lib/state/settings.svelte';
-
 	export type EnterWeightProps = {
-		system: MeasurementSystemType;
 		onAdd: (weight: UserWeightMeasurement) => void;
 	};
 </script>
@@ -13,8 +10,9 @@
 	import { m } from '$lib/paraglide/messages';
 	import WeightInput from '../inputs/WeightInput.svelte';
 	import type { UserWeightMeasurement } from '$lib/state/user.svelte';
+	import { getMeasurementSystem } from '$lib/state/settings.svelte';
 
-	let { system, onAdd }: EnterWeightProps = $props();
+	let { onAdd }: EnterWeightProps = $props();
 
 	let open = $state(false);
 
@@ -62,7 +60,7 @@
 		</div>
 	{/snippet}
 	<div class="flex flex-grow flex-col">
-		<WeightInput value={newWeight.weight} onChange={onUpdateWeight} {system} />
+		<WeightInput value={newWeight.weight} onChange={onUpdateWeight} />
 
 		<div class="mt-2 flex flex-row justify-end">
 			<button class="btn success" onclick={addNewWeight}>

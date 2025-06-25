@@ -2,18 +2,21 @@
 	import { type Locale } from '$lib/paraglide/runtime';
 	export interface FormattedDateProps {
 		date: Date;
-		locale: Locale;
 	}
 </script>
 
 <script lang="ts">
 	import { format } from 'date-fns';
+	import { getLocale } from '$lib/state/settings.svelte';
 	import { enUS, de, es } from 'date-fns/locale';
-	let { date, locale }: FormattedDateProps = $props();
+	let { date }: FormattedDateProps = $props();
 
+	let locale = $state(getLocale());
 	let fmtLocale = enUS;
 
-	if (locale == 'de') {
+	if (locale == 'en') {
+		fmtLocale = enUS;
+	} else if (locale == 'de') {
 		fmtLocale = de;
 	} else if (locale == 'es') {
 		fmtLocale = es;

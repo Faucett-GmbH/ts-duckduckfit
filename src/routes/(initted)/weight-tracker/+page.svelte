@@ -10,10 +10,21 @@
 	const userState = automergeDocHandleState(data.user);
 	const settingsState = automergeDocHandleState(data.settings);
 
-	function onAddNewWeight(weight: UserWeightMeasurement) {
+	function onAddUserWeightMeasurement(uwm: UserWeightMeasurement) {
 		userState.change((user) => {
-			user.bodyWeightMeasurements.push(weight);
-
+			user.bodyWeightMeasurements.push(uwm);
+			return user;
+		});
+	}
+	function onEditUserWeightMeasurement(index: number, uwm: UserWeightMeasurement) {
+		userState.change((user) => {
+			user.bodyWeightMeasurements[index] = uwm;
+			return user;
+		});
+	}
+	function onDeleteUserWeightMeasurement(index: number) {
+		userState.change((user) => {
+			user.bodyWeightMeasurements.splice(index, 1);
 			return user;
 		});
 	}
@@ -21,7 +32,11 @@
 
 <div class="container mx-auto">
 	<div class="card flex flex-col">
-		<EnterWeight system={settingsState.doc.measurementSystem} onAdd={onAddNewWeight} />
-		<ListWeightMeasurements userWeightMeasurements={userState.doc.bodyWeightMeasurements} />
+		<EnterWeight onAdd={onAddUserWeightMeasurement} />
+		<ListWeightMeasurements
+			userWeightMeasurements={userState.doc.bodyWeightMeasurements}
+			onEdit={onEditUserWeightMeasurement}
+			onDelete={onDeleteUserWeightMeasurement}
+		/>
 	</div>
 </div>

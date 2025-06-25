@@ -1,18 +1,18 @@
 <script lang="ts" module>
 	import { m } from '$lib/paraglide/messages';
-	import type { MeasurementSystemType } from '$lib/state/settings.svelte';
 
 	export interface WeightProps {
 		value: number | null;
-		system: MeasurementSystemType;
 		onChange: (metricValue: number) => void;
 	}
 </script>
 
 <script lang="ts">
 	import { kgToLbs, lbsToKg } from '$lib/utils/units';
-	let { value, system, onChange }: WeightProps = $props();
+	import { getMeasurementSystem } from '$lib/state/settings.svelte';
+	let { value, onChange }: WeightProps = $props();
 
+	let system = $state(getMeasurementSystem());
 	let kgValue = $state(value || 0);
 	let lbValue = $state(kgToLbs(kgValue));
 

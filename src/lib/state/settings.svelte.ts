@@ -3,16 +3,18 @@ import { Numbers } from '$lib/Numbers';
 import { getLocale as getParaglideLocale, setLocale as setParaglideLocale, type Locale } from '$lib/paraglide/runtime';
 import { userDocument } from './userDocument.svelte';
 
-let theme = $state<'dark' | 'light'>(browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light");
+export type MeasurementSystemType = "metric" | "imperial";
+export type ThemeType = "dark" | "light"
+
+let theme = $state<ThemeType>(browser && window.matchMedia('(prefers-color-scheme: dark)')?.matches ? "dark" : "light");
 let measurementSystem = $state<'metric' | 'imperial'>("metric");
 let locale = $state<Locale>(getParaglideLocale());
 const numbers = $derived.by(() => new Numbers(locale));
 
-export type MeasurementSystemType = "metric" | "imperial";
 
 export interface Settings {
   version: number;
-  theme: "dark" | "light";
+  theme: ThemeType;
   locale: Locale;
   measurementSystem: MeasurementSystemType;
 }
@@ -51,7 +53,7 @@ export function getNumbers() {
   return numbers;
 }
 
-export async function setTheme(newTheme: 'light' | 'dark') {
+export async function setTheme(newTheme: ThemeType) {
   const settings = await userDocument.current!.settings();
   settings.change(state => {
     state.theme = newTheme;
@@ -63,7 +65,7 @@ export function getTheme() {
   return theme;
 }
 
-export async function setMeasurementSystem(newMeasurementSystem: 'metric' | 'imperial') {
+export async function setMeasurementSystem(newMeasurementSystem: MeasurementSystemType) {
   const settings = await userDocument.current!.settings();
   settings.change(state => {
     state.measurementSystem = newMeasurementSystem;
