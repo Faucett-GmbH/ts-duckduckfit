@@ -2,6 +2,56 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+	--color-pear-50: #fafde8;
+	--color-pear-100: #f3f9ce;
+	--color-pear-200: #e6f3a3;
+	--color-pear-300: #cbe554;
+	--color-pear-400: #bddb40;
+	--color-pear-500: #a0c022;
+	--color-pear-600: #7b9917;
+	--color-pear-700: #5e7516;
+	--color-pear-800: #4b5d17;
+	--color-pear-900: #404f18;
+	--color-pear-950: #212b08;
+
+	--color-gray-50: #f6f6f6;
+	--color-gray-100: #e7e7e7;
+	--color-gray-200: #d1d1d1;
+	--color-gray-300: #b0b0b0;
+	--color-gray-400: #888888;
+	--color-gray-500: #6d6d6d;
+	--color-gray-600: #5d5d5d;
+	--color-gray-700: #4f4f4f;
+	--color-gray-800: #454545;
+	--color-gray-900: #3d3d3d;
+	--color-gray-950: #262626;
+
+	--color-swamp-green-50: #f5f5f0;
+	--color-swamp-green-100: #e6e9de;
+	--color-swamp-green-200: #d1d6c0;
+	--color-swamp-green-300: #acb591;
+	--color-swamp-green-400: #97a279;
+	--color-swamp-green-500: #7a865c;
+	--color-swamp-green-600: #5f6947;
+	--color-swamp-green-700: #4a5239;
+	--color-swamp-green-800: #3d4331;
+	--color-swamp-green-900: #363b2c;
+	--color-swamp-green-950: #1b1e15;
+
+	--color-winter-hazel-50: #f8f9f1;
+	--color-winter-hazel-100: #edeed7;
+	--color-winter-hazel-200: #dbdcab;
+	--color-winter-hazel-300: #cdcd86;
+	--color-winter-hazel-400: #beba61;
+	--color-winter-hazel-500: #b2a44e;
+	--color-winter-hazel-600: #9d8842;
+	--color-winter-hazel-700: #836b3a;
+	--color-winter-hazel-800: #6c5634;
+	--color-winter-hazel-900: #5a482d;
+	--color-winter-hazel-950: #322716;
+}
+
 @layer base {
 	* {
 		min-width: 0;
