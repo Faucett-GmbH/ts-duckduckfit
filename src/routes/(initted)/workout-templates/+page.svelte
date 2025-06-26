@@ -69,10 +69,11 @@
 					</a>
 				</div>
 			</div>
+			<hr />
 			<div class="flex flex-col">
 				{#each workoutTemplates as [workoutTemplateId, workoutTemplate] (workoutTemplateId)}
 					<div class="mb-4 flex flex-grow flex-col">
-						<div class="card flex flex-shrink flex-col">
+						<div class="flex flex-shrink flex-col">
 							<WorkoutTemplateComponent
 								{workoutTemplateId}
 								{workoutTemplate}
