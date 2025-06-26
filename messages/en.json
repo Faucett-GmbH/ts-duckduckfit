@@ -27,7 +27,6 @@
 	"body_measurement_units_inches_unit": "Inches (in)",
 	"settings_title": "Settings",
 	"profile_title": "Profile",
-	"weight_tracker_title": "Weight Tracker",
 	"application_settings_title": "Application",
 	"application_settings_theme_mode": "UI Theme",
 	"application_settings_language": "Language",
@@ -131,8 +130,9 @@
 	"components_inputs_height_input_cm": "cm",
 	"components_inputs_height_input_in": "in",
 	"components_inputs_height_input_ft": "ft",
+	"weight_tracker_title": "Weight Tracker",
 	"components_inputs_weight_input_kg": "kg",
 	"components_inputs_weight_input_lb": "lb",
-	"components_weight_tracker_enter_weight_title" : "Enter New Weight",
-	"components_weight_tracker_enter_weight_add" : "Add"
+	"components_weight_tracker_enter_weight_title": "Enter New Weight",
+	"components_weight_tracker_enter_weight_add": "Add"
 }
