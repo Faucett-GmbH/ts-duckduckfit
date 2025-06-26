@@ -95,7 +95,6 @@ export function diff<A, B>(a: A, b: B, getKey: GetKeyFn) {
 
 export function applyChanges<A, B>(a: A, b: B, getKey: GetKeyFn) {
   const differences = diff(a, b, getKey);
-  console.log(a, b, differences);
   applyDiff(a, differences);
   return differences.length > 0;
 }
@@ -109,7 +108,7 @@ function differencesInternal(
   const aType = typeof a;
   const bType = typeof b;
   if (aType !== bType) {
-    throw new Error("Type mismatch");
+    return [{ type: "set", path, value: b } as Difference];
   }
   if (Array.isArray(a) && b !== null) {
     return arrayDifferences(a as [], b as [], path, getKey);

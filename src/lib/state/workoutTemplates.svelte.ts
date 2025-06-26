@@ -7,6 +7,7 @@ import { applyChanges, type GetKeyFn } from "$lib/diff";
 import { getId } from "$lib/util";
 import { getLocale } from "./settings.svelte";
 import type { Exercise } from "./exerciseTypes";
+import cloneDeep from "clone-deep";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
@@ -102,7 +103,23 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
   } else {
     workoutTemplateDocument = await findDocument(workoutTemplateId);
     workoutTemplateDocument.change(workoutTemplate => {
-      const workoutTemplateWithUpdates = { ...workoutTemplate, ...workoutTemplateParams };
+      const workoutTemplateWithUpdates: WorkoutTemplate = {
+        ...workoutTemplateParams,
+        translations: cloneDeep(workoutTemplateParams.translations),
+        setGroupTemplates: workoutTemplateParams.setGroupTemplates.map(setGroupTemplateParams => ({
+          ...setGroupTemplateParams,
+          setTemplates: setGroupTemplateParams.setTemplates.map(setTemplateParams => {
+            const setTemplate = { ...setTemplateParams };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            delete setTemplate.exercise;
+            return setTemplate;
+          })
+        })),
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      };
+      console.log(workoutTemplateWithUpdates);
       if (applyChanges(workoutTemplate, workoutTemplateWithUpdates, getId as GetKeyFn)) {
         workoutTemplate.updatedAt = new Date();
       }

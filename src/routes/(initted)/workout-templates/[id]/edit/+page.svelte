@@ -15,13 +15,14 @@
 	import { getLocale } from '$lib/state/settings.svelte';
 	import { findTranslation } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import cloneDeep from 'clone-deep';
 
 	let { data }: Props = $props();
 
 	let translation = $derived(findTranslation(data.workoutTemplate));
 	let backUrl = $derived(data.referrer || `${base}/${getLocale()}/workout-templates`);
 	let workoutTemplate = $derived<WorkoutTemplateParams>({
-		translations: data.workoutTemplate.translations,
+		translations: cloneDeep(data.workoutTemplate.translations),
 		setGroupTemplates:
 			data.workoutTemplate.setGroupTemplates?.map((setGroupTemplate) => ({
 				...setGroupTemplate,
