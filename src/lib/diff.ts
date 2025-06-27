@@ -90,13 +90,23 @@ function deleteAtPath(obj: unknown, path: Path) {
 }
 
 export function diff<A, B>(a: A, b: B, getKey: GetKeyFn) {
-  return differencesInternal(a, b, [], getKey);
+  const differences = differencesInternal(a, b, [], getKey);
+  if (Array.isArray(differences)) {
+    return differences;
+  } else if (differences) {
+    return [differences];
+  } else {
+    return [];
+  }
 }
 
 export function applyChanges<A, B>(a: A, b: B, getKey: GetKeyFn) {
   const differences = diff(a, b, getKey);
-  applyDiff(a, differences);
-  return differences.length > 0;
+  if (Array.isArray(differences)) {
+    applyDiff(a, differences);
+    return differences.length > 0;
+  }
+  return false;
 }
 
 function differencesInternal(
@@ -104,11 +114,11 @@ function differencesInternal(
   b: unknown,
   path: Path,
   getKey: GetKeyFn,
-) {
+): Difference[] | Difference | null {
   const aType = typeof a;
   const bType = typeof b;
   if (aType !== bType) {
-    return [{ type: "set", path, value: b } as Difference];
+    return { type: "set", path, value: b } as Difference;
   }
   if (Array.isArray(a) && b !== null) {
     return arrayDifferences(a as [], b as [], path, getKey);
@@ -122,9 +132,9 @@ function differencesInternal(
     ) as Difference[];
   }
   if (a !== b) {
-    return [{ type: "set", path, value: b } as Difference];
+    return { type: "set", path, value: b } as Difference;
   }
-  return [];
+  return null;
 }
 
 function objectDifferences(a: object, b: object, path: Path, getKey: GetKeyFn) {
@@ -141,12 +151,17 @@ function objectDifferences(a: object, b: object, path: Path, getKey: GetKeyFn) {
           bValue,
           [],
           getKey,
-        ) as Difference[];
-        if (keyDifferences.length) {
+        );
+        if (Array.isArray(keyDifferences)) {
           objectDifferences.push({
             type: "diff",
             path: [...path, key],
             differences: keyDifferences,
+          });
+        } else if (keyDifferences !== null) {
+          objectDifferences.push({
+            ...keyDifferences,
+            path: [...path, key]
           });
         }
       } else {
