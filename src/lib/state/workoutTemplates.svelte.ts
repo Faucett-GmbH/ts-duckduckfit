@@ -1,18 +1,16 @@
-import type { WorkoutTemplateParams } from "$lib/components/workout/edit/EditWorkoutTemplate.svelte";
 import type { Locale } from "$lib/paraglide/runtime";
 import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocumentId } from "$lib/repo";
 import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
-import { applyChanges, type GetKeyFn } from "$lib/diff";
-import { getId } from "$lib/util";
+import { getAndApplyChanges } from "$lib/diff";
 import { getLocale } from "./settings.svelte";
 import type { Exercise } from "./exerciseTypes";
-import cloneDeep from "clone-deep";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
+  id: string;
   exerciseGuid: AutomergeDocumentId<Exercise>;
   setType: SetType;
   asManyRoundsAsPossible?: boolean;
@@ -30,6 +28,7 @@ export interface SetTemplate {
 }
 
 export interface SetGroupTemplate {
+  id: string;
   setGroupType: SetGroupType;
   setTemplates: SetTemplate[];
 }
@@ -86,15 +85,11 @@ export async function deleteWorkoutTemplate(workoutTemplateId: AutomergeDocument
   deleteDocument(workoutTemplateId);
 }
 
-export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTemplateParams, workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>) {
+export async function upsertWorkoutTemplate(workoutTemplateUpdates: WorkoutTemplate, workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>) {
   const workoutTemplates = await userDocument.current!.workoutTemplates();
   let workoutTemplateDocument: DocHandle<WorkoutTemplate>;
   if (!workoutTemplateId) {
-    workoutTemplateDocument = createDocument<WorkoutTemplate>({
-      ...workoutTemplateParams,
-      updatedAt: new Date(),
-      createdAt: new Date(),
-    });
+    workoutTemplateDocument = createDocument<WorkoutTemplate>(workoutTemplateUpdates);
     workoutTemplateId = workoutTemplateDocument.documentId as AutomergeDocumentId<WorkoutTemplate>;
     const documentId = workoutTemplateId;
     workoutTemplates.change((wts) => {
@@ -103,24 +98,11 @@ export async function upsertWorkoutTemplate(workoutTemplateParams: WorkoutTempla
   } else {
     workoutTemplateDocument = await findDocument(workoutTemplateId);
     workoutTemplateDocument.change(workoutTemplate => {
-      const workoutTemplateWithUpdates: WorkoutTemplate = {
-        ...workoutTemplateParams,
-        translations: cloneDeep(workoutTemplateParams.translations),
-        setGroupTemplates: workoutTemplateParams.setGroupTemplates.map(setGroupTemplateParams => ({
-          ...setGroupTemplateParams,
-          setTemplates: setGroupTemplateParams.setTemplates.map(setTemplateParams => {
-            const setTemplate = { ...setTemplateParams };
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            delete setTemplate.exercise;
-            return setTemplate;
-          })
-        })),
-        updatedAt: new Date(),
-        createdAt: new Date(),
-      };
-      console.log(workoutTemplateWithUpdates);
-      if (applyChanges(workoutTemplate, workoutTemplateWithUpdates, getId as GetKeyFn)) {
+      let updated = true;
+      if (getAndApplyChanges(workoutTemplate, workoutTemplateUpdates, (value) => value.id ?? value.locale)) {
+        updated = true;
+      }
+      if (updated) {
         workoutTemplate.updatedAt = new Date();
       }
     });

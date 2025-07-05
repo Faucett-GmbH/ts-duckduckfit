@@ -5,37 +5,18 @@
 </script>
 
 <script lang="ts">
-	import EditWorkoutTemplate, {
-		type WorkoutTemplateParams
-	} from '$lib/components/workout/edit/EditWorkoutTemplate.svelte';
+	import EditWorkoutTemplate from '$lib/components/workout/edit/EditWorkoutTemplate.svelte';
 	import { base } from '$app/paths';
-	import { unsafeId } from '$lib/util';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageData } from './$types';
 	import { getLocale } from '$lib/state/settings.svelte';
 	import { findTranslation } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import cloneDeep from 'clone-deep';
 
 	let { data }: Props = $props();
 
 	let translation = $derived(findTranslation(data.workoutTemplate));
 	let backUrl = $derived(data.referrer || `${base}/${getLocale()}/workout-templates`);
-	let workoutTemplate = $derived<WorkoutTemplateParams>({
-		translations: cloneDeep(data.workoutTemplate.translations),
-		setGroupTemplates:
-			data.workoutTemplate.setGroupTemplates?.map((setGroupTemplate) => ({
-				...setGroupTemplate,
-				setTemplates:
-					setGroupTemplate.setTemplates?.map((setTemplate) => ({
-						...setTemplate,
-						exerciseGuid: setTemplate.exerciseGuid,
-						exercise: data.exerciseByGuid[setTemplate.exerciseGuid]!,
-						id: unsafeId()
-					})) || [],
-				id: unsafeId()
-			})) || []
-	});
 </script>
 
 <svelte:head>
@@ -53,7 +34,11 @@
 			</div>
 			<div class="flex flex-grow flex-col">
 				<div class="card flex flex-shrink flex-col">
-					<EditWorkoutTemplate workoutTemplateId={data.workoutTemplateId} {workoutTemplate} />
+					<EditWorkoutTemplate
+						exerciseByGuid={data.exerciseByGuid}
+						workoutTemplateId={data.workoutTemplateId}
+						workoutTemplate={data.workoutTemplate}
+					/>
 				</div>
 			</div>
 		</div>

@@ -1,18 +1,6 @@
 import type { Exercise } from "$lib/state/exerciseTypes";
 import type { SetType } from "$lib/state/workoutTemplates.svelte";
 
-export function getUniqueExerciseMap<T extends { exercise: Exercise }>(items: T[]) {
-	const exercises: { [id: string]: Exercise } = {};
-	for (const item of items) {
-		exercises[item.exercise.guid] = item.exercise;
-	}
-	return exercises;
-}
-
-export function getUniqueExercises<T extends { exercise: Exercise }>(items: T[]) {
-	return Object.values(getUniqueExerciseMap(items));
-}
-
 export function getRealSetPosition<S extends { setType: SetType }>(
 	sets: S[],
 	set: S,

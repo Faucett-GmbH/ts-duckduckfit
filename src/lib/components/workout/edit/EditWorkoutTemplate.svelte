@@ -3,22 +3,12 @@
 
 	export type WorkoutTemplateProps = {
 		workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>;
-		workoutTemplate?: WorkoutTemplateParams;
-	};
-
-	export type WorkoutTemplateTranslationParams = {
-		locale: Locale;
-		description: string | null;
-		name: string;
-	};
-
-	export type WorkoutTemplateParams = {
-		translations: WorkoutTemplateTranslationParams[];
-		setGroupTemplates: Array<SetGroupTemplateParams>;
+		workoutTemplate?: WorkoutTemplate;
+		exerciseByGuid: { [guid: string]: Exercise };
 	};
 
 	const createSuite = () =>
-		create((data: WorkoutTemplateParams, fields: string[]) => {
+		create((data: WorkoutTemplate, fields: string[]) => {
 			only(fields);
 
 			test('translations', m.errors_message_required(), () => {
@@ -37,7 +27,7 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import Plus from 'lucide-svelte/icons/plus';
-	import EditSetGroupTemplate, { type SetGroupTemplateParams } from './EditSetGroupTemplate.svelte';
+	import EditSetGroupTemplate from './EditSetGroupTemplate.svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
@@ -45,8 +35,13 @@
 	import Sortable from '$lib/components/Sortable.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
-	import { upsertWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
-	import type { Locale } from '$lib/paraglide/runtime';
+	import {
+		upsertWorkoutTemplate,
+		type SetGroupTemplate,
+		type WorkoutTemplate,
+		type WorkoutTemplateTranslation
+	} from '$lib/state/workoutTemplates.svelte';
+	import type { Exercise } from '$lib/state/exerciseTypes';
 
 	let {
 		workoutTemplateId,
@@ -58,8 +53,11 @@
 					description: null
 				}
 			],
-			setGroupTemplates: []
-		})
+			setGroupTemplates: [],
+			updatedAt: new Date(),
+			createdAt: new Date()
+		}),
+		exerciseByGuid = {}
 	}: WorkoutTemplateProps = $props();
 	let setGroupTemplatesValid: Array<boolean | undefined> = [];
 
@@ -96,7 +94,7 @@
 	);
 	function validateAll() {
 		for (const field of Object.keys(workoutTemplate)) {
-			fields.add(field as keyof WorkoutTemplateParams);
+			fields.add(field as keyof WorkoutTemplate);
 		}
 		validate();
 		return validate.flush();
@@ -104,13 +102,13 @@
 	function onTranslationChange(
 		e: Event & { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }
 	) {
-		const field = e.currentTarget.name as keyof WorkoutTemplateTranslationParams;
+		const field = e.currentTarget.name as keyof WorkoutTemplateTranslation;
 		workoutTemplate.translations[0][field] = e.currentTarget.value as never;
 		fields.add(field);
 		validate();
 	}
 	function createOnSetGroupTemplateChange(index: number) {
-		return (params: SetGroupTemplateParams) => {
+		return (params: SetGroupTemplate) => {
 			const setGroupTemplates = workoutTemplate.setGroupTemplates.slice();
 			setGroupTemplates[index] = params;
 			workoutTemplate = {
@@ -122,7 +120,7 @@
 		};
 	}
 	function createOnSetGroupTemplateDelete(index: number) {
-		return (_params: SetGroupTemplateParams) => {
+		return (_params: SetGroupTemplate) => {
 			const setGroupTemplates = workoutTemplate.setGroupTemplates.slice();
 			setGroupTemplates.splice(index, 1);
 			workoutTemplate = {
@@ -152,7 +150,21 @@
 		try {
 			loading = true;
 			if (await validateAll()) {
-				await upsertWorkoutTemplate(workoutTemplate, workoutTemplateId);
+				await upsertWorkoutTemplate(
+					{
+						...workoutTemplate,
+						setGroupTemplates: workoutTemplate.setGroupTemplates.map((setGroupTemplate) => ({
+							...setGroupTemplate,
+							setTemplates: setGroupTemplate.setTemplates.map((setTemplate) => {
+								const newSetTemplate = { ...setTemplate };
+								// @ts-expect-error
+								delete newSetTemplate.exercise;
+								return newSetTemplate;
+							})
+						}))
+					},
+					workoutTemplateId
+				);
 				await goto(`${base}/workout-templates`);
 			}
 		} catch (error) {
@@ -229,6 +241,7 @@
 	>
 		{#snippet children({ item, index, ...props })}
 			<EditSetGroupTemplate
+				bind:exerciseByGuid
 				setGroupTemplate={item}
 				{index}
 				{...props}

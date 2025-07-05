@@ -1,26 +1,18 @@
 <script lang="ts" module>
 	import { create, test, enforce, only } from 'vest';
 
-	export type EditSetGroupTemplateProps = Omit<
-		SortableItemProps<SetGroupTemplateParams>,
-		'item'
-	> & {
-		setGroupTemplate: SetGroupTemplateParams;
+	export type EditSetGroupTemplateProps = Omit<SortableItemProps<SetGroupTemplate>, 'item'> & {
+		exerciseByGuid: { [guid: string]: Exercise };
+		setGroupTemplate: SetGroupTemplate;
 		valid?: boolean;
 		open?: boolean;
-		oninput(params: SetGroupTemplateParams): void;
-		ondelete(params: SetGroupTemplateParams): void;
+		oninput(params: SetGroupTemplate): void;
+		ondelete(params: SetGroupTemplate): void;
 		onvalid(valid: boolean): void;
 	};
 
-	export type SetGroupTemplateParams = {
-		id: string;
-		setGroupType: SetGroupType;
-		setTemplates: Array<SetTemplateParams>;
-	};
-
 	const createSuite = () =>
-		create((data: Partial<SetGroupTemplateParams> = {}, fields: Set<string>) => {
+		create((data: Partial<SetGroupTemplate> = {}, fields: Set<string>) => {
 			if (!fields.size) {
 				return;
 			}
@@ -42,7 +34,7 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import ExerciseSelector from '../ExerciseSelector.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import EditSetTemplate, { type SetTemplateParams } from './EditSetTemplate.svelte';
+	import EditSetTemplate from './EditSetTemplate.svelte';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import Grip from 'lucide-svelte/icons/grip';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
@@ -52,13 +44,19 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
 	import Sortable, { type SortableItemProps } from '$lib/components/Sortable.svelte';
-	import { createExercisesByGuid, getRealSetPosition, getUniqueExercises } from '../util';
+	import { createExercisesByGuid, getRealSetPosition } from '../util';
 	import { m } from '$lib/paraglide/messages';
-	import type { SetGroupType, SetType } from '$lib/state/workoutTemplates.svelte';
+	import type {
+		SetGroupTemplate,
+		SetGroupType,
+		SetTemplate,
+		SetType
+	} from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let {
+		exerciseByGuid = $bindable(),
 		setGroupTemplate = $bindable(),
 		index,
 		valid = $bindable(),
@@ -100,7 +98,17 @@
 
 	let setTemplatesValid: (boolean | undefined)[] = [];
 
-	let exercises = $state(getUniqueExercises(setGroupTemplate.setTemplates));
+	let exercises = $state(
+		[
+			...new Set(setGroupTemplate.setTemplates.map((setTemplate) => setTemplate.exerciseGuid))
+		].reduce((exercises, exerciseGuid) => {
+			const exercise = exerciseByGuid[exerciseGuid];
+			if (exercise) {
+				exercises.push(exercise);
+			}
+			return exercises;
+		}, [] as Exercise[])
+	);
 	$effect(() => {
 		if (exercises.length === 1) {
 			setSetGroupType('straight');
@@ -122,7 +130,7 @@
 	const suite = createSuite();
 	let result = $state(suite.get());
 
-	const fields = new Set<keyof SetGroupTemplateParams>();
+	const fields = new Set<keyof SetGroupTemplate>();
 	const validate = debounce(() => {
 		suite(setGroupTemplate, fields).done((r) => {
 			result = r;
@@ -137,7 +145,7 @@
 
 	function validateAll() {
 		for (const field of Object.keys(setGroupTemplate)) {
-			fields.add(field as keyof SetGroupTemplateParams);
+			fields.add(field as keyof SetGroupTemplate);
 		}
 		validate();
 		validate.flush();
@@ -157,20 +165,21 @@
 		}
 	});
 	function onExercisesChange(newExercies: Exercise[]) {
-		const exercisesById = createExercisesByGuid(newExercies);
+		const newExerciseByGuid = createExercisesByGuid(newExercies);
 		setGroupTemplate = {
 			...setGroupTemplate,
 			setTemplates: setGroupTemplate.setTemplates.filter(
-				(setTemplate) => !!exercisesById[setTemplate.exerciseGuid]
+				(setTemplate) => !!newExerciseByGuid[setTemplate.exerciseGuid]
 			)
 		};
+		exerciseByGuid = { ...exerciseByGuid, ...newExerciseByGuid };
 		oninput(setGroupTemplate);
 		exercises = newExercies;
 		fields.add('setTemplates');
 		validate();
 	}
 	function createOnSetTemplateChange(index: number) {
-		return (params: SetTemplateParams) => {
+		return (params: SetTemplate) => {
 			const setTemplates = setGroupTemplate.setTemplates.slice();
 			setTemplates[index] = params;
 			setGroupTemplate = {
@@ -183,7 +192,7 @@
 		};
 	}
 	function createOnSetTemplateDelete(index: number) {
-		return (_params: SetTemplateParams) => {
+		return (_params: SetTemplate) => {
 			const setTemplates = setGroupTemplate.setTemplates.slice();
 			setTemplates.splice(index, 1);
 			setGroupTemplate = {
@@ -217,7 +226,6 @@
 			setTemplates.push({
 				id: unsafeId(),
 				exerciseGuid: exercise.guid as AutomergeDocumentId<Exercise>,
-				exercise: exercise,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
 			});
 		}
@@ -392,8 +400,10 @@
 		>
 			{#snippet children({ item, index, ...props })}
 				<EditSetTemplate
+					id={item.id}
 					position={getRealSetPosition(setGroupTemplate.setTemplates, item, index)}
 					setTemplate={item}
+					exercise={exerciseByGuid[item.exerciseGuid]}
 					{...props}
 					showExercise={exercises.length > 1}
 					canMove={setGroupTemplate.setTemplates.length > 1}

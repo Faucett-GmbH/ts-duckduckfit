@@ -1,25 +1,16 @@
 <script lang="ts" module>
-	export type EditSetTemplateProps = Omit<
-		SortableItemProps<SetTemplateParams>,
-		'item' | 'index'
-	> & {
-		id?: number;
+	export type EditSetTemplateProps = Omit<SortableItemProps<SetTemplate>, 'item' | 'index'> & {
+		id: string;
 		position: number;
-		setTemplate: SetTemplateParams;
+		setTemplate: SetTemplate;
 		showExercise?: boolean;
 		showDelete?: boolean;
 		canMove?: boolean;
 		valid?: boolean;
-		oninput(params: SetTemplateParams): void;
-		ondelete(params: SetTemplateParams): void;
-		onvalid(valid: boolean): void;
-	};
-
-	export type SetTemplateParams = ExerciseSetInputParams & {
-		id: string;
-		exerciseGuid: AutomergeDocumentId<Exercise>;
 		exercise: Exercise;
-		setType: SetType;
+		oninput(params: SetTemplate): void;
+		ondelete(params: SetTemplate): void;
+		onvalid(valid: boolean): void;
 	};
 </script>
 
@@ -32,14 +23,14 @@
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import type { SortableItemProps } from '$lib/components/Sortable.svelte';
-	import type { SetType } from '$lib/state/workoutTemplates.svelte';
+	import type { SetTemplate, SetType } from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { findTranslation } from '$lib/state/exercises.svelte';
-	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let {
 		position,
 		setTemplate,
+		exercise,
 		showExercise = $bindable(false),
 		showDelete = $bindable(true),
 		canMove = true,
@@ -56,7 +47,7 @@
 	}: EditSetTemplateProps = $props();
 
 	let draggable = $state(false);
-	let translation = $derived(findTranslation(setTemplate.exercise));
+	let translation = $derived(findTranslation(exercise));
 
 	function onDraggable() {
 		draggable = true;
@@ -134,13 +125,7 @@
 		class:!bg-swamp-green-600={isDraggingOver}
 	>
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-between">
-			<ExerciseSetInput
-				exercise={setTemplate.exercise}
-				setInput={setTemplate}
-				bind:valid
-				{onvalid}
-				oninput={onInput}
-			/>
+			<ExerciseSetInput {exercise} setInput={setTemplate} bind:valid {onvalid} oninput={onInput} />
 		</div>
 		<div
 			class="mt-1 flex flex-grow flex-row items-center justify-start"

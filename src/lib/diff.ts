@@ -1,144 +1,43 @@
-export type Path = Array<string | number>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GetKeyFn = (value: any, index: number, array: any[]) => string | number;
 
-export type Difference =
-  | {
-    type: "delete";
-    path: Path;
-  }
-  | {
-    type: "set";
-    path: Path;
-    value: unknown;
-  }
-  | {
-    type: "diff";
-    path: Path;
-    differences: Difference[];
-  }
-  | {
-    type: "move";
-    path: Path;
-    from: number;
-    to: number;
-  };
+export type Change<T> =
+  ObjectChange<T> | ArrayChange<ArrayInner<T>>;
 
-export type GetKeyFn = (
-  value: unknown,
-  index: number,
-  path: Path,
-) => string | number;
-
-export function applyDiff<T>(obj: T, differences: Difference[]) {
-  for (const difference of differences) {
-    switch (difference.type) {
-      case "set": {
-        setValueAtPath(obj, difference.path, difference.value);
-        break;
-      }
-      case "delete": {
-        deleteAtPath(obj, difference.path);
-        break;
-      }
-      case "move": {
-        const array = ensurePath(obj, difference.path) as unknown as unknown[];
-        const value = array[difference.from];
-        array[difference.from] = null;
-        array[difference.to] = value;
-        break;
-      }
-      case "diff": {
-        const object = ensurePath(obj, difference.path) as Record<
-          string,
-          unknown
-        >;
-        const value = object[difference.path[difference.path.length - 1]];
-        applyDiff(value, difference.differences);
-        break;
-      }
-    }
-  }
-}
-
-function ensurePath(obj: unknown, path: Path) {
-  let current = obj as Record<string | number, unknown>;
-  for (let i = 0; i < path.length - 1; i++) {
-    const key = path[i];
-    if (!current[key]) {
-      if (typeof key === "number") {
-        current[key] = [];
-      } else {
-        current[key] = {};
-      }
-    }
-    current = current[key] as Record<string | number, unknown>;
-  }
-  return current;
-}
-
-function setValueAtPath(obj: unknown, path: Path, value: unknown) {
-  ensurePath(obj, path)[path[path.length - 1]] = value;
-}
-
-function deleteAtPath(obj: unknown, path: Path) {
-  const current = ensurePath(obj, path);
-  const key = path[path.length - 1];
-  if (Array.isArray(current)) {
-    current.splice(key as number, 1);
-  } else {
-    delete current[key];
-  }
-}
-
-export function diff<A, B>(a: A, b: B, getKey: GetKeyFn) {
-  const differences = differencesInternal(a, b, [], getKey);
-  if (Array.isArray(differences)) {
-    return differences;
-  } else if (differences) {
-    return [differences];
-  } else {
-    return [];
-  }
-}
-
-export function applyChanges<A, B>(a: A, b: B, getKey: GetKeyFn) {
-  const differences = diff(a, b, getKey);
-  if (Array.isArray(differences)) {
-    applyDiff(a, differences);
-    return differences.length > 0;
-  }
-  return false;
-}
-
-function differencesInternal(
-  a: unknown,
-  b: unknown,
-  path: Path,
-  getKey: GetKeyFn,
-): Difference[] | Difference | null {
+export function getChanges<T>(a: T, b: T, getKey: GetKeyFn): { type: 'replace', value: T } | Change<T>[] {
+  a = typeof a?.valueOf === "function" ? a.valueOf() as never : a;
+  b = typeof b?.valueOf === "function" ? b.valueOf() as never : b;
   const aType = typeof a;
   const bType = typeof b;
   if (aType !== bType) {
-    return { type: "set", path, value: b } as Difference;
+    return [];
   }
-  if (Array.isArray(a) && b !== null) {
-    return arrayDifferences(a as [], b as [], path, getKey);
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return getArrayChanges(a, b, getKey) as never;
   }
-  if (aType === "object" && a !== null && b !== null) {
-    return objectDifferences(
-      a as object,
-      b as object,
-      path,
-      getKey,
-    ) as Difference[];
+  if (aType === "object" && a != null && b != null) {
+    return getObjectChanges(a, b, getKey) as never;
   }
   if (a !== b) {
-    return { type: "set", path, value: b } as Difference;
+    return { type: 'replace', value: b };
   }
-  return null;
+  return [];
 }
 
-function objectDifferences(a: object, b: object, path: Path, getKey: GetKeyFn) {
-  const objectDifferences: Difference[] = [];
+export type ArrayInner<T> = T extends Array<infer U> ? U : never;
+
+export type ObjectChange<T> =
+  | { type: 'object-set', key: string; value: T[keyof T] }
+  | { type: 'object-delete', key: string; }
+  | { type: 'object-changes', key: string; changes: Change<T[keyof T]>[] | { type: 'replace', value: T[keyof T] } }
+
+export function getObjectChanges<T extends object>(
+  a: T,
+  b: T,
+  getKey: GetKeyFn
+): ObjectChange<T>[] {
+  const changes: ObjectChange<T>[] = [];
+
   const keys = new Set(Object.keys(a).concat(Object.keys(b)));
 
   for (const key of keys) {
@@ -146,94 +45,168 @@ function objectDifferences(a: object, b: object, path: Path, getKey: GetKeyFn) {
       const aValue = (a as never)[key];
       if (Object.hasOwn(b, key)) {
         const bValue = (b as never)[key];
-        const keyDifferences = differencesInternal(
+        const keyChanges = getChanges<T[keyof T]>(
           aValue,
           bValue,
-          [],
           getKey,
         );
-        if (Array.isArray(keyDifferences)) {
-          objectDifferences.push({
-            type: "diff",
-            path: [...path, key],
-            differences: keyDifferences,
-          });
-        } else if (keyDifferences !== null) {
-          objectDifferences.push({
-            ...keyDifferences,
-            path: [...path, key]
-          });
+        if (Array.isArray(keyChanges)) {
+          if (keyChanges.length) {
+            changes.push({
+              type: 'object-changes',
+              key,
+              changes: keyChanges,
+            });
+          }
+        } else {
+          changes.push({ type: 'object-set', key, value: keyChanges.value });
         }
       } else {
-        objectDifferences.push({ type: "delete", path: [...path, key] });
+        changes.push({ type: "object-delete", key });
       }
     } else {
       const bValue = (b as never)[key];
-      objectDifferences.push({
-        type: "set",
-        path: [...path, key],
-        value: bValue,
-      });
+      changes.push({ type: 'object-set', key, value: bValue });
     }
   }
 
-  return objectDifferences;
+  return changes;
 }
 
-function arrayDifferences<T>(a: [], b: [], path: Path, getKey: GetKeyFn) {
-  const arrayDifferences: Difference[] = [];
-  const aObject: Record<string, [index: number, value: T]> = {};
-  const bObject: Record<string, [index: number, value: T]> = {};
-  const length = Math.max(a.length, b.length);
-  for (let i = 0; i < length; i++) {
-    if (i < a.length) {
-      const aValue = a[i];
-      const aKey = getKey(aValue, i, path);
-      aObject[aKey] = [i, aValue];
-    }
-    if (i < b.length) {
-      const bValue = b[i];
-      const bKey = getKey(bValue, i, path);
-      bObject[bKey] = [i, bValue];
-    }
+export type ArrayChange<T> =
+  | { type: 'array-insert'; index: number; item: T }
+  | { type: 'array-delete'; index: number }
+  | { type: 'array-move'; from: number; to: number }
+  | { type: 'array-changes'; index: number; changes: Change<T>[] | { type: 'replace', value: T } }
+  | { type: 'array-replace', index: number; value: T };
+
+export function getArrayChanges<T>(
+  arrayA: T[],
+  arrayB: T[],
+  getKey: GetKeyFn
+): ArrayChange<T>[] {
+  const moves: ArrayChange<T>[] = [];
+  const changes: ArrayChange<T>[] = [];
+
+  const bKeys = arrayB.map(getKey);
+  const aKeys = new Array(arrayA.length);
+  const aKeyToIndex: { [key: string | number]: number } = {};
+  for (let i = 0; i < arrayA.length; i++) {
+    const value = arrayA[i];
+    const key = getKey(value, i, arrayA);
+    aKeys[i] = key;
+    aKeyToIndex[key] = i;
   }
-  const keys = new Set(Object.keys(aObject).concat(Object.keys(bObject)));
-  for (const key of keys) {
-    if (Object.hasOwn(aObject, key)) {
-      const [aIndex, aValue] = aObject[key];
-      if (Object.hasOwn(bObject, key)) {
-        const [bIndex, bValue] = bObject[key];
-        if (aIndex !== bIndex) {
-          arrayDifferences.push({
-            type: "move",
-            path,
-            from: aIndex,
-            to: bIndex,
-          });
-        }
-        const keyDifferences = differencesInternal(
-          aValue,
-          bValue,
-          [],
-          getKey,
-        ) as Difference[];
-        if (keyDifferences.length) {
-          arrayDifferences.push({
-            type: "diff",
-            path: [bIndex],
-            differences: keyDifferences,
-          });
-        }
-      } else {
-        const keyPath = [...path, aIndex];
-        arrayDifferences.push({ type: "set", path: keyPath, value: aValue });
-      }
-    } else {
-      const [bIndex, bValue] = bObject[key];
-      const keyPath = [...path, bIndex];
-      arrayDifferences.push({ type: "set", path: keyPath, value: bValue });
+
+  const bKeySet = new Set(bKeys);
+  for (let i = aKeys.length - 1; i >= 0; i--) {
+    const currentKey = aKeys[i];
+
+    if (!bKeySet.has(currentKey)) {
+      moves.push({ type: 'array-delete', index: i });
+      aKeys.splice(i, 1);
     }
   }
 
-  return arrayDifferences;
+  for (let i = 0; i < bKeys.length; i++) {
+    const desiredKey = bKeys[i];
+    const currentKey = aKeys[i];
+
+    if (currentKey === desiredKey) {
+      const itemChanges = getChanges(arrayA[aKeyToIndex[desiredKey]], arrayB[i], getKey);
+      if (Array.isArray(itemChanges)) {
+        if (itemChanges.length) {
+          changes.push({ type: 'array-changes', index: i, changes: itemChanges });
+        }
+      } else {
+        changes.push({ type: 'array-replace', index: i, value: itemChanges.value });
+      }
+      continue;
+    }
+    const existingIndex = aKeys.indexOf(desiredKey, i + 1);
+
+    if (existingIndex !== -1) {
+      const itemChanges = getChanges(arrayA[aKeyToIndex[desiredKey]], arrayB[i], getKey);
+      if (Array.isArray(itemChanges)) {
+        if (itemChanges.length) {
+          changes.push({ type: 'array-changes', index: i, changes: itemChanges });
+        }
+      } else {
+        changes.push({ type: 'array-replace', index: i, value: itemChanges.value });
+      }
+
+      moves.push({ type: 'array-move', from: existingIndex, to: i });
+      const [moved] = aKeys.splice(existingIndex, 1);
+      aKeys.splice(i, 0, moved);
+    } else {
+      const newItem = arrayB[i];
+      moves.push({ type: 'array-insert', index: i, item: newItem });
+      aKeys.splice(i, 0, desiredKey);
+    }
+  }
+
+  while (aKeys.length > bKeys.length) {
+    moves.push({ type: 'array-delete', index: aKeys.length - 1 });
+    aKeys.pop();
+  }
+
+  return moves.concat(changes);
+}
+
+export function applyChanges<T>(a: T, changes: Change<T>[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const aAny = a as any;
+  for (const change of changes) {
+    switch (change.type) {
+      case 'array-insert':
+        aAny.splice(change.index, 0, change.item);
+        break;
+      case 'array-delete':
+        aAny.splice(change.index, 1);
+        break;
+      case 'array-move': {
+        const [moved] = aAny.splice(change.from, 1);
+        aAny.splice(change.to, 0, moved);
+        break;
+      }
+      case 'array-replace': {
+        aAny[change.index] = change.value;
+        break;
+      }
+      case 'array-changes': {
+        if (Array.isArray(change.changes)) {
+          applyChanges(aAny[change.index], change.changes as never);
+        } else {
+          aAny[change.index] = change.changes.value;
+        }
+        break;
+      }
+      case 'object-set': {
+        aAny[change.key] = change.value;
+        break;
+      }
+      case 'object-delete': {
+        delete aAny[change.key];
+        break;
+      }
+      case 'object-changes': {
+        if (Array.isArray(change.changes)) {
+          applyChanges(aAny[change.key], change.changes as never);
+        } else {
+          aAny[change.key] = change.changes.value
+        }
+        break;
+      }
+    }
+  }
+}
+
+export function getAndApplyChanges<T>(a: T, b: T, getKey: GetKeyFn) {
+  const changes = getChanges(a, b, getKey);
+  if (Array.isArray(changes)) {
+    if (changes.length) {
+      return applyChanges(a, changes);
+    }
+  }
+  return b;
 }
