@@ -1,3 +1,4 @@
+test-results
 node_modules
 
 # Output
@@ -22,7 +23,6 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# OpenAPI Generator
-.openapi-generator/
-.openapi-generator-ignore
-openapitools.json
+# Paraglide
+src/lib/paraglide
+project.inlang/cache

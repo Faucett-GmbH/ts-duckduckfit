@@ -82,11 +82,3 @@
 	onkeyup={onInput}
 	onblurcapture={onBlur}
 ></span>
-
-<style lang="postcss">
-	@reference "tailwindcss";
-
-	.disabled {
-		pointer-events: none;
-	}
-</style>

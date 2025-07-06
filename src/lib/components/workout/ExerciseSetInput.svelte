@@ -172,17 +172,22 @@
 	);
 
 	const fields = new Set<keyof ExerciseSetInputParams>();
-	const validate = debounce(() => {
-		suite(setInput, exercise, repsInputType, fields).done((r) => {
-			result = r;
-			const newValid = result.isValid();
-			if (newValid !== valid) {
-				valid = newValid;
-				onvalid(valid);
-			}
-		});
-		fields.clear();
-	}, 300);
+	const validate = debounce(
+		() =>
+			new Promise<boolean>((resolve) => {
+				suite(setInput, exercise, repsInputType, fields).done((r) => {
+					result = r;
+					const newValid = result.isValid();
+					if (newValid !== valid) {
+						valid = newValid;
+						onvalid(valid);
+					}
+					resolve(valid);
+				});
+				fields.clear();
+			}),
+		300
+	);
 	function onMeasurementChange(
 		metricValue: number,
 		_metricUnits: Units<'metric', any>,
@@ -215,7 +220,7 @@
 	}
 
 	$effect(() => {
-		disabled = loading || result.isValid();
+		disabled = loading || !result.isValid();
 	});
 
 	onMount(() => {

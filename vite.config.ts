@@ -1,4 +1,5 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js'
+import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'node:fs';
@@ -43,11 +44,12 @@ export default defineConfig(async ({ mode }) => {
 		plugins: [
 			tailwindcss(),
 			sveltekit(),
+			devtoolsJson(),
 			paraglideVitePlugin({
 				project: './project.inlang',
 				outdir: './src/lib/paraglide',
-				strategy: ['localStorage', 'preferredLanguage', 'baseLocale'],
-			}),
+				strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
+			})
 		],
 		build: {
 			target:
