@@ -28,7 +28,7 @@ if (browser) {
       const doc = await sync.doc();
       const device = doc.devices[deviceId];
       if (device) {
-        createNotification(m.sync_device_disconnected({ name: device.name }, "info"));
+        createNotification(m.sync_device_disconnected({ name: device.name }), 'info');
       }
     }
   });
