@@ -14,9 +14,9 @@
 	let { value, system, onChange }: HumanLengthProps = $props();
 
 	let cmValue = $state(value || 0);
-	let ftIn = cmToFeetInches(cmValue);
-	let feetValue = $state(ftIn.feet);
-	let inchesValue = $state(ftIn.inches);
+	let ftIn = $derived(cmToFeetInches(cmValue));
+	let feetValue = $derived(ftIn.feet);
+	let inchesValue = $derived(ftIn.inches);
 
 	const onChangeCm = () => {
 		ftIn = cmToFeetInches(cmValue);
