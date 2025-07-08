@@ -107,11 +107,11 @@
 								</div>
 								<div class="h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"></div>
 								<p class="mb-0 ms-2">
-									{exercise ? findExerciseTranslation(exercise).name : setTemplate.exerciseGuid}
+									{exercise ? findExerciseTranslation(exercise).name : ''}
 								</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
-								<SetAmounts execution={'REPS_ONLY'} set={setTemplate} />
+								<SetAmounts execution={exercise.execution} set={setTemplate} />
 							</div>
 						</div>
 					{/each}
