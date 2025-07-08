@@ -44,6 +44,7 @@
 	const onFocus: EventHandler<FocusEvent, HTMLSpanElement> = async (e) => {
 		if (disabled) {
 			e.preventDefault();
+			e.stopPropagation();
 			return;
 		}
 		await waitMS(0);
@@ -54,6 +55,7 @@
 	const onInput: EventHandler<KeyboardEvent, HTMLSpanElement> = (e) => {
 		if (disabled) {
 			e.preventDefault();
+			e.stopPropagation();
 			return;
 		}
 		oninput?.(e);
@@ -61,6 +63,7 @@
 	const onBlur: EventHandler<FocusEvent, HTMLSpanElement> = (e) => {
 		if (disabled) {
 			e.preventDefault();
+			e.stopPropagation();
 			return;
 		}
 		onchange?.(e);
@@ -68,8 +71,11 @@
 </script>
 
 <span
-	class="inline-block border-none p-0 m-0 text-nowrap bg-transparent outline-none focus:outline-none {className}"
-	class:pointer-events-none={disabled}
+	class={[
+		'inline-block border-none p-0 m-0 text-nowrap bg-transparent outline-none focus:outline-none',
+		className,
+		disabled && 'pointer-events-none select-none opacity-50'
+	]}
 	{id}
 	{name}
 	{tabindex}
@@ -79,6 +85,6 @@
 	bind:this={inputElement}
 	bind:innerText
 	onfocuscapture={onFocus}
-	onkeyup={onInput}
+	onkeydown={onInput}
 	onblurcapture={onBlur}
 ></span>

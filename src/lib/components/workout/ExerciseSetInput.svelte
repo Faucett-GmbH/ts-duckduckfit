@@ -151,7 +151,7 @@
 		setInput,
 		exercise,
 		valid = $bindable(),
-		disabled = $bindable(false),
+		disabled = false,
 		restAfter = true,
 		onvalid,
 		oninput
@@ -160,7 +160,6 @@
 	let repsInputType: RepsInputType = $state('reps');
 	let suite = createSuite();
 	let result = $state(suite.get());
-	let loading = $state(false);
 	let cn = $derived(
 		classnames(result, {
 			untested: 'untested',
@@ -218,10 +217,6 @@
 		}
 		validate();
 	}
-
-	$effect(() => {
-		disabled = loading || !result.isValid();
-	});
 
 	onMount(() => {
 		fields.add('restAfterInSeconds');

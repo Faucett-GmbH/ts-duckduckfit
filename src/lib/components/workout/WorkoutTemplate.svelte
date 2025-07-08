@@ -17,15 +17,11 @@
 	import SetAmounts from './SetAmounts.svelte';
 	import SetTypeComponent from './SetType.svelte';
 	import { getRealSetPosition } from './util';
-	import {
-		deleteWorkoutTemplate,
-		findTranslation,
-		type WorkoutTemplate
-	} from '$lib/state/workoutTemplates.svelte';
-	import { findTranslation as findExerciseTranslation } from '$lib/state/exercises.svelte';
+	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { findTranslation } from '$lib/util';
 
 	let {
 		workoutTemplateId,
@@ -53,7 +49,7 @@
 </script>
 
 <div class="flex flex-row flex-wrap items-center justify-between">
-	<h3 class="m-0">{findTranslation(workoutTemplate).name}</h3>
+	<h3 class="m-0">{findTranslation(workoutTemplate.translations).name}</h3>
 	<div class="flex flex-row">
 		<button class="btn danger icon me-2" onclick={onOpenDelete}><Trash /></button>
 		<a
@@ -107,11 +103,11 @@
 								</div>
 								<div class="h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"></div>
 								<p class="mb-0 ms-2">
-									{exercise ? findExerciseTranslation(exercise).name : ''}
+									{exercise ? findTranslation(exercise.translations).name : ''}
 								</p>
 							</div>
 							<div class="flex flex-shrink flex-col justify-center">
-								<SetAmounts execution={exercise.execution} set={setTemplate} />
+								{#if exercise}<SetAmounts execution={exercise.execution} set={setTemplate} />{/if}
 							</div>
 						</div>
 					{/each}
@@ -125,7 +121,7 @@
 	{#snippet title()}
 		<h5>
 			{m.workouts_template_delete_title({
-				name: findTranslation(workoutTemplate).name
+				name: findTranslation(workoutTemplate.translations).name
 			})}
 		</h5>
 	{/snippet}

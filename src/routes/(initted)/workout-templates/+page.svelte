@@ -14,6 +14,7 @@
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { getExerciseByGuid } from '$lib/state/exercises.svelte';
+	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 
 	let offset = $state(0);
 	let limit = $state(10);
@@ -80,6 +81,15 @@
 								{exerciseByGuid}
 								onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
 							/>
+							<div class="mt-2 flex flex-row justify-center">
+								<a
+									class="btn primary flex flex-row justify-center max-sm:w-full"
+									href={`${base}/workout-templates/${workoutTemplateId}/start`}
+								>
+									{m.workouts_start_title()}
+									<ChevronRight />
+								</a>
+							</div>
 						</div>
 					</div>
 				{/each}

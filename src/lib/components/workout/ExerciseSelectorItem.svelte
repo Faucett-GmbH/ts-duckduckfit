@@ -13,7 +13,7 @@
 	import { m } from '$lib/paraglide/messages';
 	import type { SortableItemProps } from '../Sortable.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
-	import { findTranslation } from '$lib/state/exercises.svelte';
+	import { findTranslation } from '$lib/util';
 
 	let {
 		canDrag,
@@ -27,7 +27,7 @@
 		onDragOver
 	}: ExerciseSelectorItemProps = $props();
 
-	let translation = $derived(findTranslation(exercise));
+	let translation = $derived(findTranslation(exercise.translations));
 
 	function onDeleteInternal(e: Event) {
 		e.stopPropagation();

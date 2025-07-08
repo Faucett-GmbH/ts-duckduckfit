@@ -10,12 +10,12 @@
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageData } from './$types';
 	import { getLocale } from '$lib/state/settings.svelte';
-	import { findTranslation } from '$lib/state/workoutTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import { findTranslation } from '$lib/util';
 
 	let { data }: Props = $props();
 
-	let translation = $derived(findTranslation(data.workoutTemplate));
+	let translation = $derived(findTranslation(data.workoutTemplate.translations));
 	let backUrl = $derived(data.referrer || `${base}/${getLocale()}/workout-templates`);
 </script>
 

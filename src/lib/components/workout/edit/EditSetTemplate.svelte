@@ -25,7 +25,7 @@
 	import type { SortableItemProps } from '$lib/components/Sortable.svelte';
 	import type { SetTemplate, SetType } from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
-	import { findTranslation } from '$lib/state/exercises.svelte';
+	import { findTranslation } from '$lib/util';
 
 	let {
 		position,
@@ -47,7 +47,7 @@
 	}: EditSetTemplateProps = $props();
 
 	let draggable = $state(false);
-	let translation = $derived(findTranslation(exercise));
+	let translation = $derived(findTranslation(exercise.translations));
 
 	function onDraggable() {
 		draggable = true;

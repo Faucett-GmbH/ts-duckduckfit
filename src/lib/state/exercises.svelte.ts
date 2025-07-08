@@ -5,11 +5,10 @@ import { createNotification } from "./notifications.svelte";
 import { ZipReader, BlobReader, TextWriter } from "@zip.js/zip.js";
 import { getUserDocument, userDocument } from "./userDocument.svelte";
 import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDocHandle, type AutomergeDocumentId } from "$lib/repo";
-import type { Exercise, ExerciseTranslation } from "./exerciseTypes";
-import { applyChanges, type GetKeyFn } from "$lib/diff";
+import type { Exercise } from "./exerciseTypes";
+import { getAndApplyChanges, type GetKeyFn } from "$lib/diff";
 import { getId } from "$lib/util";
 import { fuzzyEquals } from '@aicacia/string-fuzzy_equals'
-import { getLocale } from "./settings.svelte";
 
 const RELEASES = "https://api.github.com/repos/Faucett-GmbH/exdb_data/releases";
 const CORS_URL = "https://corsproxy.io/?url=";
@@ -78,37 +77,23 @@ export async function deleteExercise(exerciseGuid: AutomergeDocumentId<Exercise>
   deleteDocument(exerciseGuid);
 }
 
-export async function upsertExercise(exercise: Exercise, exerciseGuid?: AutomergeDocumentId<Exercise>) {
+export async function upsertExercise(exercise: Exercise, exerciseDocumentId?: AutomergeDocumentId<Exercise>) {
   const exercises = await userDocument.current!.exercises();
   let exerciseDocument: AutomergeDocHandle<Exercise>;
-  if (!exerciseGuid) {
+  if (!exerciseDocumentId) {
     exerciseDocument = createDocument<Exercise>(exercise);
-    exerciseGuid = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
-    const documentId = exerciseGuid;
+    exerciseDocumentId = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
+    const documentId = exerciseDocumentId;
     exercises.change((wts) => {
       wts.exercisesByGuid[exercise.guid] = documentId;
     });
   } else {
-    exerciseDocument = await findDocument(exerciseGuid);
-    exerciseDocument.change(wt => {
-      applyChanges(wt, exercise, getId as GetKeyFn);
+    exerciseDocument = await findDocument(exerciseDocumentId);
+    exerciseDocument.change(e => {
+      getAndApplyChanges(e, exercise, getId as GetKeyFn);
     });
   }
-}
-
-export function findTranslation(exercise: Exercise) {
-  const locale = getLocale();
-  let translation: ExerciseTranslation | undefined;
-  for (const t of exercise.translations) {
-    if (t.locale === locale) {
-      translation = t;
-      break;
-    }
-    if (t.locale === 'en' && !translation) {
-      translation = t;
-    }
-  }
-  return translation!;
+  return
 }
 
 if (browser) {

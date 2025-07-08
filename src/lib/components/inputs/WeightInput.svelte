@@ -1,6 +1,4 @@
 <script lang="ts" module>
-	import { m } from '$lib/paraglide/messages';
-
 	export interface WeightProps {
 		value: number | null;
 		onChange: (metricValue: number) => void;
@@ -8,13 +6,14 @@
 </script>
 
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages';
 	import { kgToLbs, lbsToKg } from '$lib/utils/units';
 	import { getMeasurementSystem } from '$lib/state/settings.svelte';
+
 	let { value, onChange }: WeightProps = $props();
 
-	let system = $state(getMeasurementSystem());
 	let kgValue = $state(value || 0);
-	let lbValue = $state(kgToLbs(kgValue));
+	let lbValue = $derived(kgToLbs(kgValue));
 
 	const onChangeKg = () => {
 		lbValue = kgToLbs(kgValue);
@@ -27,7 +26,7 @@
 	};
 </script>
 
-{#if system == 'metric'}
+{#if getMeasurementSystem() == 'metric'}
 	<div class="Kilograms MetricInput flex items-center gap-1">
 		<input
 			id="kg"
@@ -41,7 +40,7 @@
 		/>
 		<label for="kg" class="ms-1">{m.components_inputs_weight_input_kg()}</label>
 	</div>
-{:else if system == 'imperial'}
+{:else if getMeasurementSystem() == 'imperial'}
 	<div class="Pounds ImperialInput flex items-center gap-1">
 		<input
 			id="lb"

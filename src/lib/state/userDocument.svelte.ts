@@ -8,6 +8,7 @@ import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
 import { settingsConfig, type Settings } from './settings.svelte';
+import { workoutsConfig, type Workouts } from './workouts.svelte';
 
 export interface UserDocument {
 	version: number;
@@ -15,6 +16,7 @@ export interface UserDocument {
 	user: AutomergeDocumentId<User>;
 	sync: AutomergeDocumentId<Sync>;
 	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
+	workouts: AutomergeDocumentId<Workouts>;
 	exercises: AutomergeDocumentId<Exercises>;
 }
 
@@ -26,6 +28,7 @@ export const userDocumentConfig = {
 			userDocument.user = createDocument<User>({}, repo).documentId;
 			userDocument.sync = createDocument<Sync>({}, repo).documentId;
 			userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
+			userDocument.workouts = createDocument<Workouts>({}, repo).documentId;
 			userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
 		}
 	}
@@ -41,6 +44,7 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	await initDocument(await findDocument(userDocument.user), userConfig);
 	await initDocument(await findDocument(userDocument.sync), syncConfig);
 	await initDocument(await findDocument(userDocument.workoutTemplates), workoutTemplatesConfig);
+	await initDocument(await findDocument(userDocument.workouts), workoutsConfig);
 	await initDocument(await findDocument(userDocument.exercises), exercisesConfig);
 }
 
@@ -84,6 +88,9 @@ export class CurrentUserDocument {
 	}
 	async workoutTemplates() {
 		return findDocument((await this.userDocument()).workoutTemplates);
+	}
+	async workouts() {
+		return findDocument((await this.userDocument()).workouts);
 	}
 	async exercises() {
 		return findDocument((await this.userDocument()).exercises);

@@ -1,6 +1,8 @@
 import { env } from '$env/dynamic/public';
 import { PUBLIC_URL } from '$env/static/public';
 import { building, browser } from '$app/environment';
+import type { Locale } from './paraglide/runtime';
+import { getLocale } from './state/settings.svelte';
 
 export type ExtractPromise<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;
 
@@ -86,4 +88,19 @@ export function getGuid<T extends { guid: string }>(value: T) {
 }
 export function getName<T extends { name: string }>(value: T) {
 	return value.name;
+}
+
+export function findTranslation<T extends { locale: Locale }>(translations: T[]) {
+	const locale = getLocale();
+	let translation: T | undefined;
+	for (const t of translations) {
+		if (t.locale === locale) {
+			translation = t;
+			break;
+		}
+		if (t.locale === 'en' && !translation) {
+			translation = t;
+		}
+	}
+	return translation!;
 }

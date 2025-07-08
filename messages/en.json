@@ -134,5 +134,15 @@
 	"components_inputs_weight_input_kg": "kg",
 	"components_inputs_weight_input_lb": "lb",
 	"components_weight_tracker_enter_weight_title": "Enter New Weight",
-	"components_weight_tracker_enter_weight_add": "Add"
+	"components_weight_tracker_enter_weight_add": "Add",
+	"workouts_start_title": "Start",
+	"workouts_set_success_title": "Success",
+	"workouts_set_failed_title": "Failed",
+	"workouts_set_success_letter": "S",
+	"workouts_set_failed_letter": "F",
+	"workouts_delete_title": "Delete {name}",
+	"workouts_delete_body": "Are you sure you want to delete this workout? this is permanent and can not be undone.",
+	"workouts_delete_submit": "Delete",
+	"workouts_workout_continue": "Continue",
+	"workouts_workout_begin": "Begin"
 }

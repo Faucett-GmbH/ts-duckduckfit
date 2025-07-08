@@ -18,9 +18,9 @@
 	import Sortable from '../Sortable.svelte';
 	import ExerciseSelectorItem from './ExerciseSelectorItem.svelte';
 	import { createExercisesByGuid } from './util';
-	import { getGuid } from '$lib/util';
+	import { findTranslation, getGuid } from '$lib/util';
 	import type { Exercise } from '$lib/state/exerciseTypes';
-	import { findTranslation, getExercises } from '$lib/state/exercises.svelte';
+	import { getExercises } from '$lib/state/exercises.svelte';
 
 	let {
 		id = undefined,
@@ -151,7 +151,7 @@
 		<ul class="h-64 list-none overflow-y-auto overflow-x-hidden p-0">
 			{#each results as exercise, index (exercise.guid)}
 				{@const selectedExercise = exercisesById[exercise.guid]}
-				{@const translation = findTranslation(exercise)}
+				{@const translation = findTranslation(exercise.translations)}
 				<li class="flex flex-row items-center justify-between py-2 pe-1 ps-2">
 					<span>{translation?.name}</span>
 					{#if selectedExercise}

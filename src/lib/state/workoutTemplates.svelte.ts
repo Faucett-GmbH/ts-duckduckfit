@@ -3,7 +3,6 @@ import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDo
 import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
 import { getAndApplyChanges } from "$lib/diff";
-import { getLocale } from "./settings.svelte";
 import type { Exercise } from "./exerciseTypes";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
@@ -13,18 +12,18 @@ export interface SetTemplate {
   id: string;
   exerciseGuid: AutomergeDocumentId<Exercise>;
   setType: SetType;
-  asManyRoundsAsPossible?: boolean;
-  distanceInMeters?: number;
-  percentOfOneRepMax?: number;
-  rateOfPerceivedExertion?: number;
-  repRangeLow?: number;
-  repRangeHigh?: number;
-  repsForTimeInSeconds?: number;
-  repsInReserve?: number;
-  restAfterInSeconds?: number;
-  reps?: number;
-  timeInSeconds?: number;
-  weightInKilograms?: number;
+  asManyRoundsAsPossible: boolean | null;
+  distanceInMeters: number | null;
+  percentOfOneRepMax: number | null;
+  rateOfPerceivedExertion: number | null;
+  repRangeLow: number | null;
+  repRangeHigh: number | null;
+  repsForTimeInSeconds: number | null;
+  repsInReserve: number | null;
+  restAfterInSeconds: number | null;
+  reps: number | null;
+  timeInSeconds: number | null;
+  weightInKilograms: number | null;
 }
 
 export interface SetGroupTemplate {
@@ -107,19 +106,5 @@ export async function upsertWorkoutTemplate(workoutTemplateUpdates: WorkoutTempl
       }
     });
   }
-}
-
-export function findTranslation(workoutTemplate: WorkoutTemplate) {
-  const locale = getLocale();
-  let translation: WorkoutTemplateTranslation | undefined;
-  for (const t of workoutTemplate.translations) {
-    if (t.locale === locale) {
-      translation = t;
-      break;
-    }
-    if (t.locale === 'en' && !translation) {
-      translation = t;
-    }
-  }
-  return translation!;
+  return workoutTemplateId;
 }
