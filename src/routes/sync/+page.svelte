@@ -22,13 +22,13 @@
 	import type { PageData } from './$types';
 	import { page } from '$app/state';
 	import { getDeviceId } from '$lib/state/fingerprintjs.svelte';
-	import type { AddSyncMessage } from '../(initted)/profile/_AddSyncDevice.svelte';
+	import type { AddSyncMessage } from '../(initted)/settings/sync/_AddSyncDevice.svelte';
 	import { setUserDocumentId } from '$lib/state/userDocument.svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
-	import { webRTCClientAdapter } from '$lib/sync';
+	import { getWebRTCClientAdapter } from '$lib/sync';
 
 	let room = $state('');
 	let roomPassword = $state('');
@@ -58,8 +58,12 @@
 								break;
 							}
 							case 'added': {
-								webRTCClientAdapter.init(deviceId, message.payload.room, message.payload.password);
-								webRTCClientAdapter.setDeviceIds([message.payload.deviceId]);
+								getWebRTCClientAdapter().init(
+									deviceId,
+									message.payload.room,
+									message.payload.password
+								);
+								getWebRTCClientAdapter().setDeviceIds([message.payload.deviceId]);
 
 								await setUserDocumentId(message.payload.userDocumentId);
 								await goto(`${base}/profile`);

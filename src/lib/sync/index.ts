@@ -4,11 +4,12 @@ import { WebRTCClientAdapter } from "./WebRTCClientAdapter";
 import { userDocument } from "$lib/state/userDocument.svelte";
 import { createNotification } from "$lib/state/notifications.svelte";
 import { m } from "$lib/paraglide/messages";
+import { lazy } from "$lib/lazy";
 
-export const webRTCClientAdapter = new WebRTCClientAdapter();
+export const getWebRTCClientAdapter = lazy(() => new WebRTCClientAdapter());
 
 if (browser) {
-  webRTCClientAdapter.on("peer-candidate", async (payload: PeerCandidatePayload) => {
+  getWebRTCClientAdapter().on("peer-candidate", async (payload: PeerCandidatePayload) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deviceId = (payload as any).deviceId as string;
     const sync = await userDocument.current?.sync();
@@ -20,7 +21,7 @@ if (browser) {
       }
     }
   });
-  webRTCClientAdapter.on("peer-disconnected", async (payload: PeerDisconnectedPayload) => {
+  getWebRTCClientAdapter().on("peer-disconnected", async (payload: PeerDisconnectedPayload) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deviceId = (payload as any).deviceId as string;
     const sync = await userDocument.current?.sync();

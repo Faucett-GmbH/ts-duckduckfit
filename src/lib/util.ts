@@ -32,17 +32,6 @@ export async function copyToClipboard(value: string) {
 	await navigator.clipboard.writeText(value);
 }
 
-const LAZY_UNINIT = {};
-export function lazy<R>(init: () => R): () => R {
-	let value: R = LAZY_UNINIT as never;
-	return () => {
-		if (value === LAZY_UNINIT) {
-			value = init();
-		}
-		return value;
-	}
-}
-
 export function isVisible(element: HTMLElement) {
 	const rect = element.getBoundingClientRect(),
 		width = window.innerWidth || document.documentElement.clientWidth,

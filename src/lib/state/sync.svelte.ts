@@ -2,7 +2,7 @@ import type { DocHandleChangePayload } from "@automerge/automerge-repo/slim";
 import type { AutomergeDocHandle } from "$lib/repo";
 import { v7 } from "uuid";
 import { getDeviceId } from "./fingerprintjs.svelte";
-import { webRTCClientAdapter } from "$lib/sync";
+import { getWebRTCClientAdapter } from "$lib/sync";
 import { debounce } from "@aicacia/debounce";
 
 export interface SyncDevice {
@@ -38,11 +38,11 @@ export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
 
   const onChange = debounce((event: DocHandleChangePayload<Sync>) => {
     if (event.doc.room && event.doc.password) {
-      webRTCClientAdapter.init(deviceId, event.doc.room, event.doc.password);
+      getWebRTCClientAdapter().init(deviceId, event.doc.room, event.doc.password);
     }
     const deviceIds = Object.keys(event.doc.devices);
     if (deviceIds.length > 0) {
-      webRTCClientAdapter.setDeviceIds(deviceIds);
+      getWebRTCClientAdapter().setDeviceIds(deviceIds);
     }
   }, 0);
 
@@ -62,8 +62,8 @@ export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
     });
     await docHandle.whenReady();
   } else if (sync) {
-    webRTCClientAdapter.init(deviceId, sync.room, sync.password);
-    webRTCClientAdapter.setDeviceIds(Object.keys(sync.devices));
+    getWebRTCClientAdapter().init(deviceId, sync.room, sync.password);
+    getWebRTCClientAdapter().setDeviceIds(Object.keys(sync.devices));
   }
 }
 
@@ -75,7 +75,7 @@ export async function addSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceI
     };
     return doc;
   });
-  webRTCClientAdapter.addDeviceId(deviceId);
+  getWebRTCClientAdapter().addDeviceId(deviceId);
 }
 
 export async function updateSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string, name: string) {
@@ -86,7 +86,7 @@ export async function updateSyncDevice(docHandle: AutomergeDocHandle<Sync>, devi
 }
 
 export function removeSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string) {
-  webRTCClientAdapter.removeDeviceId(deviceId);
+  getWebRTCClientAdapter().removeDeviceId(deviceId);
   docHandle.change((doc) => {
     delete doc.devices[deviceId];
     return doc;

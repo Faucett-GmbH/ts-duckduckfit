@@ -17,7 +17,7 @@
 	let { userWeightMeasurements, onDelete, onEdit } = $props();
 
 	let open = $state(false);
-	let activeUserWeightMeasurement: UserWeightMeasurement | null = $state(null);
+	let activeUserWeightMeasurement = $state<UserWeightMeasurement | null>(null);
 	let activeUserWeightIndex: number = $state(0);
 
 	const onDeleteMeasurement = (index: number) => {
@@ -25,7 +25,9 @@
 	};
 
 	const onUpdateWeight = (newWeight: number) => {
-		activeUserWeightMeasurement.weight = newWeight;
+		if (activeUserWeightMeasurement) {
+			activeUserWeightMeasurement.weight = newWeight;
+		}
 	};
 
 	function onStartEdit(e: Event, index: number, uwm: UserWeightMeasurement) {
@@ -90,7 +92,9 @@
 		</div>
 	{/snippet}
 	<div class="flex flex-grow flex-col">
-		<WeightInput value={activeUserWeightMeasurement.weight} onChange={onUpdateWeight} />
+		{#if activeUserWeightMeasurement}
+			<WeightInput value={activeUserWeightMeasurement.weight} onChange={onUpdateWeight} />
+		{/if}
 
 		<div class="mt-2 flex flex-row justify-end">
 			<button class="btn success" onclick={saveEdit}> Save Changes </button>
