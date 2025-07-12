@@ -5,6 +5,7 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { Settings } from 'lucide-svelte';
 	import Dumbbell from 'lucide-svelte/icons/dumbbell';
+	import Repeat from 'lucide-svelte/icons/repeat';
 	import Weight from 'lucide-svelte/icons/weight';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
@@ -47,6 +48,17 @@
 				{/snippet}
 
 				<a
+					href={`${base}/workouts`}
+					class={{
+						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
+						'bg-black/10': page.route.id === '/(initted)/workouts'
+					}}
+					onclick={onGoto}
+				>
+					<Dumbbell /><span class="ms-4">{m.workouts_title()}</span>
+				</a>
+
+				<a
 					href={`${base}/workout-templates`}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
@@ -54,7 +66,7 @@
 					}}
 					onclick={onGoto}
 				>
-					<Dumbbell /><span class="ms-4">{m.workout_templates_title()}</span>
+					<Repeat /><span class="ms-4">{m.workout_templates_title()}</span>
 				</a>
 
 				<a

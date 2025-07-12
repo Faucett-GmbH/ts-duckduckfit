@@ -67,12 +67,12 @@
 						notes: [],
 						startedAt: new Date(),
 						completedAt: null,
-						attemptedDistanceInMeters: st.distanceInMeters,
-						attemptedRateOfPerceivedExertion: st.rateOfPerceivedExertion,
-						attemptedReps: st.reps || st.repRangeLow || st.repRangeHigh,
-						attemptedRepsInReserve: st.repsInReserve,
-						attemptedTimeInSeconds: st.timeInSeconds,
-						attemptedWeightInKilograms: st.weightInKilograms
+						attemptedDistanceInMeters: st.distanceInMeters ?? null,
+						attemptedRateOfPerceivedExertion: st.rateOfPerceivedExertion ?? null,
+						attemptedReps: st.reps ?? st.repRangeLow ?? st.repRangeHigh ?? null,
+						attemptedRepsInReserve: st.repsInReserve ?? null,
+						attemptedTimeInSeconds: st.timeInSeconds ?? null,
+						attemptedWeightInKilograms: st.weightInKilograms ?? null
 					}))
 				})),
 				updatedAt: new Date(),

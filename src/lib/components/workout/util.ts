@@ -28,3 +28,15 @@ export function createExercisesByGuid(exercises: Exercise[]) {
 		{} as { [guid: string]: Exercise }
 	);
 }
+
+export function getUniqueExercises<T extends { exerciseGuid: string }>(values: T[], exercisesByGuid: { [guid: string]: Exercise }) {
+	const exercises: { [guid: string]: Exercise } = {};
+	for (const value of values) {
+		const exerciseGuid = value.exerciseGuid;
+		const exercise = exercisesByGuid[exerciseGuid];
+		if (exercise) {
+			exercises[exerciseGuid] = exercise;
+		}
+	}
+	return Object.values(exercises);
+}

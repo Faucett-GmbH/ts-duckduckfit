@@ -12,13 +12,13 @@
 	}
 
 	export interface RepsInputParams {
-		asManyRoundsAsPossible?: boolean;
-		percentOfOneRepMax?: number;
-		repRangeHigh?: number;
-		repRangeLow?: number;
-		reps?: number;
-		repsForTimeInSeconds?: number;
-		repsInReserve?: number;
+		asManyRoundsAsPossible: boolean | null;
+		percentOfOneRepMax: number | null;
+		repRangeHigh: number | null;
+		repRangeLow: number | null;
+		reps: number | null;
+		repsForTimeInSeconds: number | null;
+		repsInReserve: number | null;
 	}
 </script>
 
@@ -54,11 +54,11 @@
 	function onSelectRepsInputType(e: Event & { currentTarget: HTMLSelectElement }) {
 		const newSetTemplate: RepsInputParams = {
 			...repsInput,
-			repRangeLow: undefined,
-			repRangeHigh: undefined,
-			percentOfOneRepMax: undefined,
-			asManyRoundsAsPossible: undefined,
-			reps: undefined
+			repRangeLow: null,
+			repRangeHigh: null,
+			percentOfOneRepMax: null,
+			asManyRoundsAsPossible: null,
+			reps: null
 		};
 		const newInputType = e.currentTarget.value as RepsInputType;
 		const fields: Array<keyof RepsInputParams> = [];

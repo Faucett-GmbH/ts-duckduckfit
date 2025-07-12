@@ -86,11 +86,13 @@
 						{@const exercise = exerciseByGuid[set.exerciseGuid]}
 						{@const translation = findTranslation(exercise?.translations || [])}
 						<div
-							class="flex flex-col bg-black p-1"
-							class:bg-opacity-0={index % 2 === 0}
-							class:bg-opacity-5={index % 2 === 1}
+							class={{
+								'flex flex-row justify-between bg-black p-1': true,
+								'bg-black/0': index % 2 === 0,
+								'bg-black/5': index % 2 === 1
+							}}
 						>
-							<div class="flex flex-row justify-between">
+							<div class="flex flex-grow flex-row justify-between">
 								<div class="me-2 flex flex-shrink flex-row">
 									<div class="me-2 flex flex-col justify-center">
 										<SetTypeComponent setType={set.setType} {position} />
@@ -98,7 +100,7 @@
 									<div
 										class="me-2 h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"
 									></div>
-									<p class="mb-0 ms-2">{translation.name}</p>
+									<p class="mb-0 ms-2">{translation?.name || ''}</p>
 								</div>
 								<div class="flex flex-shrink flex-row">
 									<div class="flex flex-shrink flex-col justify-center">
@@ -125,9 +127,6 @@
 									</div>
 								</div>
 							</div>
-							{#if set.notes}
-								<p class="m-0 ps-10">{set.notes}</p>
-							{/if}
 						</div>
 					{/each}
 				</div>

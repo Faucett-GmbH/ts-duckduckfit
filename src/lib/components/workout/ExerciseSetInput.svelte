@@ -12,13 +12,13 @@
 	}
 
 	export interface ExerciseSetInputParams extends RepsInputParams {
-		distanceInMeters?: number;
+		distanceInMeters: number | null;
 		distanceUnits?: Units<'metric', 'distance'>;
-		restAfterInSeconds?: number;
+		restAfterInSeconds: number | null;
 		restAfterUnits?: Units<'metric', 'duration'>;
-		timeInSeconds?: number;
+		timeInSeconds: number | null;
 		timeUnits?: Units<'metric', 'duration'>;
-		weightInKilograms?: number;
+		weightInKilograms: number | null;
 		weightUnits?: Units<'metric', 'mass'>;
 	}
 

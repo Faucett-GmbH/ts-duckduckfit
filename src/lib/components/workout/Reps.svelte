@@ -5,11 +5,11 @@
 	};
 
 	export type Reps = {
-		asManyRoundsAsPossible?: boolean;
-		percentOfOneRepMax?: number;
-		repRangeHigh?: number;
-		repRangeLow?: number;
-		reps?: number;
+		asManyRoundsAsPossible: boolean | null;
+		percentOfOneRepMax: number | null;
+		repRangeHigh: number | null;
+		repRangeLow: number | null;
+		reps: number | null;
 	};
 </script>
 

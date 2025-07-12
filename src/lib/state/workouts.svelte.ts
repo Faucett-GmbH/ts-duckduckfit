@@ -7,7 +7,7 @@ import { getAndApplyChanges } from "$lib/diff";
 
 export type SetStatusType = 'success' | 'failed'
 
-export interface Set extends SetTemplate {
+export interface AttemptedSet extends SetTemplate {
   attemptedDistanceInMeters: number | null;
   attemptedRateOfPerceivedExertion: number | null;
   attemptedReps: number | null;
@@ -20,8 +20,8 @@ export interface Set extends SetTemplate {
   completedAt: Date | null;
 }
 
-export interface SetGroup extends Omit<SetGroupTemplate, 'setTemplates'> {
-  sets: Set[];
+export interface AttemptedSetGroup extends Omit<SetGroupTemplate, 'setTemplates'> {
+  sets: AttemptedSet[];
 }
 
 export interface WorkoutTranslation {
@@ -39,7 +39,7 @@ export interface Workout {
   workoutTemplateId: AutomergeDocumentId<WorkoutTemplate> | null;
   translations: WorkoutTranslation[];
   notes: WorkoutNote[];
-  setGroups: SetGroup[];
+  setGroups: AttemptedSetGroup[];
   durationInSeconds: number | null;
   startedAt: Date;
   completedAt: Date | null;

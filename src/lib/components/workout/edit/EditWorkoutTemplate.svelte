@@ -42,13 +42,14 @@
 		type WorkoutTemplateTranslation
 	} from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
+	import { getLocale } from '$lib/state/settings.svelte';
 
 	let {
 		workoutTemplateId,
 		workoutTemplate = $bindable({
 			translations: [
 				{
-					locale: 'en',
+					locale: getLocale(),
 					name: '',
 					description: null
 				}

@@ -1,4 +1,4 @@
-import { getWorkoutTemplateById, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
+import { getWorkoutById, type Workout } from '$lib/state/workouts.svelte';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import type { AutomergeDocumentId } from '$lib/repo';
@@ -9,14 +9,14 @@ export const prerender = false;
 
 export const load: PageLoad = async (event) => {
 	await event.parent();
-	const workoutTemplateId = event.params.id as unknown as AutomergeDocumentId<WorkoutTemplate>;
-	const workoutTemplate = await getWorkoutTemplateById(workoutTemplateId);
-	if (!workoutTemplate) {
+	const workoutId = event.params.id as unknown as AutomergeDocumentId<Workout>;
+	const workout = await getWorkoutById(workoutId);
+	if (!workout) {
 		error(404);
 	}
 	const exerciseGuids = new Set<AutomergeDocumentId<Exercise>>();
-	for (const sgt of workoutTemplate.setGroupTemplates) {
-		for (const st of sgt.setTemplates) {
+	for (const sgt of workout.setGroups) {
+		for (const st of sgt.sets) {
 			exerciseGuids.add(st.exerciseGuid);
 		}
 	}
@@ -29,7 +29,7 @@ export const load: PageLoad = async (event) => {
 	return {
 		referrer: event.url.searchParams.get('referrer'),
 		exerciseByGuid,
-		workoutTemplateId,
-		workoutTemplate
+		workoutId,
+		workout
 	};
 };

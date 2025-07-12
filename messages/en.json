@@ -144,5 +144,12 @@
 	"workouts_delete_body": "Are you sure you want to delete this workout? this is permanent and can not be undone.",
 	"workouts_delete_submit": "Delete",
 	"workouts_workout_continue": "Continue",
-	"workouts_workout_begin": "Begin"
+	"workouts_workout_begin": "Begin",
+	"workouts_title": "Workouts",
+	"workouts_workout_edit_title": "Edit",
+	"workouts_set_group_set_warm_up_rest_timers": "Update Warm up Rest Timers",
+	"workouts_set_group_set_working_set_rest_timers": "Update Working set Rest Timers",
+	"workouts_set_expected": "Expected",
+	"workouts_set_actual": "Actual",
+	"workouts_set_incomplete_title": "Incomplete"
 }
