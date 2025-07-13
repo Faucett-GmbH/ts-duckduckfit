@@ -1,70 +1,35 @@
-<svelte:options immutable />
-
 <script lang="ts">
-	import { run, stopPropagation } from 'svelte/legacy';
-
-	import LL from '$lib/i18n/i18n-svelte';
 	import { getId, setUrlParams, toHHMMSS } from '$lib/util';
-	import type { PageData } from './$types';
-	import { page } from '$app/stores';
 	import CirclePause from 'lucide-svelte/icons/circle-pause';
 	import CirclePlay from 'lucide-svelte/icons/circle-play';
 	import ArrowRight from 'lucide-svelte/icons/arrow-right';
 	import Plus from 'lucide-svelte/icons/plus';
 	import Check from 'lucide-svelte/icons/check';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import Ban from 'lucide-svelte/icons/ban';
-	import { createWorkout } from '$lib/stores/workout';
-	import { now } from '$lib/stores/now';
-	import AttemptedSetGroup from '$lib/components/workout/AttemptedSetGroup.svelte';
-	import { SetStatusType, type AttemptedSet, type Workout } from '$lib/openapi/duckduckfit';
-	import { workoutApi } from '$lib/openapi';
-	import { handleError } from '$lib/errors';
-	import { get } from 'svelte/store';
+	import { SvelteDate } from 'svelte/reactivity';
 	import { afterNavigate, goto } from '$app/navigation';
-	import { locale } from '$lib/stores/language';
 	import { base } from '$app/paths';
-	import Spinner from '$lib/components/Spinner.svelte';
 	import { onMount, tick } from 'svelte';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { createWorkout } from '$lib/state/workout.svelte';
+	import type { PageProps } from './$types';
+	import { upsertWorkout, type AttemptedSet, type Workout } from '$lib/state/workouts.svelte';
+	import { handleError } from '$lib/error';
+	import { page } from '$app/state';
+	import { m } from '$lib/paraglide/messages';
+	import AttemptedSetGroup from '$lib/components/workout/AttemptedSetGroup.svelte';
 
-	interface Props {
-		data: PageData;
-	}
+	let { data }: PageProps = $props();
 
-	let { data }: Props = $props();
-
-	const {
-		workout,
-		done,
-		duration,
-		activeSetDuration,
-		restTimer,
-		paused,
-		activeSetGroupIndex,
-		activeSetIndex,
-		activeSet,
-		fromURLSearchParams,
-		urlSearchParams,
-		setSet,
-		next,
-		updateSet,
-		createSets,
-		updateActiveSet,
-		update,
-		deleteSet,
-		copySet,
-		addSetGroup,
-		moveSetGroups,
-		moveSets,
-		deleteSetGroup
-	} = createWorkout(data.workout);
+	const workout = createWorkout(data.workout, data.workoutId);
 
 	let initted = $state(false);
 	let startedFirst = $state(false);
 
 	function onTogglePause() {
-		paused.update((paused) => !paused);
+		workout.paused = !workout.paused;
 	}
 	let openEndWorkout = $state(false);
 	function onOpenEndWorkout() {
@@ -72,73 +37,66 @@
 	}
 	function createOnSelectSet(setGroupIndex: number, setIndex: number) {
 		return async () => {
-			if ($activeSetGroupIndex === setGroupIndex && $activeSetIndex === setIndex) {
+			if (workout.activeSetGroupIndex === setGroupIndex && workout.activeSetIndex === setIndex) {
 				return;
 			}
-			setSet(setGroupIndex, setIndex);
+			workout.setSet(setGroupIndex, setIndex);
 			await tick();
-			if (!$activeSet.status) {
-				updateActiveSet((set) => ({
+			if (!workout.activeSet.status) {
+				workout.updateActiveSet((set) => ({
 					...set,
 					startedAt: new Date(),
 					durationInSeconds: 0,
 					attemptedTimeInSeconds: 0
 				}));
-				activeSetDuration.set(0);
+				workout.activeSetDuration = 0;
 			} else {
-				activeSetDuration.set($activeSet.attemptedTimeInSeconds || 0);
+				workout.activeSetDuration = workout.activeSet.attemptedTimeInSeconds || 0;
 			}
 		};
 	}
 	function createUpdate(setGroupIndex: number, setIndex: number) {
 		return (updateFn: (set: AttemptedSet) => AttemptedSet, debounce = false) => {
-			updateSet(setGroupIndex, setIndex, updateFn, debounce);
+			workout.updateSet(setGroupIndex, setIndex, updateFn, debounce);
 		};
 	}
 	function createCopySet(setGroupIndex: number, setIndex: number) {
-		return () => copySet(setGroupIndex, setIndex);
+		return () => workout.copySet(setGroupIndex, setIndex);
 	}
 	function createDeleteSet(setGroupIndex: number, setIndex: number) {
-		return () => deleteSet(setGroupIndex, setIndex);
+		return () => workout.deleteSet(setGroupIndex, setIndex);
 	}
 	function onFail() {
-		updateActiveSet((set) => ({
+		workout.updateActiveSet((set) => ({
 			...set,
-			status: SetStatusType.FailedSetStatusType,
+			status: 'failed',
 			completedAt: new Date(),
-			durationInSeconds: $activeSetDuration,
-			attemptedTimeInSeconds: $activeSetDuration
+			durationInSeconds: workout.activeSetDuration,
+			attemptedTimeInSeconds: workout.activeSetDuration
 		}));
 	}
 	function onSuccess() {
-		updateActiveSet((set) => ({
+		workout.updateActiveSet((set) => ({
 			...set,
-			status: SetStatusType.SuccessSetStatusType,
+			status: 'success',
 			completedAt: new Date(),
-			durationInSeconds: $activeSetDuration,
-			attemptedTimeInSeconds: $activeSetDuration
+			durationInSeconds: workout.activeSetDuration,
+			attemptedTimeInSeconds: workout.activeSetDuration
 		}));
 	}
 	async function onNext() {
-		if (next()) {
+		if (workout.next()) {
 			await tick();
-			updateActiveSet((set) => ({
+			workout.updateActiveSet((set) => ({
 				...set,
 				startedAt: new Date()
 			}));
 		}
 	}
 
-	async function updateWorkout(workout: Workout) {
+	async function updateWorkout(newWorkout: Workout) {
 		try {
-			await workoutApi.updateWorkout(
-				workout.id,
-				{
-					...workout,
-					setGroups: undefined
-				},
-				true
-			);
+			await upsertWorkout(newWorkout, data.workoutId);
 		} catch (error) {
 			await handleError(error);
 		}
@@ -149,13 +107,13 @@
 		try {
 			finishing = true;
 			await updateWorkout(
-				update((workout) => ({
-					...workout,
-					durationInSeconds: get(duration),
+				workout.update((w) => ({
+					...w,
+					durationInSeconds: workout.duration,
 					completedAt: new Date()
 				}))
 			);
-			await goto(`${base}/${$locale}/workouts`);
+			await goto(`${base}}/workouts`);
 		} catch (error) {
 			await handleError(error);
 		} finally {
@@ -164,10 +122,11 @@
 	}
 
 	let addingSetGroup = $state(false);
-	async function onAddSetGroup() {
+	async function onAddSetGroup(e: Event) {
+		e.stopPropagation();
 		try {
 			addingSetGroup = true;
-			await addSetGroup();
+			await workout.addSetGroup();
 		} catch (error) {
 			await handleError(error);
 		} finally {
@@ -183,41 +142,37 @@
 	afterNavigate(() => {
 		navigated = true;
 	});
-	run(() => {
-		if (!$paused) {
-			const _now = $now;
-			duration.update((d) => d + 1);
-			if (!$activeSet.status) {
-				activeSetDuration.update((d) => d + 1);
+	$effect(() => {
+		if (!workout.paused) {
+			const _now = SvelteDate.now();
+			workout.duration += 1;
+			if (!workout.activeSet.status) {
+				workout.activeSetDuration += 1;
 			}
-			restTimer.update((d) => (d > 0 ? d - 1 : 0));
-			const d = get(duration);
+			workout.restTimer = workout.restTimer > 0 ? workout.restTimer - 1 : 0;
+			const d = workout.duration;
 			if (d % 10 === 0) {
-				const workout = update((workout) => ({ ...workout, durationInSeconds: d }));
-				updateWorkout({
-					id: workout.id,
-					durationInSeconds: workout.durationInSeconds
-				} as Workout);
+				workout.update((workout) => ({ ...workout, durationInSeconds: d }));
 			}
 		}
 	});
 	let isHydrated = $derived(mounted && navigated);
-	run(() => {
+	$effect(() => {
 		if (isHydrated) {
-			fromURLSearchParams($page.url.searchParams);
+			workout.fromURLSearchParams(page.url.searchParams);
 			initted = true;
 		}
 	});
-	run(() => {
+	$effect(() => {
 		if (isHydrated) {
-			setUrlParams($urlSearchParams);
+			setUrlParams(workout.urlSearchParams);
 		}
 	});
-	run(() => {
+	$effect(() => {
 		if (!startedFirst && initted) {
 			startedFirst = true;
-			if (!$activeSet.status) {
-				updateActiveSet((set) => ({
+			if (!workout.activeSet.status) {
+				workout.updateActiveSet((set) => ({
 					...set,
 					startedAt: new Date(),
 					durationInSeconds: 0,
@@ -229,7 +184,7 @@
 </script>
 
 <svelte:head>
-	<title>{$LL.workouts.workout.title()}: {$workout.name}</title>
+	<title>{m.workouts_workout_title()}</title>
 </svelte:head>
 
 <div class="flex flex-grow flex-col overflow-hidden">
@@ -237,96 +192,98 @@
 		<div class="card flex h-full flex-grow flex-col overflow-hidden !rounded-none !p-0 sm:!px-2">
 			<div class="card secondary flex flex-row justify-between !rounded-t-none !p-2">
 				<div>
-					<h6 class="mb-0">{toHHMMSS($duration)}</h6>
+					<h6 class="mb-0">{toHHMMSS(workout.duration)}</h6>
 				</div>
 				<div class="flex flex-row flex-wrap">
 					<button class="btn ghost flex flex-row" onclick={onTogglePause}>
 						<span class="me-1">
-							{#if $paused}
+							{#if workout.paused}
 								<CirclePlay />
 							{:else}
 								<CirclePause />
 							{/if}
 						</span>
-						{#if $paused}
-							{$LL.workouts.workout.resume()}
+						{#if workout.paused}
+							{m.workouts_workout_resume()}
 						{:else}
-							{$LL.workouts.workout.pause()}
+							{m.workouts_workout_pause()}
 						{/if}
 					</button>
 					<button class="btn danger flex flex-row" disabled={finishing} onclick={onOpenEndWorkout}>
-						{#if finishing}<Spinner />{/if}
-						{$LL.workouts.workout.end.open()}
+						{#if finishing}<div class="inline-block h-6 w-6 animate-spin">
+								<LoaderCircle />
+							</div>{/if}
+						{m.workouts_workout_end_open()}
 					</button>
 				</div>
 			</div>
 			<div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden pb-4 pt-2" role="list">
 				<Sortable
-					id={`set-groups-${$workout.id}`}
-					items={$workout.setGroups}
+					id={`set-groups-workout.{workout.workout.id}`}
+					items={workout.workout.setGroups}
 					getKey={getId}
-					onMove={moveSetGroups}
-					
-					
-					
-					
-					
-					
-					
-					
+					onMove={workout.moveSetGroups}
 				>
-					{#snippet children({ isDragging, isDraggingOver, index, item, onDragStart, onDragEnd, onDragLeave, onDragOver })}
-										<AttemptedSetGroup
+					{#snippet children({
+						isDragging,
+						isDraggingOver,
+						index,
+						item,
+						onDragStart,
+						onDragEnd,
+						onDragLeave,
+						onDragOver
+					})}
+						<AttemptedSetGroup
 							setGroup={item}
 							setGroupIndex={index}
-							activeSetIndex={$activeSetIndex}
-							activeSetGroupIndex={$activeSetGroupIndex}
-							unitSystem={data.user.unitSystem}
-							{activeSetDuration}
+							activeSetIndex={workout.activeSetIndex}
+							activeSetGroupIndex={workout.activeSetGroupIndex}
+							activeSetDuration={workout.activeSetDuration}
 							{isDragging}
 							{isDraggingOver}
 							{onDragStart}
 							{onDragEnd}
 							{onDragLeave}
 							{onDragOver}
-							{moveSets}
-							{deleteSetGroup}
-							{createSets}
+							moveSets={workout.moveSets}
+							deleteSetGroup={workout.deleteSetGroup}
+							createSets={workout.createSets}
 							{createOnSelectSet}
 							{createUpdate}
 							{createCopySet}
 							{createDeleteSet}
 						/>
-														{/snippet}
-								</Sortable>
+					{/snippet}
+				</Sortable>
 				<div class="ms-7 mt-2 flex flex-row justify-start">
 					<button
 						class="btn success flex flex-row"
 						disabled={addingSetGroup}
-						onclick={stopPropagation(onAddSetGroup)}
+						onclick={onAddSetGroup}
 					>
 						<Plus />
-						{$LL.workouts.setGroup.add()}
+						{m.workouts_set_group_add()}
 					</button>
 				</div>
 			</div>
 			<div class="card secondary flex flex-shrink flex-col !rounded-b-none !p-2">
 				<div class="flex flex-col">
-					{#if !$activeSet.status}
-						<h6 class="mb-0">{toHHMMSS($activeSetDuration)}</h6>
+					{#if !workout.activeSet.status}
+						<h6 class="mb-0">{toHHMMSS(workout.activeSetDuration)}</h6>
 					{/if}
 				</div>
 				<div class="flex flex-row justify-between">
-					{#if $activeSet.status}
+					{#if workout.activeSet.status}
 						<button
 							class="btn ghost flex flex-row"
-							disabled={$restTimer == 0}
+							disabled={workout.restTimer == 0}
 							onclick={onTogglePause}
 						>
-							{toHHMMSS($restTimer)}
-							{#if $restTimer > 0}
+							{toHHMMSS(workout.restTimer)}
+							{#if workout.restTimer > 0}
 								<span class="ms-1">
-									{#if $paused}
+									{#if workout.paused}
 										<CirclePlay />
 									{:else}
 										<CirclePause />
@@ -334,18 +291,20 @@
 								</span>
 							{/if}
 						</button>
-						{#if $done}
+						{#if workout.done}
 							<button class="btn info flex flex-row" disabled={finishing} onclick={onFinish}>
-								{#if finishing}<Spinner />{/if}
-								{$LL.workouts.workout.finish()}
+								{#if finishing}<div class="inline-block h-6 w-6 animate-spin">
+										<LoaderCircle />
+									</div>{/if}
+								{m.workouts_workout_finish()}
 								<ArrowRight />
 							</button>
 						{:else}
 							<button class="btn info flex flex-row" onclick={onNext}>
-								{#if $restTimer == 0}
-									{$LL.workouts.workout.next()}
+								{#if workout.restTimer == 0}
+									{m.workouts_workout_next()}
 								{:else}
-									{$LL.workouts.workout.skipRestStartNext()}
+									{m.workouts_workout_skip_rest_start_next()}
 								{/if}
 								<ArrowRight />
 							</button>
@@ -366,12 +325,12 @@
 
 <Modal bind:open={openEndWorkout}>
 	{#snippet title()}
-		<h5 >{$LL.workouts.workout.end.title()}</h5>
+		<h5>{m.workouts_workout_end_title()}</h5>
 	{/snippet}
-	<p>{$LL.workouts.workout.end.body()}</p>
+	<p>{m.workouts_workout_end_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onFinish}>
-			{$LL.workouts.workout.end.submit()}
+			{m.workouts_workout_end_submit()}
 		</button>
 	</div>
 </Modal>

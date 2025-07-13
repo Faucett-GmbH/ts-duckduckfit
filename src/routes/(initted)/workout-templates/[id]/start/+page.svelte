@@ -107,7 +107,7 @@
 					<WorkoutTemplate
 						workoutTemplateId={data.workoutTemplateId}
 						workoutTemplate={data.workoutTemplate}
-						exerciseByGuid={data.exerciseByGuid}
+						bind:exerciseByGuid={data.exerciseByGuid}
 						editReferrer={`${base}/workout-templates/${data.workoutTemplateId}/start`}
 						{onDelete}
 					/>

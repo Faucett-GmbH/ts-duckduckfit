@@ -30,7 +30,7 @@
 					<EditWorkout
 						workoutId={data.workoutId}
 						workout={data.workout}
-						exerciseByGuid={data.exerciseByGuid}
+						bind:exerciseByGuid={data.exerciseByGuid}
 					/>
 				</div>
 			</div>

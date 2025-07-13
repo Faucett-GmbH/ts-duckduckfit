@@ -14,6 +14,7 @@ export interface AttemptedSet extends SetTemplate {
   attemptedRepsInReserve: number | null;
   attemptedTimeInSeconds: number | null;
   attemptedWeightInKilograms: number | null;
+  durationInSeconds: number | null;
   status: SetStatusType | null;
   notes: WorkoutNote[];
   startedAt: Date | null;

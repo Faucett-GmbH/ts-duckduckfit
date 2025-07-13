@@ -14,7 +14,7 @@ export const load: PageLoad = async (event) => {
 	if (!workout) {
 		error(404);
 	}
-	const exerciseGuids = new Set<AutomergeDocumentId<Exercise>>();
+	const exerciseGuids = new Set<string>();
 	for (const sgt of workout.setGroups) {
 		for (const st of sgt.sets) {
 			exerciseGuids.add(st.exerciseGuid);

@@ -225,9 +225,9 @@
 		for (const exercise of exercises) {
 			setTemplates.push({
 				id: unsafeId(),
-				exerciseGuid: exercise.guid as AutomergeDocumentId<Exercise>,
+				exerciseGuid: exercise.guid,
 				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
-			});
+			} as never);
 		}
 		setGroupTemplate = {
 			...setGroupTemplate,

@@ -7,7 +7,7 @@
 		| 'top-center'
 		| 'bottom-center';
 
-	export interface Props {
+	export interface PopupProps {
 		anchor: Element;
 		anchorPosition?: Position;
 		position?: Position;
@@ -30,7 +30,7 @@
 		open = $bindable(false),
 		closeOnClickOutside = true,
 		children
-	}: Props = $props();
+	}: PopupProps = $props();
 
 	let child: HTMLElement;
 	let offsetWidth: number = $state<number>(0);

@@ -151,5 +151,20 @@
 	"workouts_set_group_set_working_set_rest_timers": "Update Working set Rest Timers",
 	"workouts_set_expected": "Expected",
 	"workouts_set_actual": "Actual",
-	"workouts_set_incomplete_title": "Incomplete"
+	"workouts_set_incomplete_title": "Incomplete",
+	"workouts_workout_title": "Workout",
+	"workouts_workout_resume": "Resume",
+	"workouts_workout_pause": "Pause",
+	"workouts_workout_end_open": "End",
+	"workouts_workout_finish": "Finish",
+	"workouts_workout_next": "Next",
+	"workouts_workout_skip_rest_start_next": "Skip Rest",
+	"workouts_workout_end_title": "End incomplete Workout?",
+	"workouts_workout_end_body": "Are you sure you want to end this Workout?",
+	"workouts_workout_end_submit": "End",
+	"workouts_set_add_submit": "Submit",
+	"workouts_set_duplicate": "Duplicate",
+	"workouts_set_reset_timer": "Reset Timer",
+	"workouts_set_notes_placeholder": "Notes...",
+	"workouts_set_incomplete_letter": "I"
 }

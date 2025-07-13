@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	import { create, test, enforce, only } from 'vest';
 
-	interface Props {
+	export interface EditWorkoutProps {
 		workoutId: AutomergeDocumentId<Workout>;
 		workout: Workout;
 		exerciseByGuid: { [exerciseGuid: string]: Exercise };
@@ -39,7 +39,11 @@
 	import type { EventHandler } from 'svelte/elements';
 	import EditSetGroup from './EditSetGroup.svelte';
 
-	let { workout = $bindable(), workoutId, exerciseByGuid }: Props = $props();
+	let {
+		workout = $bindable(),
+		workoutId,
+		exerciseByGuid = $bindable()
+	}: EditWorkoutProps = $props();
 	let setGroupsValid: Array<boolean | undefined> = [];
 
 	let valid: boolean | undefined = undefined;
@@ -201,7 +205,7 @@
 		})}
 			<EditSetGroup
 				setGroup={item}
-				{exerciseByGuid}
+				bind:exerciseByGuid
 				{index}
 				{isDragging}
 				{isDraggingOver}

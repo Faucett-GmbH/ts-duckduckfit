@@ -35,7 +35,7 @@
 			<div class="flex flex-grow flex-col">
 				<div class="card flex flex-shrink flex-col">
 					<EditWorkoutTemplate
-						exerciseByGuid={data.exerciseByGuid}
+						bind:exerciseByGuid={data.exerciseByGuid}
 						workoutTemplateId={data.workoutTemplateId}
 						workoutTemplate={data.workoutTemplate}
 					/>

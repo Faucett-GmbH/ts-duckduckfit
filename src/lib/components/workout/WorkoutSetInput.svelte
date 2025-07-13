@@ -5,8 +5,8 @@
 		setInput: WorkoutSetInputParams;
 		exercise: Exercise;
 		valid?: boolean | undefined;
-		oninput(params: WorkoutSetInputParams): void;
-		onvalid(valid: boolean): void;
+		oninput?(params: WorkoutSetInputParams): void;
+		onvalid?(valid: boolean): void;
 	}
 
 	export interface WorkoutSetInputParams {

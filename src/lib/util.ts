@@ -3,6 +3,8 @@ import { PUBLIC_URL } from '$env/static/public';
 import { building, browser } from '$app/environment';
 import type { Locale } from './paraglide/runtime';
 import { getLocale } from './state/settings.svelte';
+import { page } from '$app/state';
+import { replaceState } from '$app/navigation';
 
 export type ExtractPromise<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;
 
@@ -92,4 +94,24 @@ export function findTranslation<T extends { locale: Locale }>(translations: T[])
 		}
 	}
 	return translation!;
+}
+
+export function setUrlParams(params: { [key: string]: string | null | undefined }) {
+	const url = page.url;
+	Object.entries(params).forEach(([key, value]) => {
+		if (value == null) {
+			url.searchParams.delete(key);
+		} else {
+			url.searchParams.set(key, value);
+		}
+	});
+	replaceState(url, page.state);
+}
+
+export function toHHMMSS(timeInSeconds: number) {
+	const seconds = Math.floor(timeInSeconds);
+	const h = Math.floor(seconds / 3600) % 60;
+	const m = Math.floor(seconds / 60) % 60;
+	const s = seconds % 60;
+	return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }

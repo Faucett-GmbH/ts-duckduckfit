@@ -22,14 +22,14 @@ const lastExerciseRelease = localStorageState<LastExerciseRelease | null>('last-
 
 export interface Exercises {
   version: number;
-  exercisesByGuid: Record<string, AutomergeDocumentId<Exercise>>;
+  exerciseByGuid: Record<string, AutomergeDocumentId<Exercise>>;
 }
 
 export const exercisesConfig = {
   migrations: {
     1: () => (exercises: Exercises) => {
       exercises.version = 1;
-      exercises.exercisesByGuid = {};
+      exercises.exerciseByGuid = {};
     }
   }
 };
@@ -39,7 +39,7 @@ export async function getExercises(offset: number, limit: number, search?: strin
   const startOffset = offset * limit;
   const endOffset = startOffset + limit - 1;
   const repo = getRepo();
-  let exerciseGuids = Object.values(exercises.exercisesByGuid) as AutomergeDocumentId<Exercise>[];
+  let exerciseGuids = Object.values(exercises.exerciseByGuid) as AutomergeDocumentId<Exercise>[];
   if (!search) {
     exerciseGuids = exerciseGuids.slice(startOffset, endOffset);
   }
@@ -56,9 +56,9 @@ export async function getExercises(offset: number, limit: number, search?: strin
   return exercisesAndIds;
 }
 
-export async function getExerciseByGuid(exerciseGuid: AutomergeDocumentId<Exercise>): Promise<Exercise | null> {
+export async function getExerciseByGuid(exerciseGuid: string): Promise<Exercise | null> {
   const exercises = (await userDocument.current!.exercises()).doc();
-  const exerciseId = exercises.exercisesByGuid[exerciseGuid];
+  const exerciseId = exercises.exerciseByGuid[exerciseGuid];
   if (!exerciseId) {
     return null;
   }
@@ -72,7 +72,7 @@ export async function getExerciseByGuid(exerciseGuid: AutomergeDocumentId<Exerci
 export async function deleteExercise(exerciseGuid: AutomergeDocumentId<Exercise>) {
   const exercises = await userDocument.current!.exercises();
   exercises.change((wts) => {
-    delete wts.exercisesByGuid[exerciseGuid];
+    delete wts.exerciseByGuid[exerciseGuid];
   });
   deleteDocument(exerciseGuid);
 }
@@ -85,7 +85,7 @@ export async function upsertExercise(exercise: Exercise, exerciseDocumentId?: Au
     exerciseDocumentId = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
     const documentId = exerciseDocumentId;
     exercises.change((wts) => {
-      wts.exercisesByGuid[exercise.guid] = documentId;
+      wts.exerciseByGuid[exercise.guid] = documentId;
     });
   } else {
     exerciseDocument = await findDocument(exerciseDocumentId);
@@ -140,7 +140,7 @@ if (browser) {
         }
         const exercisesJSON = JSON.parse(await exercisesJsonEntry.getData(new TextWriter("utf-8")));
         const exercises = await (await (await getUserDocument()).exercises()).doc();
-        await Promise.all(exercisesJSON.map((exerciseJSON: Exercise) => upsertExercise(exerciseJSON, exercises.exercisesByGuid[exerciseJSON.guid])));
+        await Promise.all(exercisesJSON.map((exerciseJSON: Exercise) => upsertExercise(exerciseJSON, exercises.exerciseByGuid[exerciseJSON.guid])));
         lastExerciseRelease.value = {
           updatedAt: new Date(),
           publishedAt: latestPublishedAt,

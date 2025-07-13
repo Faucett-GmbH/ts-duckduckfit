@@ -58,7 +58,7 @@
 			updatedAt: new Date(),
 			createdAt: new Date()
 		}),
-		exerciseByGuid = {}
+		exerciseByGuid = $bindable()
 	}: WorkoutTemplateProps = $props();
 	let setGroupTemplatesValid: Array<boolean | undefined> = [];
 

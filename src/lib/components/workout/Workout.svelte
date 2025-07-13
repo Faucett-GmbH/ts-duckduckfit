@@ -23,7 +23,12 @@
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { m } from '$lib/paraglide/messages';
 
-	let { workoutId, workout, exerciseByGuid, editReferrer = undefined }: WorkoutProps = $props();
+	let {
+		workoutId,
+		workout,
+		exerciseByGuid = $bindable(),
+		editReferrer = undefined
+	}: WorkoutProps = $props();
 
 	const translation = $derived(findTranslation(workout.translations));
 
@@ -84,7 +89,7 @@
 					{#each setGroup.sets as set, index (set.id)}
 						{@const position = getRealSetPosition(setGroup.sets, set, index)}
 						{@const exercise = exerciseByGuid[set.exerciseGuid]}
-						{@const translation = findTranslation(exercise?.translations || [])}
+						{@const translation = findTranslation(exercise?.translations ?? [])}
 						<div
 							class={{
 								'flex flex-row justify-between bg-black p-1': true,
@@ -116,12 +121,14 @@
 												? m.workouts_set_success_title()
 												: set.status === 'failed'
 													? m.workouts_set_failed_title()
-													: ''}
+													: m.workouts_set_incomplete_title()}
 										>
 											{#if set.status === 'success'}
 												{m.workouts_set_success_letter()}
 											{:else if set.status === 'failed'}
 												{m.workouts_set_failed_letter()}
+											{:else}
+												{m.workouts_set_incomplete_letter()}
 											{/if}
 										</div>
 									</div>

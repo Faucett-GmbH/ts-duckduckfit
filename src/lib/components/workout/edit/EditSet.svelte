@@ -204,12 +204,14 @@
 									? m.workouts_set_success_title()
 									: set.status === 'failed'
 										? m.workouts_set_failed_title()
-										: ''}
+										: m.workouts_set_incomplete_title()}
 							>
 								{#if set.status === 'success'}
 									{m.workouts_set_success_letter()}
 								{:else if set.status === 'failed'}
 									{m.workouts_set_failed_letter()}
+								{:else}
+									{m.workouts_set_incomplete_letter()}
 								{/if}
 							</button>
 						{/snippet}

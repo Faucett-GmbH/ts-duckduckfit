@@ -68,7 +68,7 @@
 				{#each workouts as [workoutId, workout] (workoutId)}
 					<div class="mb-4 flex flex-grow flex-col">
 						<div class="flex flex-shrink flex-col">
-							<WorkoutComponent {workoutId} {workout} {exerciseByGuid} />
+							<WorkoutComponent {workoutId} {workout} bind:exerciseByGuid />
 							{#if workout.completedAt === null}
 								<div class="mt-2 flex flex-row justify-center">
 									<a

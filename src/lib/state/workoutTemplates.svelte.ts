@@ -3,14 +3,13 @@ import { createDocument, deleteDocument, findDocument, getRepo, type AutomergeDo
 import type { DocHandle } from "@automerge/automerge-repo";
 import { userDocument } from "./userDocument.svelte";
 import { getAndApplyChanges } from "$lib/diff";
-import type { Exercise } from "./exerciseTypes";
 
 export type SetGroupType = "straight" | "superset" | "circuit";
 export type SetType = "warmup" | "working" | "backoff";
 
 export interface SetTemplate {
   id: string;
-  exerciseGuid: AutomergeDocumentId<Exercise>;
+  exerciseGuid: string;
   setType: SetType;
   asManyRoundsAsPossible: boolean | null;
   distanceInMeters: number | null;

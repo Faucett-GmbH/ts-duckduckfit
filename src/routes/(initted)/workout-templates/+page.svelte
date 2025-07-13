@@ -32,9 +32,7 @@
 				)
 			);
 			const uniqueExercisGuids = [...new Set(exercisGuids)];
-			for (const exercise of await Promise.all(
-				uniqueExercisGuids.map((exercisGuid) => getExerciseByGuid(exercisGuid))
-			)) {
+			for (const exercise of await Promise.all(uniqueExercisGuids.map(getExerciseByGuid))) {
 				if (exercise) {
 					exerciseByGuid[exercise.guid] = exercise;
 				}
@@ -78,7 +76,7 @@
 							<WorkoutTemplateComponent
 								{workoutTemplateId}
 								{workoutTemplate}
-								{exerciseByGuid}
+								bind:exerciseByGuid
 								onDelete={createOnDelete(workoutTemplateId, workoutTemplate)}
 							/>
 							<div class="mt-2 flex flex-row justify-center">
