@@ -147,7 +147,7 @@
 		</div>
 	{/if}
 	<div class="me-1 flex flex-shrink flex-col">
-		<select onchange={onSelectRepsInputType} value={inputType}>
+		<select {disabled} onchange={onSelectRepsInputType} value={inputType}>
 			<option value="reps" title={m.workouts_set_reps_label()}>{m.workouts_set_reps_label()}</option
 			>
 			<!-- <option value="percentOfOneRepMax" title={m.workouts_set_percentOfOneRepMaxLabel()}>{m.workouts_set_percentOfOneRepMaxLabel()}</option> -->
