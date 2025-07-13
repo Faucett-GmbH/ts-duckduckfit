@@ -282,7 +282,7 @@
 			<textarea
 				bind:this={notesElement}
 				placeholder={m.workouts_set_notes_placeholder()}
-				value={setNoteTranslation.note || ''}
+				value={setNoteTranslation?.note ?? ''}
 				maxlength="255"
 				oninput={debouncedOnNoteUpdate}
 			></textarea>

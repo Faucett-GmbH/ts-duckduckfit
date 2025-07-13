@@ -23,6 +23,10 @@ export function createWorkout(w: Workout, workoutId: AutomergeDocumentId<Workout
 		s: setIndex.toString()
 	});
 
+	$effect(() => {
+		console.log({ urlSearchParams });
+	});
+
 	function getNext(workout: Workout, setGroupIndex: number, setIndex: number) {
 		let setGroup = workout.setGroups[setGroupIndex];
 		let set = setGroup.sets[setIndex];

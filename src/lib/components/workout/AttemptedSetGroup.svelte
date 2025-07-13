@@ -5,7 +5,7 @@
 		activeSetIndex: number;
 		activeSetGroupIndex: number;
 		activeSetDuration: number;
-		exerciseByGuid?: { [guid: string]: Exercise };
+		exerciseByGuid: { [guid: string]: Exercise };
 		open?: boolean;
 		isDragging?: boolean;
 		isDraggingOver?: boolean;
@@ -56,7 +56,7 @@
 		activeSetGroupIndex,
 		activeSetDuration = $bindable(),
 		open = $bindable(false),
-		exerciseByGuid = $bindable({}),
+		exerciseByGuid = $bindable(),
 		isDragging = false,
 		isDraggingOver = false,
 		onDragStart,

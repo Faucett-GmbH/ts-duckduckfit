@@ -7,7 +7,6 @@
 	import Check from 'lucide-svelte/icons/check';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import Ban from 'lucide-svelte/icons/ban';
-	import { SvelteDate } from 'svelte/reactivity';
 	import { afterNavigate, goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount, tick } from 'svelte';
@@ -113,7 +112,7 @@
 					completedAt: new Date()
 				}))
 			);
-			await goto(`${base}}/workouts`);
+			await goto(`${base}/workouts`);
 		} catch (error) {
 			await handleError(error);
 		} finally {
@@ -136,20 +135,45 @@
 
 	let mounted = $state(false);
 	let navigated = $state(false);
+	let now = $state(Date.now());
 	onMount(() => {
 		mounted = true;
+
+		const intervalId = setInterval(() => {
+			now = Date.now();
+		}, 1000);
+
+		return () => {
+			clearInterval(intervalId);
+		};
 	});
 	afterNavigate(() => {
 		navigated = true;
 	});
+	// svelte-ignore state_referenced_locally
+	let lastNow = now;
 	$effect(() => {
+		if (lastNow === now) {
+			return;
+		}
+		lastNow = now;
 		if (!workout.paused) {
-			const _now = SvelteDate.now();
 			workout.duration += 1;
 			if (!workout.activeSet.status) {
 				workout.activeSetDuration += 1;
 			}
-			workout.restTimer = workout.restTimer > 0 ? workout.restTimer - 1 : 0;
+			if (workout.restTimer > 0) {
+				workout.restTimer -= 1;
+			}
+		}
+	});
+	let lastDuration = workout.duration;
+	$effect(() => {
+		if (lastDuration === workout.duration) {
+			return;
+		}
+		lastDuration = workout.duration;
+		if (!workout.paused) {
 			const d = workout.duration;
 			if (d % 10 === 0) {
 				workout.update((workout) => ({ ...workout, durationInSeconds: d }));
@@ -235,6 +259,7 @@
 						onDragOver
 					})}
 						<AttemptedSetGroup
+							bind:exerciseByGuid={data.exerciseByGuid}
 							setGroup={item}
 							setGroupIndex={index}
 							activeSetIndex={workout.activeSetIndex}
