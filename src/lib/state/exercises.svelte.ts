@@ -9,6 +9,7 @@ import type { Exercise } from "./exerciseTypes";
 import { getAndApplyChanges, type GetKeyFn } from "$lib/diff";
 import { getId } from "$lib/util";
 import { fuzzyEquals } from '@aicacia/string-fuzzy_equals'
+import { isBefore, subDays } from 'date-fns'
 
 const RELEASES = "https://api.github.com/repos/Faucett-GmbH/exdb_data/releases";
 const CORS_URL = "https://corsproxy.io/?url=";
@@ -97,7 +98,11 @@ export async function upsertExercise(exercise: Exercise, exerciseDocumentId?: Au
 }
 
 if (browser) {
-  if (lastExerciseRelease.value === null || lastExerciseRelease.value.updatedAt.valueOf() < Date.now() - 24 * 60 * 60 * 1000) {
+
+  const checkForNewRelease = lastExerciseRelease.value === null ||
+    isBefore(new Date(lastExerciseRelease.value.updatedAt), subDays(new Date(), 1));
+
+  if (checkForNewRelease) {
     fetch(`${CORS_URL}${encodeURIComponent(`${RELEASES}?_=${Date.now}`)}`)
       .then(async releaseResponse => {
         if (!releaseResponse.ok) {

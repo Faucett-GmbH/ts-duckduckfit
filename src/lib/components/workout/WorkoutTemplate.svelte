@@ -49,7 +49,7 @@
 </script>
 
 <div class="flex flex-row flex-wrap items-center justify-between">
-	<h3 class="m-0">{findTranslation(workoutTemplate.translations).name}</h3>
+	<h3 class="m-0">{findTranslation(workoutTemplate.translations)?.name}</h3>
 	<div class="flex flex-row">
 		<button class="btn danger icon me-2" onclick={onOpenDelete}><Trash /></button>
 		<a

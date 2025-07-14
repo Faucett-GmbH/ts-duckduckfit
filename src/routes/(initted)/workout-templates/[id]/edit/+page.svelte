@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{translation.name}</title>
+	<title>{translation?.name}</title>
 </svelte:head>
 
 <div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
