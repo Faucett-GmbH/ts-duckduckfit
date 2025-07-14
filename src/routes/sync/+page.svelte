@@ -66,7 +66,7 @@
 								getWebRTCClientAdapter().setDeviceIds([message.payload.deviceId]);
 
 								await setUserDocumentId(message.payload.userDocumentId);
-								await goto(`${base}/profile`);
+								await goto(`${base}/settings/profile`);
 								break;
 							}
 						}
