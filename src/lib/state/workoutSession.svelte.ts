@@ -3,7 +3,7 @@ import { debounce } from '@aicacia/debounce';
 import { upsertWorkout, type AttemptedSet, type AttemptedSetGroup, type Workout } from './workouts.svelte';
 import type { AutomergeDocumentId } from '$lib/repo';
 
-export function createWorkout(w: Workout, workoutId: AutomergeDocumentId<Workout>) {
+export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<Workout>) {
 	let workout = $state(w);
 	let duration = $state(w.durationInSeconds || 0);
 	let restTimer = $state(0);
@@ -21,10 +21,6 @@ export function createWorkout(w: Workout, workoutId: AutomergeDocumentId<Workout
 		r: restTimer.toString(),
 		sg: setGroupIndex.toString(),
 		s: setIndex.toString()
-	});
-
-	$effect(() => {
-		console.log({ urlSearchParams });
 	});
 
 	function getNext(workout: Workout, setGroupIndex: number, setIndex: number) {
@@ -80,10 +76,9 @@ export function createWorkout(w: Workout, workoutId: AutomergeDocumentId<Workout
 		paused = false;
 	}
 
-	function update(updateFn: (workout: Workout) => Workout) {
-		const updatedWorkout = updateFn(workout);
-		workout = updatedWorkout;
-		return updatedWorkout;
+	async function update(updateFn: (workout: Workout) => Workout) {
+		workout = updateFn(workout);
+		await internalUpdate();
 	}
 
 	function internalUpdateSet(

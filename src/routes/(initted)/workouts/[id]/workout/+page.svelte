@@ -12,7 +12,7 @@
 	import { onMount, tick } from 'svelte';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { createWorkout } from '$lib/state/workout.svelte';
+	import { createWorkoutSession } from '$lib/state/workoutSession.svelte';
 	import type { PageProps } from './$types';
 	import { upsertWorkout, type AttemptedSet, type Workout } from '$lib/state/workouts.svelte';
 	import { handleError } from '$lib/error';
@@ -22,13 +22,13 @@
 
 	let { data }: PageProps = $props();
 
-	const workout = createWorkout(data.workout, data.workoutId);
+	const workoutSession = createWorkoutSession(data.workout, data.workoutId);
 
 	let initted = $state(false);
 	let startedFirst = $state(false);
 
 	function onTogglePause() {
-		workout.paused = !workout.paused;
+		workoutSession.paused = !workoutSession.paused;
 	}
 	let openEndWorkout = $state(false);
 	function onOpenEndWorkout() {
@@ -36,68 +36,63 @@
 	}
 	function createOnSelectSet(setGroupIndex: number, setIndex: number) {
 		return async () => {
-			if (workout.activeSetGroupIndex === setGroupIndex && workout.activeSetIndex === setIndex) {
+			if (
+				workoutSession.activeSetGroupIndex === setGroupIndex &&
+				workoutSession.activeSetIndex === setIndex
+			) {
 				return;
 			}
-			workout.setSet(setGroupIndex, setIndex);
+			workoutSession.setSet(setGroupIndex, setIndex);
 			await tick();
-			if (!workout.activeSet.status) {
-				workout.updateActiveSet((set) => ({
+			if (!workoutSession.activeSet.status) {
+				workoutSession.updateActiveSet((set) => ({
 					...set,
 					startedAt: new Date(),
 					durationInSeconds: 0,
 					attemptedTimeInSeconds: 0
 				}));
-				workout.activeSetDuration = 0;
+				workoutSession.activeSetDuration = 0;
 			} else {
-				workout.activeSetDuration = workout.activeSet.attemptedTimeInSeconds || 0;
+				workoutSession.activeSetDuration = workoutSession.activeSet.attemptedTimeInSeconds || 0;
 			}
 		};
 	}
 	function createUpdate(setGroupIndex: number, setIndex: number) {
 		return (updateFn: (set: AttemptedSet) => AttemptedSet, debounce = false) => {
-			workout.updateSet(setGroupIndex, setIndex, updateFn, debounce);
+			workoutSession.updateSet(setGroupIndex, setIndex, updateFn, debounce);
 		};
 	}
 	function createCopySet(setGroupIndex: number, setIndex: number) {
-		return () => workout.copySet(setGroupIndex, setIndex);
+		return () => workoutSession.copySet(setGroupIndex, setIndex);
 	}
 	function createDeleteSet(setGroupIndex: number, setIndex: number) {
-		return () => workout.deleteSet(setGroupIndex, setIndex);
+		return () => workoutSession.deleteSet(setGroupIndex, setIndex);
 	}
 	function onFail() {
-		workout.updateActiveSet((set) => ({
+		workoutSession.updateActiveSet((set) => ({
 			...set,
 			status: 'failed',
 			completedAt: new Date(),
-			durationInSeconds: workout.activeSetDuration,
-			attemptedTimeInSeconds: workout.activeSetDuration
+			durationInSeconds: workoutSession.activeSetDuration,
+			attemptedTimeInSeconds: workoutSession.activeSetDuration
 		}));
 	}
 	function onSuccess() {
-		workout.updateActiveSet((set) => ({
+		workoutSession.updateActiveSet((set) => ({
 			...set,
 			status: 'success',
 			completedAt: new Date(),
-			durationInSeconds: workout.activeSetDuration,
-			attemptedTimeInSeconds: workout.activeSetDuration
+			durationInSeconds: workoutSession.activeSetDuration,
+			attemptedTimeInSeconds: workoutSession.activeSetDuration
 		}));
 	}
 	async function onNext() {
-		if (workout.next()) {
+		if (workoutSession.next()) {
 			await tick();
-			workout.updateActiveSet((set) => ({
+			workoutSession.updateActiveSet((set) => ({
 				...set,
 				startedAt: new Date()
 			}));
-		}
-	}
-
-	async function updateWorkout(newWorkout: Workout) {
-		try {
-			await upsertWorkout(newWorkout, data.workoutId);
-		} catch (error) {
-			await handleError(error);
 		}
 	}
 
@@ -105,13 +100,11 @@
 	async function onFinish() {
 		try {
 			finishing = true;
-			await updateWorkout(
-				workout.update((w) => ({
-					...w,
-					durationInSeconds: workout.duration,
-					completedAt: new Date()
-				}))
-			);
+			workoutSession.update((w) => ({
+				...w,
+				durationInSeconds: workoutSession.duration,
+				completedAt: new Date()
+			}));
 			await goto(`${base}/workouts`);
 		} catch (error) {
 			await handleError(error);
@@ -125,7 +118,7 @@
 		e.stopPropagation();
 		try {
 			addingSetGroup = true;
-			await workout.addSetGroup();
+			await workoutSession.addSetGroup();
 		} catch (error) {
 			await handleError(error);
 		} finally {
@@ -157,46 +150,46 @@
 			return;
 		}
 		lastNow = now;
-		if (!workout.paused) {
-			workout.duration += 1;
-			if (!workout.activeSet.status) {
-				workout.activeSetDuration += 1;
+		if (!workoutSession.paused) {
+			workoutSession.duration += 1;
+			if (!workoutSession.activeSet.status) {
+				workoutSession.activeSetDuration += 1;
 			}
-			if (workout.restTimer > 0) {
-				workout.restTimer -= 1;
+			if (workoutSession.restTimer > 0) {
+				workoutSession.restTimer -= 1;
 			}
 		}
 	});
-	let lastDuration = workout.duration;
+	let lastDuration = workoutSession.duration;
 	$effect(() => {
-		if (lastDuration === workout.duration) {
+		if (lastDuration === workoutSession.duration) {
 			return;
 		}
-		lastDuration = workout.duration;
-		if (!workout.paused) {
-			const d = workout.duration;
+		lastDuration = workoutSession.duration;
+		if (!workoutSession.paused) {
+			const d = workoutSession.duration;
 			if (d % 10 === 0) {
-				workout.update((workout) => ({ ...workout, durationInSeconds: d }));
+				workoutSession.update((workout) => ({ ...workout, durationInSeconds: d }));
 			}
 		}
 	});
 	let isHydrated = $derived(mounted && navigated);
 	$effect(() => {
 		if (isHydrated) {
-			workout.fromURLSearchParams(page.url.searchParams);
+			workoutSession.fromURLSearchParams(page.url.searchParams);
 			initted = true;
 		}
 	});
 	$effect(() => {
 		if (isHydrated) {
-			setUrlParams(workout.urlSearchParams);
+			setUrlParams(workoutSession.urlSearchParams);
 		}
 	});
 	$effect(() => {
 		if (!startedFirst && initted) {
 			startedFirst = true;
-			if (!workout.activeSet.status) {
-				workout.updateActiveSet((set) => ({
+			if (!workoutSession.activeSet.status) {
+				workoutSession.updateActiveSet((set) => ({
 					...set,
 					startedAt: new Date(),
 					durationInSeconds: 0,
@@ -216,18 +209,18 @@
 		<div class="card flex h-full flex-grow flex-col overflow-hidden !rounded-none !p-0 sm:!px-2">
 			<div class="card secondary flex flex-row justify-between !rounded-t-none !p-2">
 				<div>
-					<h6 class="mb-0">{toHHMMSS(workout.duration)}</h6>
+					<h6 class="mb-0">{toHHMMSS(workoutSession.duration)}</h6>
 				</div>
 				<div class="flex flex-row flex-wrap">
 					<button class="btn ghost flex flex-row" onclick={onTogglePause}>
 						<span class="me-1">
-							{#if workout.paused}
+							{#if workoutSession.paused}
 								<CirclePlay />
 							{:else}
 								<CirclePause />
 							{/if}
 						</span>
-						{#if workout.paused}
+						{#if workoutSession.paused}
 							{m.workouts_workout_resume()}
 						{:else}
 							{m.workouts_workout_pause()}
@@ -244,9 +237,9 @@
 			<div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden pb-4 pt-2" role="list">
 				<Sortable
 					id={`set-groups-workout.{workout.workout.id}`}
-					items={workout.workout.setGroups}
+					items={workoutSession.workout.setGroups}
 					getKey={getId}
-					onMove={workout.moveSetGroups}
+					onMove={workoutSession.moveSetGroups}
 				>
 					{#snippet children({
 						isDragging,
@@ -262,18 +255,18 @@
 							bind:exerciseByGuid={data.exerciseByGuid}
 							setGroup={item}
 							setGroupIndex={index}
-							activeSetIndex={workout.activeSetIndex}
-							activeSetGroupIndex={workout.activeSetGroupIndex}
-							activeSetDuration={workout.activeSetDuration}
+							activeSetIndex={workoutSession.activeSetIndex}
+							activeSetGroupIndex={workoutSession.activeSetGroupIndex}
+							activeSetDuration={workoutSession.activeSetDuration}
 							{isDragging}
 							{isDraggingOver}
 							{onDragStart}
 							{onDragEnd}
 							{onDragLeave}
 							{onDragOver}
-							moveSets={workout.moveSets}
-							deleteSetGroup={workout.deleteSetGroup}
-							createSets={workout.createSets}
+							moveSets={workoutSession.moveSets}
+							deleteSetGroup={workoutSession.deleteSetGroup}
+							createSets={workoutSession.createSets}
 							{createOnSelectSet}
 							{createUpdate}
 							{createCopySet}
@@ -294,21 +287,21 @@
 			</div>
 			<div class="card secondary flex flex-shrink flex-col !rounded-b-none !p-2">
 				<div class="flex flex-col">
-					{#if !workout.activeSet.status}
-						<h6 class="mb-0">{toHHMMSS(workout.activeSetDuration)}</h6>
+					{#if !workoutSession.activeSet.status}
+						<h6 class="mb-0">{toHHMMSS(workoutSession.activeSetDuration)}</h6>
 					{/if}
 				</div>
 				<div class="flex flex-row justify-between">
-					{#if workout.activeSet.status}
+					{#if workoutSession.activeSet.status}
 						<button
 							class="btn ghost flex flex-row"
-							disabled={workout.restTimer == 0}
+							disabled={workoutSession.restTimer == 0}
 							onclick={onTogglePause}
 						>
-							{toHHMMSS(workout.restTimer)}
-							{#if workout.restTimer > 0}
+							{toHHMMSS(workoutSession.restTimer)}
+							{#if workoutSession.restTimer > 0}
 								<span class="ms-1">
-									{#if workout.paused}
+									{#if workoutSession.paused}
 										<CirclePlay />
 									{:else}
 										<CirclePause />
@@ -316,7 +309,7 @@
 								</span>
 							{/if}
 						</button>
-						{#if workout.done}
+						{#if workoutSession.done}
 							<button class="btn info flex flex-row" disabled={finishing} onclick={onFinish}>
 								{#if finishing}<div class="inline-block h-6 w-6 animate-spin">
 										<LoaderCircle />
@@ -326,7 +319,7 @@
 							</button>
 						{:else}
 							<button class="btn info flex flex-row" onclick={onNext}>
-								{#if workout.restTimer == 0}
+								{#if workoutSession.restTimer == 0}
 									{m.workouts_workout_next()}
 								{:else}
 									{m.workouts_workout_skip_rest_start_next()}
