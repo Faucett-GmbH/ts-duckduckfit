@@ -347,7 +347,7 @@
 	{/snippet}
 	<p>{m.workouts_workout_end_body()}</p>
 	<div class="flex flex-row justify-end">
-		<button class="btn danger" onclick={onFinish}>
+		<button class="btn danger" disabled={finishing} onclick={onFinish}>
 			{m.workouts_workout_end_submit()}
 		</button>
 	</div>

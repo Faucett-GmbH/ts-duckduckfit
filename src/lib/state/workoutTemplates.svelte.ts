@@ -96,7 +96,7 @@ export async function upsertWorkoutTemplate(workoutTemplateUpdates: WorkoutTempl
   } else {
     workoutTemplateDocument = await findDocument(workoutTemplateId);
     workoutTemplateDocument.change(workoutTemplate => {
-      let updated = true;
+      let updated = false;
       if (getAndApplyChanges(workoutTemplate, workoutTemplateUpdates, (value) => value.id ?? value.locale)) {
         updated = true;
       }

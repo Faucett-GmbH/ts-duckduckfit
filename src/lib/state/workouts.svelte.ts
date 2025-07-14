@@ -117,7 +117,7 @@ export async function upsertWorkout(workoutUpdates: Workout, workoutId?: Automer
     workoutDocument = await findDocument(workoutId);
     const previousWorkoutTemplateId = workoutDocument.doc().workoutTemplateId;
     workoutDocument.change(workout => {
-      let updated = true;
+      let updated = false;
       if (getAndApplyChanges(workout, workoutUpdates, (value) => value.id ?? value.locale)) {
         updated = true;
       }

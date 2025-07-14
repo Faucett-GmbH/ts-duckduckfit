@@ -5,20 +5,20 @@ export type Change<T> =
   ObjectChange<T> | ArrayChange<ArrayInner<T>>;
 
 export function getChanges<T>(a: T, b: T, getKey: GetKeyFn): { type: 'replace', value: T } | Change<T>[] {
-  a = typeof a?.valueOf === "function" ? a.valueOf() as never : a;
-  b = typeof b?.valueOf === "function" ? b.valueOf() as never : b;
-  const aType = typeof a;
-  const bType = typeof b;
+  const aValue = typeof a?.valueOf === "function" ? a.valueOf() as never : a;
+  const bValue = typeof b?.valueOf === "function" ? b.valueOf() as never : b;
+  const aType = typeof aValue;
+  const bType = typeof bValue;
   if (aType !== bType) {
-    return [];
+    return { type: 'replace', value: b };
   }
-  if (Array.isArray(a) && Array.isArray(b)) {
-    return getArrayChanges(a, b, getKey) as never;
+  if (Array.isArray(aValue) && Array.isArray(bValue)) {
+    return getArrayChanges(aValue, bValue, getKey) as never;
   }
-  if (aType === "object" && a != null && b != null) {
-    return getObjectChanges(a, b, getKey) as never;
+  if (aType === "object" && aValue != null && bValue != null) {
+    return getObjectChanges(aValue, bValue, getKey) as never;
   }
-  if (a !== b) {
+  if (aValue !== bValue) {
     return { type: 'replace', value: b };
   }
   return [];
@@ -42,13 +42,13 @@ export function getObjectChanges<T extends object>(
 
   for (const key of keys) {
     if (Object.hasOwn(a, key)) {
-      const aValue = (a as never)[key];
+      const aValue = (a as never)[key] as T[keyof T];
       if (Object.hasOwn(b, key)) {
-        const bValue = (b as never)[key];
+        const bValue = (b as never)[key] as T[keyof T];
         const keyChanges = getChanges<T[keyof T]>(
           aValue,
           bValue,
-          getKey,
+          getKey
         );
         if (Array.isArray(keyChanges)) {
           if (keyChanges.length) {
