@@ -85,12 +85,11 @@ export function findTranslation<T extends { locale: Locale }>(translations: T[])
 	const locale = getLocale();
 	let translation: T | undefined;
 	for (const t of translations) {
-		if (t.locale === locale) {
+		if (!translation || t.locale.includes(locale)) {
 			translation = t;
-			break;
 		}
-		if (t.locale === 'en' && !translation) {
-			translation = t;
+		if (t.locale === locale) {
+			break;
 		}
 	}
 	return translation!;

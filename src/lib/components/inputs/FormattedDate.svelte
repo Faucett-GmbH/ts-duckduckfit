@@ -8,6 +8,7 @@
 	import { format } from 'date-fns';
 	import { getLocale } from '$lib/state/settings.svelte';
 	import { enUS, de, es } from 'date-fns/locale';
+
 	let { date }: FormattedDateProps = $props();
 
 	let locale = $state(getLocale());
