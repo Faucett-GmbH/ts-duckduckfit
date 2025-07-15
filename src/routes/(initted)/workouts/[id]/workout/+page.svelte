@@ -14,7 +14,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import { createWorkoutSession } from '$lib/state/workoutSession.svelte';
 	import type { PageProps } from './$types';
-	import { upsertWorkout, type AttemptedSet, type Workout } from '$lib/state/workouts.svelte';
+	import type { AttemptedSet } from '$lib/state/workouts.svelte';
 	import { handleError } from '$lib/error';
 	import { page } from '$app/state';
 	import { m } from '$lib/paraglide/messages';
@@ -168,7 +168,7 @@
 		lastDuration = workoutSession.duration;
 		if (!workoutSession.paused) {
 			const d = workoutSession.duration;
-			if (d % 10 === 0) {
+			if (d % 5 === 0) {
 				workoutSession.update((workout) => ({ ...workout, durationInSeconds: d }));
 			}
 		}
@@ -176,13 +176,13 @@
 	let isHydrated = $derived(mounted && navigated);
 	$effect(() => {
 		if (isHydrated) {
-			workoutSession.fromURLSearchParams(page.url.searchParams);
-			initted = true;
+			setUrlParams(workoutSession.urlSearchParams);
 		}
 	});
 	$effect(() => {
 		if (isHydrated) {
-			setUrlParams(workoutSession.urlSearchParams);
+			workoutSession.fromURLSearchParams(page.url.searchParams);
+			initted = true;
 		}
 	});
 	$effect(() => {

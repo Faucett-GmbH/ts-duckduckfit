@@ -2,8 +2,9 @@ import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { readFileSync } from 'node:fs';
 import tailwindcss from '@tailwindcss/vite';
+import { networkInterfaces } from 'node:os';
+import { readFileSync } from 'node:fs';
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
@@ -13,7 +14,7 @@ export default defineConfig(async ({ mode }) => {
 
 	const packageJSON = JSON.parse(readFileSync(`${__dirname}/package.json`).toString('utf8'));
 
-	const host = process.env.TAURI_DEV_HOST;
+	const host = await getInternalIpV4();
 
 	const define = {
 		__VERSION__: JSON.stringify(packageJSON.version)
@@ -23,28 +24,28 @@ export default defineConfig(async ({ mode }) => {
 		clearScreen: false,
 		resolve: process.env.VITEST
 			? {
-					conditions: ['browser']
-				}
+				conditions: ['browser']
+			}
 			: undefined,
 		test: {
 			environment: 'jsdom'
 		},
 		server: {
-			host: host || '0.0.0.0',
+			host: '0.0.0.0',
 			port: 5173,
 			strictPort: true,
 			hmr: host
 				? {
-						protocol: 'ws',
-						host,
-						port: 5183
-					}
+					protocol: 'ws',
+					host,
+					port: 5183
+				}
 				: undefined,
 			watch: {
 				ignored: ['**/src-tauri/**']
 			}
 		},
-		envPrefix: ['VITE_', 'TAURI_ENV_*'],
+		envPrefix: ['VITE_', 'TAURI_*'],
 		plugins: [
 			tailwindcss(),
 			sveltekit(),
@@ -68,3 +69,21 @@ export default defineConfig(async ({ mode }) => {
 
 	return config;
 });
+
+function getInternalIpV4() {
+	if (process.env.TAURI_DEV_HOST) {
+		return process.env.TAURI_DEV_HOST;
+	}
+	const nets = networkInterfaces();
+	for (const networks of Object.values(nets)) {
+		if (networks) {
+			for (const net of networks) {
+				const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
+				if (net.family === familyV4Value && !net.internal) {
+					return net.address;
+				}
+			}
+		}
+	}
+	return '0.0.0.0';
+}

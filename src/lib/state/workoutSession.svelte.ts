@@ -13,7 +13,7 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 	let duration = $state(w.durationInSeconds || 0);
 	let restTimer = $state(0);
 	let paused = $state(false);
-	let done = $state(w.setGroups.every((sg) => sg.sets.every((s) => s.status)));
+	const done = $derived(workout.setGroups.every((sg) => sg.sets.every((s) => s.status)));
 	const initialIndexes = getNext(w, 0, 0);
 	let setGroupIndex = $state(initialIndexes?.[0] || 0);
 	let setIndex = $state(initialIndexes?.[1] || 0);
@@ -27,6 +27,8 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 		sg: setGroupIndex.toString(),
 		s: setIndex.toString()
 	});
+
+	console.log(duration, urlSearchParams, w.durationInSeconds);
 
 	function getNext(workout: Workout, setGroupIndex: number, setIndex: number) {
 		let setGroup = workout.setGroups[setGroupIndex];
@@ -81,9 +83,13 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 		paused = false;
 	}
 
-	async function update(updateFn: (workout: Workout) => Workout) {
+	async function update(updateFn: (workout: Workout) => Workout, debounce = false) {
 		workout = updateFn(workout);
-		await internalUpdate();
+		if (debounce) {
+			debouncedUpdate();
+		} else {
+			await internalUpdate();
+		}
 	}
 
 	function internalUpdateSet(
@@ -106,7 +112,6 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 			...workout,
 			setGroups: newSetGroups
 		};
-		done = newSetGroups.every((sg) => sg.sets.every((s) => s.status));
 		workout = updatedWorkout;
 		if (!set.status && newSet.status) {
 			restTimer = newSet.restAfterInSeconds || 0;
@@ -236,7 +241,6 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 			setGroups: newSetGroups
 		};
 		await internalUpdate();
-		done = workout.setGroups.every((sg) => sg.sets.every((s) => s.status));
 		if (setGroupIndex === activeSetGroupIndex && setIndex === activeSetIndex) {
 			setGroupIndex = 0;
 			setIndex = 0;
@@ -316,9 +320,6 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 		get activeSet() {
 			return set;
 		},
-		get fromURLSearchParams() {
-			return fromURLSearchParams;
-		},
 		get urlSearchParams() {
 			return urlSearchParams;
 		},
@@ -333,6 +334,7 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 		moveSets,
 		moveSetGroups,
 		addSetGroup,
-		deleteSetGroup
+		deleteSetGroup,
+		fromURLSearchParams
 	};
 }
