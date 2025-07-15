@@ -20,6 +20,10 @@
 		reps: set.attemptedReps,
 		distanceInMeters: set.attemptedDistanceInMeters,
 		timeInSeconds: set.attemptedTimeInSeconds,
-		weightInKilograms: set.attemptedWeightInKilograms
+		weightInKilograms: set.attemptedWeightInKilograms,
+		asManyRoundsAsPossible: set.asManyRoundsAsPossible,
+		percentOfOneRepMax: set.percentOfOneRepMax,
+		repRangeHigh: set.repRangeHigh,
+		repRangeLow: set.repRangeLow
 	}}
 />

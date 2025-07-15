@@ -5,13 +5,11 @@
 		distanceInMeters: number | null;
 		timeInSeconds: number | null;
 		weightInKilograms: number | null;
-		reps: number | null;
 	}
 
 	export interface SetAmmountsProps {
 		execution: Exercise['execution'];
 		set: SetAmounts;
-		unitSystem?: MeasurementSystem;
 	}
 </script>
 
@@ -19,9 +17,8 @@
 	import Measurement from '../inputs/Measurement.svelte';
 	import RepsComponent from './Reps.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
-	import type { MeasurementSystem } from '../inputs/MeasurementInput.svelte';
 
-	let { execution, set, unitSystem = 'metric' }: SetAmmountsProps = $props();
+	let { execution, set }: SetAmmountsProps = $props();
 </script>
 
 <div class="flex flex-shrink flex-col justify-end sm:flex-row">

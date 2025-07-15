@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="flex flex-shrink flex-row min-h-fit justify-between border-b border-gray-100 bg-white dark:border-gray-900 dark:bg-gray-800"
+	class="flex min-h-fit flex-shrink flex-row justify-between border-b border-gray-100 bg-white dark:border-gray-900 dark:bg-gray-800"
 >
 	<div class="ms-2 flex flex-shrink flex-row items-center justify-center">
 		<a class="flex flex-row items-center justify-center" href={`${base}/`}>
@@ -39,7 +39,7 @@
 		{/await}
 	</div>
 	<div class="me-2 flex flex-shrink flex-row">
-		<div class="flex flex-col content-center justify-center m-1">
+		<div class="m-1 flex flex-col content-center justify-center">
 			<Dropdown bind:open>
 				{#snippet button()}
 					<button class="btn primary icon flex">

@@ -183,16 +183,16 @@
 						<EllipsisVertical size="1rem" />
 					</button>
 				{/snippet}
-				<button class="btn ghost text-nowrap text-left" onclick={onCopySet}
+				<button class="btn ghost text-left text-nowrap" onclick={onCopySet}
 					>{m.workouts_set_duplicate()}</button
 				>
 				{#if active}
-					<button class="btn ghost text-nowrap text-left" onclick={onResetTimer}
+					<button class="btn ghost text-left text-nowrap" onclick={onResetTimer}
 						>{m.workouts_set_reset_timer()}</button
 					>
 				{/if}
 				<hr class="my-1" />
-				<button class="btn ghost text-nowrap text-left" onclick={onOpenDeleteSet}
+				<button class="btn ghost text-left text-nowrap" onclick={onOpenDeleteSet}
 					>{m.workouts_set_delete_title()}</button
 				>
 			</Dropdown>
@@ -206,12 +206,12 @@
 					<SetTypeComponent setType={set.setType} {position} />
 				{/snippet}
 				<button
-					class="btn ghost text-nowrap text-left"
+					class="btn ghost text-left text-nowrap"
 					class:active={set.setType === 'working'}
 					onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
 				>
 				<button
-					class="btn ghost text-nowrap text-left"
+					class="btn ghost text-left text-nowrap"
 					class:active={set.setType === 'warmup'}
 					onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
 				>
@@ -250,17 +250,17 @@
 						</button>
 					{/snippet}
 					<button
-						class="btn ghost text-nowrap text-left"
+						class="btn ghost text-left text-nowrap"
 						class:active={set.status === 'success'}
 						onclick={createOnStatus('success')}>{m.workouts_set_success_title()}</button
 					>
 					<button
-						class="btn ghost text-nowrap text-left"
+						class="btn ghost text-left text-nowrap"
 						class:active={set.status === 'failed'}
 						onclick={createOnStatus('failed')}>{m.workouts_set_failed_title()}</button
 					>
 					<button
-						class="btn ghost text-nowrap text-left"
+						class="btn ghost text-left text-nowrap"
 						class:active={!set.status}
 						onclick={createOnStatus(null)}>{m.workouts_set_incomplete_title()}</button
 					>

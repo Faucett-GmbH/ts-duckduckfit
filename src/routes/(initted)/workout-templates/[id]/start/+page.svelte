@@ -63,16 +63,17 @@
 					setGroupType: sgt.setGroupType,
 					sets: sgt.setTemplates.map((st) => ({
 						...st,
-						status: null,
-						notes: [],
-						startedAt: new Date(),
-						completedAt: null,
 						attemptedDistanceInMeters: st.distanceInMeters ?? null,
 						attemptedRateOfPerceivedExertion: st.rateOfPerceivedExertion ?? null,
 						attemptedReps: st.reps ?? st.repRangeLow ?? st.repRangeHigh ?? null,
 						attemptedRepsInReserve: st.repsInReserve ?? null,
 						attemptedTimeInSeconds: st.timeInSeconds ?? null,
-						attemptedWeightInKilograms: st.weightInKilograms ?? null
+						attemptedWeightInKilograms: st.weightInKilograms ?? null,
+						durationInSeconds: null,
+						status: null,
+						notes: [],
+						startedAt: new Date(),
+						completedAt: null
 					}))
 				})),
 				updatedAt: new Date(),
@@ -93,9 +94,9 @@
 	>
 </svelte:head>
 
-<div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
+<div class="flex flex-grow flex-col overflow-x-hidden overflow-y-auto">
 	<div class="flex w-full flex-grow flex-col sm:container sm:mx-auto">
-		<div class="mb-16 mt-4">
+		<div class="mt-4 mb-16">
 			<div class="flex flex-shrink flex-row">
 				<a class="flex flex-shrink flex-row" href={`${base}/workout-templates`}>
 					<ChevronLeft />

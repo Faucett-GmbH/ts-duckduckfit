@@ -126,7 +126,7 @@
 		{/snippet}
 	</Sortable>
 	{#if exercises.length === 0}
-		<p class="m-0 mt-1 cursor-text select-none opacity-10">
+		<p class="m-0 mt-1 cursor-text opacity-10 select-none">
 			{m.exercises_selector_search_placeholder()}
 		</p>
 	{/if}
@@ -148,11 +148,11 @@
 			bind:value={search}
 			oninput={onSearchListener}
 		/>
-		<ul class="h-64 list-none overflow-y-auto overflow-x-hidden p-0">
+		<ul class="h-64 list-none overflow-x-hidden overflow-y-auto p-0">
 			{#each results as exercise, index (exercise.guid)}
 				{@const selectedExercise = exercisesById[exercise.guid]}
 				{@const translation = findTranslation(exercise.translations)}
-				<li class="flex flex-row items-center justify-between py-2 pe-1 ps-2">
+				<li class="flex flex-row items-center justify-between py-2 ps-2 pe-1">
 					<span>{translation?.name}</span>
 					{#if selectedExercise}
 						<button class="btn sm danger icon" onclick={createOnRemove(exercise)}>
@@ -181,6 +181,6 @@
 	@reference "tailwindcss";
 
 	.exercise-selector {
-		@apply cursor-text rounded-lg border border-gray-600 bg-gray-50 px-3 pb-1 pt-0 text-sm text-gray-950 placeholder-gray-600 outline-none focus:outline-none dark:bg-gray-900 dark:text-white;
+		@apply cursor-text rounded-lg border border-gray-600 bg-gray-50 px-3 pt-0 pb-1 text-sm text-gray-950 placeholder-gray-600 outline-none focus:outline-none dark:bg-gray-900 dark:text-white;
 	}
 </style>

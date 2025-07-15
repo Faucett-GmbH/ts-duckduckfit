@@ -234,7 +234,7 @@
 					</button>
 				</div>
 			</div>
-			<div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden pb-4 pt-2" role="list">
+			<div class="flex flex-grow flex-col overflow-x-hidden overflow-y-auto pt-2 pb-4" role="list">
 				<Sortable
 					id={`set-groups-workout.{workout.workout.id}`}
 					items={workoutSession.workout.setGroups}

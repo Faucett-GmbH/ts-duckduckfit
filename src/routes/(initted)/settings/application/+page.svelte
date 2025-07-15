@@ -29,14 +29,14 @@
 <form class="card flex flex-col">
 	<h2>{m.application_settings_title()}</h2>
 	{#if settingsState.doc}
-		<div class="flex flex-row items-center flex-grow mb-2">
+		<div class="mb-2 flex flex-grow flex-row items-center">
 			<label for="theme" class="me-2">{m.application_settings_theme_mode()}</label>
 			<Toggle name="theme" checked={settingsState.doc.theme === 'light'} onchange={onThemeChange}
 				>{#if settingsState.doc.theme === 'light'}<Sun />{:else}<Moon />{/if}</Toggle
 			>
 		</div>
 
-		<div class="flex flex-row items-center flex-grow mb-2">
+		<div class="mb-2 flex flex-grow flex-row items-center">
 			<label for="language">{m.application_settings_language()}</label>
 			<select
 				name="language"
@@ -50,7 +50,7 @@
 			</select>
 		</div>
 
-		<div class="flex flex-row items-center flex-grow mb-2">
+		<div class="mb-2 flex flex-grow flex-row items-center">
 			<label for="measurementSystem">{m.application_settings_measurement_system()}</label>
 			<select
 				class="ms-2"
@@ -62,7 +62,7 @@
 					<option
 						value={measurementSystem}
 						selected={settingsState.doc.measurementSystem == measurementSystem}
-						>{m[`${measurementSystem}_system`]()}</option
+						>{#if measurementSystem === 'imperial'}{m.imperial_system()}{:else}{m.metric_system()}{/if}</option
 					>
 				{/each}
 			</select>

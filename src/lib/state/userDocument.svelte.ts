@@ -1,6 +1,13 @@
 import { InternalError } from '$lib/error';
 import { localStorageState } from '$lib/localStorageState.svelte';
-import { findDocument, getRepo, createDocument, type AutomergeDocumentId, initDocument, type AutomergeDocHandle } from '$lib/repo';
+import {
+	findDocument,
+	getRepo,
+	createDocument,
+	type AutomergeDocumentId,
+	initDocument,
+	type AutomergeDocHandle
+} from '$lib/repo';
 import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userConfig, type User } from './user.svelte';
 import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplates.svelte';
@@ -97,8 +104,13 @@ export class CurrentUserDocument {
 	}
 }
 
-const currentUserDocumentId = localStorageState<AutomergeDocumentId<UserDocument> | null>('user-document-id', null);
-const currentUserDocument = $derived<CurrentUserDocument | null>(currentUserDocumentId.value ? new CurrentUserDocument(currentUserDocumentId.value) : null);
+const currentUserDocumentId = localStorageState<AutomergeDocumentId<UserDocument> | null>(
+	'user-document-id',
+	null
+);
+const currentUserDocument = $derived<CurrentUserDocument | null>(
+	currentUserDocumentId.value ? new CurrentUserDocument(currentUserDocumentId.value) : null
+);
 
 export const userDocument = {
 	get documentId() {
@@ -107,7 +119,7 @@ export const userDocument = {
 	get current() {
 		return currentUserDocument;
 	}
-}
+};
 
 async function initUserDocument() {
 	if (currentUserDocumentId.value == null) {

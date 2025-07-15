@@ -69,7 +69,7 @@ export function localStorageState<T>(key: string, initialValue: T, options: Opti
 			updateStorage(state);
 		});
 
-		return () => { };
+		return () => {};
 	});
 
 	return {

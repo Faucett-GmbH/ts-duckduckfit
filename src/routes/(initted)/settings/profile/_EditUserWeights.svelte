@@ -95,7 +95,7 @@
 <div class="flex flex-col">
 	<div class="flex flex-row justify-between">
 		<h3 class="m-0">{m.user_weights_title()}</h3>
-		<div class="flex justify-center items-center">
+		<div class="flex items-center justify-center">
 			<button class="btn success icon sm" onclick={onAddEditWeight}
 				>{#if todaysWeight}<Pencil />{:else}<Plus />{/if}</button
 			>
@@ -123,9 +123,9 @@
 			onclick={createOnChangeTimeFrame('1y')}>{m.user_weights_1_year()}</button
 		>
 	</div>
-	<div class="flex flex-col flex-grow">
+	<div class="flex flex-grow flex-col">
 		{#if timeFrame === '1d'}
-			<div class="flex flex-col flex-grow justify-center items-center">
+			<div class="flex flex-grow flex-col items-center justify-center">
 				{#if weight}
 					<p class="m-0 p-2"><Measurement metricValue={weight.weight} metricUnits="kg" /></p>
 				{:else}
@@ -133,8 +133,8 @@
 				{/if}
 			</div>
 		{:else}
-			<div class="flex flex-col flex-grow justify-center items-center">
-				<div class="flex flex-col flex-grow">
+			<div class="flex flex-grow flex-col items-center justify-center">
+				<div class="flex flex-grow flex-col">
 					{#if weightsByTime.length}
 						{#each weightsByTime as weight (weight.measuredAt)}
 							<p class="m-0 p-0">
@@ -152,7 +152,7 @@
 		{/if}
 	</div>
 	<hr />
-	<div class="flex flex-col flex-grow">
+	<div class="flex flex-grow flex-col">
 		{#if weight}
 			<p class="m-0">
 				{m.user_weights_weight_label()}:

@@ -142,7 +142,7 @@
 		</select>
 		<InputResults name="bodyMeasurementUnit" {result} />
 	</div>
-	<div class="flex flex-row ms-2 justify-end">
+	<div class="ms-2 flex flex-row justify-end">
 		<button type="submit" class="btn primary flex flex-shrink" {disabled}>
 			{#if loading}
 				<div class="mr-2 flex flex-row justify-center">

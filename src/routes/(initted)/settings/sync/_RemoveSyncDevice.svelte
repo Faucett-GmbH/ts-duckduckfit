@@ -26,10 +26,10 @@
 </script>
 
 <form class="flex flex-col" onsubmit={onSubmit}>
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<p>{m.sync_remove_device_content({ name })}</p>
 	</div>
-	<div class="flex flex-row flex-shrink justify-end">
+	<div class="flex flex-shrink flex-row justify-end">
 		<button type="submit" class="btn danger flex flex-shrink" {disabled}>
 			{#if loading}
 				<div class="mr-2 flex flex-row justify-center">

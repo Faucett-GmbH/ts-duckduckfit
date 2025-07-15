@@ -336,13 +336,13 @@
 						<SetTypeComponent setType={restAfterInSecondsSetType} />
 					{/snippet}
 					<button
-						class="btn ghost text-nowrap text-left"
+						class="btn ghost text-left text-nowrap"
 						class:active={restAfterInSecondsSetType === 'working'}
 						onclick={createOnRestAfterInSecondsSetType('working')}
 						>{m.workouts_working_set_title()}</button
 					>
 					<button
-						class="btn ghost text-nowrap text-left"
+						class="btn ghost text-left text-nowrap"
 						class:active={restAfterInSecondsSetType === 'warmup'}
 						onclick={createOnRestAfterInSecondsSetType('warmup')}
 						>{m.workouts_warmup_title()}</button

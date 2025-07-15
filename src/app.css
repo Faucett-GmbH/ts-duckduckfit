@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -204,7 +204,7 @@
 
 @layer components {
 	.btn {
-		@apply cursor-pointer rounded-lg border border-gray-600 px-3 py-1 text-center text-base font-bold no-underline outline-none transition-all duration-150 ease-linear focus:outline-none;
+		@apply cursor-pointer rounded-lg border border-gray-600 px-3 py-1 text-center text-base font-bold no-underline transition-all duration-150 ease-linear outline-none focus:outline-none;
 	}
 	.btn[disabled] {
 		@apply cursor-not-allowed opacity-50;
@@ -271,7 +271,7 @@
 	}
 
 	.badge {
-		@apply flex flex-shrink flex-row content-center items-center text-nowrap rounded border border-transparent px-2 py-1 text-xs font-medium;
+		@apply flex flex-shrink flex-row content-center items-center rounded border border-transparent px-2 py-1 text-xs font-medium text-nowrap;
 	}
 	.badge .btn {
 		@apply p-0;

@@ -6,9 +6,9 @@
 	let { children } = $props();
 </script>
 
-<div class="mx-auto container">
+<div class="container mx-auto">
 	<div class="flex flex-row">
-		<ul class="flex flex-col flex-shrink min-w-fit list-none">
+		<ul class="flex min-w-fit flex-shrink list-none flex-col">
 			<li>
 				<a
 					href={`${base}/settings/profile`}
@@ -43,7 +43,7 @@
 				</a>
 			</li>
 		</ul>
-		<div class="flex flex-col flex-grow m-4 mb-8">
+		<div class="m-4 mb-8 flex flex-grow flex-col">
 			{@render children()}
 		</div>
 	</div>

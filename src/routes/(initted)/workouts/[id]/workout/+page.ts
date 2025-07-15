@@ -20,12 +20,15 @@ export const load: PageLoad = async (event) => {
 			exerciseGuids.add(st.exerciseGuid);
 		}
 	}
-	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce((exercises, exercise) => {
-		if (exercise) {
-			exercises[exercise.guid] = exercise;
-		}
-		return exercises;
-	}, {} as { [id: string]: Exercise });
+	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce(
+		(exercises, exercise) => {
+			if (exercise) {
+				exercises[exercise.guid] = exercise;
+			}
+			return exercises;
+		},
+		{} as { [id: string]: Exercise }
+	);
 	return {
 		exerciseByGuid,
 		workoutId,

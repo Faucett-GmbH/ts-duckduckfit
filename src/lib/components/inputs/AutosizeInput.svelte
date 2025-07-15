@@ -72,9 +72,9 @@
 
 <span
 	class={[
-		'inline-block border-none p-0 m-0 text-nowrap bg-transparent outline-none focus:outline-none',
+		'm-0 inline-block border-none bg-transparent p-0 text-nowrap outline-none focus:outline-none',
 		className,
-		disabled && 'pointer-events-none select-none opacity-50'
+		disabled && 'pointer-events-none opacity-50 select-none'
 	]}
 	{id}
 	{name}

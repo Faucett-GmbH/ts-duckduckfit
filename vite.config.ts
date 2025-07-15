@@ -1,4 +1,4 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js'
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
-	const isProd = mode === "production" || !process.env.TAURI_ENV_DEBUG;
+	const isProd = mode === 'production' || !process.env.TAURI_ENV_DEBUG;
 
 	process.env = { ...process.env, ...loadEnv(mode, process.cwd(), '') };
 
@@ -21,9 +21,11 @@ export default defineConfig(async ({ mode }) => {
 
 	const config: UserConfig = {
 		clearScreen: false,
-		resolve: process.env.VITEST ? {
-			conditions: ['browser']
-		} : undefined,
+		resolve: process.env.VITEST
+			? {
+					conditions: ['browser']
+				}
+			: undefined,
 		test: {
 			environment: 'jsdom'
 		},
@@ -31,11 +33,13 @@ export default defineConfig(async ({ mode }) => {
 			host: host || '0.0.0.0',
 			port: 5173,
 			strictPort: true,
-			hmr: host ? {
-				protocol: 'ws',
-				host,
-				port: 5183,
-			} : undefined,
+			hmr: host
+				? {
+						protocol: 'ws',
+						host,
+						port: 5183
+					}
+				: undefined,
 			watch: {
 				ignored: ['**/src-tauri/**']
 			}
@@ -53,11 +57,11 @@ export default defineConfig(async ({ mode }) => {
 		],
 		build: {
 			target:
-				(!process.env.TAURI_ENV_PLATFORM || process.env.TAURI_ENV_PLATFORM === 'windows')
+				!process.env.TAURI_ENV_PLATFORM || process.env.TAURI_ENV_PLATFORM === 'windows'
 					? 'chrome105'
 					: 'safari13',
 			minify: isProd ? 'esbuild' : false,
-			sourcemap: !isProd,
+			sourcemap: !isProd
 		},
 		define
 	};

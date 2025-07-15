@@ -19,4 +19,4 @@ declare global {
 	declare const __DEV_AUTH_URL__: string | undefined;
 }
 
-export { };
+export {};

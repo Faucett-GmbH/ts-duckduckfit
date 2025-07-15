@@ -6,37 +6,37 @@
 */
 
 export interface Exercise {
-  guid: string;
-  /**
-   * url safe unique resource identifier
-   */
-  uri: string;
-  execution:
-  | "WEIGHT_REPS"
-  | "REPS_ONLY"
-  | "DURATION"
-  | "WEIGHT_DURATION"
-  | "DISTANCE_DURATION"
-  | "DISTANCE"
-  | "WEIGHT_DISTANCE";
-  image_url: string | null;
-  thumbnail_image_url: string | null;
-  translations: ExerciseTranslation[];
+	guid: string;
+	/**
+	 * url safe unique resource identifier
+	 */
+	uri: string;
+	execution:
+		| 'WEIGHT_REPS'
+		| 'REPS_ONLY'
+		| 'DURATION'
+		| 'WEIGHT_DURATION'
+		| 'DISTANCE_DURATION'
+		| 'DISTANCE'
+		| 'WEIGHT_DISTANCE';
+	image_url: string | null;
+	thumbnail_image_url: string | null;
+	translations: ExerciseTranslation[];
 }
 export interface ExerciseTranslation {
-  guid: string;
-  locale: "en" | "de" | "es";
-  /**
-   * url safe unique resource identifier
-   */
-  uri: string;
-  name: string;
-  alternative_names?: string[];
-  metadata_keywords?: string[];
-  metadata_authors?: string[];
-  video_url?: string | null;
-  description: string;
-  summary: string;
-  instructions: string;
-  tips?: string[];
+	guid: string;
+	locale: 'en' | 'de' | 'es';
+	/**
+	 * url safe unique resource identifier
+	 */
+	uri: string;
+	name: string;
+	alternative_names?: string[];
+	metadata_keywords?: string[];
+	metadata_authors?: string[];
+	video_url?: string | null;
+	description: string;
+	summary: string;
+	instructions: string;
+	tips?: string[];
 }

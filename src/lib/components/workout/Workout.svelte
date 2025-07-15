@@ -105,7 +105,7 @@
 									<div
 										class="me-2 h-8 min-h-8 w-8 min-w-8 rounded-full bg-gray-600 max-sm:hidden"
 									></div>
-									<p class="mb-0 ms-2">{translation?.name || ''}</p>
+									<p class="ms-2 mb-0">{translation?.name || ''}</p>
 								</div>
 								<div class="flex flex-shrink flex-row">
 									<div class="flex flex-shrink flex-col justify-center">

@@ -335,7 +335,7 @@
 	</div>
 	{#if setGroupTemplate.setTemplates.length}
 		<div class="mb-2 flex flex-row items-end" class:hidden={!open}>
-			<div class="flex flex-shrink flex-col mb-1">
+			<div class="mb-1 flex flex-shrink flex-col">
 				<div class="cursor-pointer">
 					<Dropdown
 						position="top-left"
@@ -346,19 +346,19 @@
 							<SetTypeComponent setType={restAfterInSecondsSetType} />
 						{/snippet}
 						<button
-							class="btn ghost text-nowrap text-left"
+							class="btn ghost text-left text-nowrap"
 							class:active={restAfterInSecondsSetType === 'working'}
 							onclick={createOnRestAfterInSecondsSetType('working')}
 							>{m.workouts_working_set_title()}</button
 						>
 						<button
-							class="btn ghost text-nowrap text-left"
+							class="btn ghost text-left text-nowrap"
 							class:active={restAfterInSecondsSetType === 'warmup'}
 							onclick={createOnRestAfterInSecondsSetType('warmup')}
 							>{m.workouts_warmup_title()}</button
 						>
 						<button
-							class="btn ghost text-nowrap text-left"
+							class="btn ghost text-left text-nowrap"
 							class:active={restAfterInSecondsSetType === 'backoff'}
 							onclick={createOnRestAfterInSecondsSetType('backoff')}
 							>{m.workouts_backoff_title()}</button

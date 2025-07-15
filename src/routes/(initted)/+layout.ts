@@ -7,10 +7,13 @@ export const ssr = false;
 export const load: LayoutLoad = async (event) => {
 	await event.parent();
 	const currentUserDocument = await getUserDocument();
-	const [settings, user] = await Promise.all([currentUserDocument.settings(), currentUserDocument.user()]);
+	const [settings, user] = await Promise.all([
+		currentUserDocument.settings(),
+		currentUserDocument.user()
+	]);
 	return {
 		currentUserDocument,
 		settings,
-		user,
+		user
 	};
 };

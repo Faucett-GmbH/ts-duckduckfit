@@ -11,10 +11,10 @@
 	let { children, checked = $bindable(false), ...props } = $props();
 </script>
 
-<label class="inline-flex items-center cursor-pointer">
-	<input type="checkbox" class="sr-only peer" bind:checked {...props} />
+<label class="inline-flex cursor-pointer items-center">
+	<input type="checkbox" class="peer sr-only" bind:checked {...props} />
 	<div
-		class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"
+		class="peer relative h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-blue-600 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600"
 	></div>
 	<span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">{@render children()}</span
 	>

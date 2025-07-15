@@ -116,7 +116,7 @@
 </script>
 
 <div
-	class="absolute flex max-h-full max-w-full flex-col border-gray-300 bg-gray-50 shadow-md transition-transform duration-75 focus:outline-none dark:border-gray-600 dark:bg-gray-700 z-20"
+	class="absolute z-20 flex max-h-full max-w-full flex-col border-gray-300 bg-gray-50 shadow-md transition-transform duration-75 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
 	bind:this={child}
 	bind:offsetWidth
 	use:portal

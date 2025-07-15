@@ -3,5 +3,5 @@ import type { PageLoad } from './$types';
 import { base } from '$app/paths';
 
 export const load: PageLoad = async (_event) => {
-  redirect(302, `${base}/settings/profile`);
+	redirect(302, `${base}/settings/profile`);
 };

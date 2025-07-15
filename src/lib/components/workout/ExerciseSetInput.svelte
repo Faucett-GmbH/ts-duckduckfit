@@ -300,7 +300,7 @@
 			/>
 			<InputResults name="distanceInMeters" {result} />
 		</div>
-		<div class="me-1 ms-2 flex flex-shrink flex-col">
+		<div class="ms-2 me-1 flex flex-shrink flex-col">
 			<label class="text-xs" for="timeInSeconds">{m.workouts_set_time_in_seconds_label()}</label>
 			<MeasurementInput
 				class={cn('timeInSeconds')}

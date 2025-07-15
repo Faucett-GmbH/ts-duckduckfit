@@ -22,12 +22,12 @@
 	});
 </script>
 
-<div class="flex flex-row justify-center flex-grow w-full h-full" hidden={!loading}>
+<div class="flex h-full w-full flex-grow flex-row justify-center" hidden={!loading}>
 	<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 </div>
 <canvas
 	title={text}
-	class="w-full h-full"
+	class="h-full w-full"
 	class:hidden={loading}
 	bind:this={canvas}
 	width={size}

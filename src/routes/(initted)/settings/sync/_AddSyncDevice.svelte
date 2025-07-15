@@ -35,12 +35,12 @@
 	import { v7 } from 'uuid';
 	import type { KeepAliveWebSocket } from '@aicacia/keepalivewebsocket';
 	import { m } from '$lib/paraglide/messages';
-	import type { SyncMessage, SyncMessageDevice } from '../../sync/+page.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
 	import { Copy } from 'lucide-svelte';
 	import { copyToClipboard } from '$lib/util';
 	import { createNotification } from '$lib/state/notifications.svelte';
+	import type { SyncMessage, SyncMessageDevice } from '../../../sync/+page.svelte';
 
 	let { currentUserDocument, currentDeviceId, onAdd }: AddSyncDeviceProps = $props();
 
@@ -143,7 +143,7 @@
 	}
 </script>
 
-<div class="flex flex-col justify-center items-center">
+<div class="flex flex-col items-center justify-center">
 	{#if newDevice}
 		<form class="flex flex-col" onsubmit={onSubmitNewDevice}>
 			<p>{m.sync_add_device({ name: newDevice.name })}</p>
@@ -159,7 +159,7 @@
 		</form>
 	{:else if url}
 		<QrCode text={url} size={384} />
-		<div class="flex flex-row flex-grow w-full mt-2">
+		<div class="mt-2 flex w-full flex-grow flex-row">
 			<input class="flex flex-grow" type="text" readonly value={url} />
 			<button class="btn icon primary" onclick={onCopyUrl}>
 				<Copy />

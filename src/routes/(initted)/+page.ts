@@ -6,6 +6,6 @@ export const prerender = true;
 export const ssr = false;
 
 export const load: PageLoad = async (event) => {
-  await event.parent();
-  return redirect(302, `${base}/workouts`);
+	await event.parent();
+	return redirect(302, `${base}/workouts`);
 };

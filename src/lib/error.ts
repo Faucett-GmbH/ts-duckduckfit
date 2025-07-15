@@ -6,25 +6,33 @@ export type MessageKey = keyof Messages;
 export type MessageParameters<M extends Extract<MessageKey, string>> = Parameters<Messages[M]>;
 
 export class InternalError extends Error {
-  static from<C extends MessageKey, M extends MessageKey>(code: C, message: M, ...parameters: MessageParameters<M>) {
-    return new InternalError(getError(code, message, parameters));
-  }
+	static from<C extends MessageKey, M extends MessageKey>(
+		code: C,
+		message: M,
+		...parameters: MessageParameters<M>
+	) {
+		return new InternalError(getError(code, message, parameters));
+	}
 }
 
-export function getError<C extends MessageKey, M extends MessageKey>(code: C, message: M, parameters: MessageParameters<M>) {
-  /** @ts-ignore */
-  const name = m[code]();
-  /** @ts-ignore */
-  const body = m[message](...parameters);
-  return `${name}: ${body}`;
+export function getError<C extends MessageKey, M extends MessageKey>(
+	code: C,
+	message: M,
+	parameters: MessageParameters<M>
+) {
+	/** @ts-ignore */
+	const name = m[code]();
+	/** @ts-ignore */
+	const body = m[message](...parameters);
+	return `${name}: ${body}`;
 }
 
 export function handleError(error: unknown) {
-  if (error instanceof InternalError) {
-    createNotification(error.message);
-    return;
-  }
-  console.error(error);
-  createNotification(`${m.errors_message_application()}: ${m.errors_message_application()}`);
-  throw error;
+	if (error instanceof InternalError) {
+		createNotification(error.message);
+		return;
+	}
+	console.error(error);
+	createNotification(`${m.errors_message_application()}: ${m.errors_message_application()}`);
+	throw error;
 }

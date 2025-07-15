@@ -81,9 +81,9 @@
 	</div>
 </div>
 <hr class="mt-1 mb-2" />
-<table class="table-auto w-full">
+<table class="w-full table-auto">
 	<thead>
-		<tr class="text-left border-b">
+		<tr class="border-b text-left">
 			<th class="p-1">{m.sync_device_name_label()}</th>
 			<th class="p-1">{m.sync_device_created_at_label()}</th>
 			<th class="p-1"></th>
@@ -100,7 +100,7 @@
 						{/if}
 					</td>
 					<td class="p-1">{device.createdAt.toLocaleString()}</td>
-					<td class="p-1 flex justify-end">
+					<td class="flex justify-end p-1">
 						<button class="btn primary icon" onclick={() => onOpenEditDevice(deviceId, device)}>
 							<Pencil />
 						</button>

@@ -57,7 +57,7 @@
 	{/if}
 	{#if open}
 		<div
-			class="fixed inset-0 overflow-y-auto z-10"
+			class="fixed inset-0 z-10 overflow-y-auto"
 			onpointerdown={onClickOutside}
 			transition:fly={{ duration: 150, y: 300 }}
 		>
@@ -77,7 +77,7 @@
 							<X />
 						</button>
 					</div>
-					<div class="relative flex-grow flex-col px-4 pb-4 pt-0">
+					<div class="relative flex-grow flex-col px-4 pt-0 pb-4">
 						{@render children()}
 					</div>
 				</div>

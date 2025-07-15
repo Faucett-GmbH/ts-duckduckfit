@@ -23,9 +23,9 @@
 	<title>{translation?.name}</title>
 </svelte:head>
 
-<div class="flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
+<div class="flex flex-grow flex-col overflow-x-hidden overflow-y-auto">
 	<div class="flex w-full flex-grow flex-col sm:container sm:mx-auto">
-		<div class="mb-16 mt-4">
+		<div class="mt-4 mb-16">
 			<div class="flex flex-shrink flex-row">
 				<a class="flex flex-shrink flex-row" href={backUrl}>
 					<ChevronLeft />

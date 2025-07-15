@@ -99,7 +99,7 @@
 </svelte:head>
 
 <div class="container mx-auto p-4">
-	<div class="flex flex-col max-w-fit mx-auto">
+	<div class="mx-auto flex max-w-fit flex-col">
 		<h2>{m.sync_syncing_device()}</h2>
 		<div class="mr-2 flex flex-row justify-center">
 			<div class="inline-block h-24 w-24 animate-spin"><LoaderCircle size={96} /></div>

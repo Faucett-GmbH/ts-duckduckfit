@@ -182,7 +182,7 @@
 
 <form class="flex flex-col" onsubmit={onSubmit}>
 	<!-- username -->
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<label for="username">{m.user_info_username_label()}</label>
 		<input
 			class="w-full {cn('username')}"
@@ -196,7 +196,7 @@
 	</div>
 
 	<!-- fullName -->
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<label for="fullName">{m.user_info_full_name_label()}</label>
 		<input
 			class="w-full {cn('fullName')}"
@@ -210,7 +210,7 @@
 	</div>
 
 	<!-- BIO -->
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<label for="bio">{m.user_info_bio_label()}</label>
 		<textarea
 			class="w-full {cn('bio')}"
@@ -233,7 +233,7 @@
 	</div>
 
 	<!-- Birthdate -->
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<label for="birthdate">{m.user_info_birthdate_label()}</label>
 		<input
 			class="w-full {cn('birthdate')}"
@@ -247,14 +247,14 @@
 	</div>
 
 	<!-- height -->
-	<div class="flex flex-col flex-grow mb-2">
+	<div class="mb-2 flex flex-grow flex-col">
 		<label for="height">{m.user_info_height_label()}</label>
 
 		<HeightInput value={height} system={measurementSystem} onChange={onChangeHeight} />
 		<InputResults name="height" {result} />
 	</div>
 
-	<div class="flex flex-row flex-shrink justify-end">
+	<div class="flex flex-shrink flex-row justify-end">
 		<button type="submit" class="btn primary flex flex-shrink" {disabled}>
 			{#if loading}
 				<div class="mr-2 flex flex-row justify-center">

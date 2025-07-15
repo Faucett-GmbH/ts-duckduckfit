@@ -11,32 +11,38 @@ export const prerender = false;
 export const load: PageLoad = async (event) => {
 	await event.parent();
 	const workoutTemplateId = event.params.id as unknown as AutomergeDocumentId<WorkoutTemplate>;
-	const [workoutAndId, workoutTemplate] = await Promise.all([getActiveWorkoutByWorkoutTemplateId(workoutTemplateId), getWorkoutTemplateById(workoutTemplateId)]);
+	const [workoutAndId, workoutTemplate] = await Promise.all([
+		getActiveWorkoutByWorkoutTemplateId(workoutTemplateId),
+		getWorkoutTemplateById(workoutTemplateId)
+	]);
 	if (!workoutTemplate) {
 		error(404);
 	}
-	const exerciseGuids = new Set<AutomergeDocumentId<Exercise>>();
+	const exerciseGuids = new Set<string>();
 	let workout: Workout | null = null;
 	let workoutId: AutomergeDocumentId<Workout> | null = null;
 	if (workoutAndId) {
 		[workoutId, workout] = workoutAndId;
-		workout.setGroups.forEach(sg => {
-			sg.sets.forEach(s => {
+		for (const sg of workout.setGroups) {
+			for (const s of sg.sets) {
 				exerciseGuids.add(s.exerciseGuid);
-			})
-		});
-	}
-	workoutTemplate.setGroupTemplates.forEach(sgt => {
-		sgt.setTemplates.forEach(st => {
-			exerciseGuids.add(st.exerciseGuid);
-		})
-	});
-	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce((exercises, exercise) => {
-		if (exercise) {
-			exercises[exercise.guid] = exercise;
+			}
 		}
-		return exercises;
-	}, {} as { [id: string]: Exercise });
+	}
+	for (const sgt of workoutTemplate.setGroupTemplates) {
+		for (const st of sgt.setTemplates) {
+			exerciseGuids.add(st.exerciseGuid);
+		}
+	}
+	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce(
+		(exercises, exercise) => {
+			if (exercise) {
+				exercises[exercise.guid] = exercise;
+			}
+			return exercises;
+		},
+		{} as { [id: string]: Exercise }
+	);
 	return {
 		referrer: event.url.searchParams.get('referrer'),
 		exerciseByGuid,

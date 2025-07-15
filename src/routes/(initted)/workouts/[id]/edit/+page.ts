@@ -14,18 +14,21 @@ export const load: PageLoad = async (event) => {
 	if (!workout) {
 		error(404);
 	}
-	const exerciseGuids = new Set<AutomergeDocumentId<Exercise>>();
+	const exerciseGuids = new Set<string>();
 	for (const sgt of workout.setGroups) {
 		for (const st of sgt.sets) {
 			exerciseGuids.add(st.exerciseGuid);
 		}
 	}
-	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce((exercises, exercise) => {
-		if (exercise) {
-			exercises[exercise.guid] = exercise;
-		}
-		return exercises;
-	}, {} as { [id: string]: Exercise });
+	const exerciseByGuid = (await Promise.all([...exerciseGuids].map(getExerciseByGuid))).reduce(
+		(exercises, exercise) => {
+			if (exercise) {
+				exercises[exercise.guid] = exercise;
+			}
+			return exercises;
+		},
+		{} as { [id: string]: Exercise }
+	);
 	return {
 		referrer: event.url.searchParams.get('referrer'),
 		exerciseByGuid,

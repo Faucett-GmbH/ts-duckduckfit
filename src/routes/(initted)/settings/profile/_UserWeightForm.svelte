@@ -92,7 +92,7 @@
 </script>
 
 <form class="flex flex-row" onsubmit={onInternalSubmit}>
-	<div class="flex flex-col flex-grow">
+	<div class="flex flex-grow flex-col">
 		<label for="weightInKg">{m.user_weights_weight_label()}</label>
 		<MeasurementInput
 			class={cn('weightInKg')}
@@ -103,7 +103,7 @@
 		/>
 		<InputResults name="weightInKg" {result} />
 	</div>
-	<div class="flex flex-col flex-shrink ms-2 justify-end">
+	<div class="ms-2 flex flex-shrink flex-col justify-end">
 		<button type="submit" class="btn primary flex flex-shrink" {disabled}>
 			{#if loading}
 				<div class="mr-2 flex flex-row justify-center">

@@ -1,6 +1,11 @@
 import type { SetParams } from '$lib/components/workout/edit/EditSet.svelte';
 import { debounce } from '@aicacia/debounce';
-import { upsertWorkout, type AttemptedSet, type AttemptedSetGroup, type Workout } from './workouts.svelte';
+import {
+	upsertWorkout,
+	type AttemptedSet,
+	type AttemptedSetGroup,
+	type Workout
+} from './workouts.svelte';
 import type { AutomergeDocumentId } from '$lib/repo';
 
 export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<Workout>) {
@@ -297,7 +302,7 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 			restTimer = value;
 		},
 		get done() {
-			return done
+			return done;
 		},
 		get activeSetGroupIndex() {
 			return setGroupIndex;

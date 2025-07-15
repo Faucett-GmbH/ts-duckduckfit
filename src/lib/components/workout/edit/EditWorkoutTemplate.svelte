@@ -4,7 +4,7 @@
 	export type WorkoutTemplateProps = {
 		workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>;
 		workoutTemplate?: WorkoutTemplate;
-		exerciseByGuid: { [guid: string]: Exercise };
+		exerciseByGuid?: { [guid: string]: Exercise };
 	};
 
 	const createSuite = () =>
@@ -58,7 +58,7 @@
 			updatedAt: new Date(),
 			createdAt: new Date()
 		}),
-		exerciseByGuid = $bindable()
+		exerciseByGuid = $bindable({})
 	}: WorkoutTemplateProps = $props();
 	let setGroupTemplatesValid: Array<boolean | undefined> = [];
 
