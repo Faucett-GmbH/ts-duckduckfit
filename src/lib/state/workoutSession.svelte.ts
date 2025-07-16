@@ -13,22 +13,21 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 	let duration = $state(w.durationInSeconds || 0);
 	let restTimer = $state(0);
 	let paused = $state(false);
-	const done = $derived(workout.setGroups.every((sg) => sg.sets.every((s) => s.status)));
+	const done = $derived.by(() => workout.setGroups.every((sg) => sg.sets.every((s) => s.status)));
 	const initialIndexes = getNext(w, 0, 0);
 	let setGroupIndex = $state(initialIndexes?.[0] || 0);
 	let setIndex = $state(initialIndexes?.[1] || 0);
-	const setGroup = $derived(workout.setGroups[setGroupIndex]);
-	const set = $derived(setGroup.sets[setIndex]);
+	const setGroup = $derived.by(() => workout.setGroups[setGroupIndex]);
+	const set = $derived.by(() => setGroup.sets[setIndex]);
+	// svelte-ignore state_referenced_locally
 	let activeSetDuration = $state(set.durationInSeconds || 0);
-	const urlSearchParams = $derived({
+	const urlSearchParams = $derived.by(() => ({
 		d: duration.toString(),
 		p: paused.toString(),
 		r: restTimer.toString(),
 		sg: setGroupIndex.toString(),
 		s: setIndex.toString()
-	});
-
-	console.log(duration, urlSearchParams, w.durationInSeconds);
+	}));
 
 	function getNext(workout: Workout, setGroupIndex: number, setIndex: number) {
 		let setGroup = workout.setGroups[setGroupIndex];
