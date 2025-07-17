@@ -1,0 +1,7 @@
+/.github
+/.svelte-kit
+/.vscode
+/build
+/helm
+/node_modules
+/src-tauri
