@@ -2,7 +2,7 @@
 
 set -e
 
-FILE="/usr/share/nginx/html/internal/env.js"
+FILE="/usr/share/nginx/html/_app/env.js"
 echo -n "export const env={" > $FILE
 env | grep ^PUBLIC_ | while read -r line; do
   key=${line%%=*}
