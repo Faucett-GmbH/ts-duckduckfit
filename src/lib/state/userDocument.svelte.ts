@@ -8,7 +8,6 @@ import {
 	initDocument,
 	type AutomergeDocHandle
 } from '$lib/repo';
-import type { DocHandle } from '@automerge/automerge-repo/slim';
 import { userConfig, type User } from './user.svelte';
 import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplates.svelte';
 import { initSync, syncConfig, type Sync } from './sync.svelte';
@@ -29,14 +28,17 @@ export interface UserDocument {
 
 export const userDocumentConfig = {
 	migrations: {
-		1: () => (userDocument: UserDocument) => {
+		1: () => {
 			const repo = getRepo();
-			userDocument.settings = createDocument<Settings>({}, repo).documentId;
-			userDocument.user = createDocument<User>({}, repo).documentId;
-			userDocument.sync = createDocument<Sync>({}, repo).documentId;
-			userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
-			userDocument.workouts = createDocument<Workouts>({}, repo).documentId;
-			userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
+
+			return (userDocument: UserDocument) => {
+				userDocument.settings = createDocument<Settings>({}, repo).documentId;
+				userDocument.user = createDocument<User>({}, repo).documentId;
+				userDocument.sync = createDocument<Sync>({}, repo).documentId;
+				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
+				userDocument.workouts = createDocument<Workouts>({}, repo).documentId;
+				userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
+			}
 		}
 	}
 };
@@ -57,7 +59,7 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 
 export class CurrentUserDocument {
 	#userDocumentId: AutomergeDocumentId<UserDocument>;
-	#userDocumentDocHandle: Promise<DocHandle<UserDocument>>;
+	#userDocumentDocHandle: Promise<AutomergeDocHandle<UserDocument>>;
 
 	constructor(userDocumentId: AutomergeDocumentId<UserDocument>) {
 		this.#userDocumentId = userDocumentId;
@@ -65,6 +67,7 @@ export class CurrentUserDocument {
 	}
 
 	syncUrl(room: string, password: string) {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const url = new URL(`${PUBLIC_URL}/sync`);
 		url.searchParams.set('room', room);
 		url.searchParams.set('password', password);

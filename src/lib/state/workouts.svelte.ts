@@ -4,9 +4,9 @@ import {
 	deleteDocument,
 	findDocument,
 	getRepo,
-	type AutomergeDocumentId
+	type AutomergeDocumentId,
+	type AutomergeDocHandle
 } from '$lib/repo';
-import type { DocHandle } from '@automerge/automerge-repo';
 import { userDocument } from './userDocument.svelte';
 import type { SetGroupTemplate, SetTemplate, WorkoutTemplate } from './workoutTemplates.svelte';
 import { getAndApplyChanges } from '$lib/diff';
@@ -126,7 +126,7 @@ export async function upsertWorkout(
 	workoutId?: AutomergeDocumentId<Workout>
 ) {
 	const workouts = await userDocument.current!.workouts();
-	let workoutDocument: DocHandle<Workout>;
+	let workoutDocument: AutomergeDocHandle<Workout>;
 	if (!workoutId) {
 		workoutDocument = createDocument<Workout>(workoutUpdates);
 		workoutId = workoutDocument.documentId as AutomergeDocumentId<Workout>;
@@ -146,6 +146,7 @@ export async function upsertWorkout(
 				updated = true;
 			}
 			if (updated) {
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				workout.updatedAt = new Date();
 			}
 		});

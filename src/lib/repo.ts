@@ -1,6 +1,6 @@
 import wasmUrl from "@automerge/automerge/automerge.wasm?url";
 import {
-	next as Automerge,
+	initializeWasm,
 	type ChangeFn,
 	type Doc,
 } from "@automerge/automerge/slim";
@@ -21,7 +21,7 @@ export type AutomergeDocHandle<T> = DocHandle<T> & {
 };
 
 export const initAutomerge = lazy(
-	async () => await Automerge.initializeWasm(wasmUrl),
+	async () => await initializeWasm(wasmUrl),
 );
 
 export const getRepo = lazy(

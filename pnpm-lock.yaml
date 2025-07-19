@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.4
         version: 0.1.4(tslib@2.8.1)
       '@automerge/automerge':
-        specifier: ^2.2.9
-        version: 2.2.9
+        specifier: ^3.0.0
+        version: 3.0.0
       '@automerge/automerge-repo':
         specifier: ^2.1.0
         version: 2.1.0
@@ -56,6 +56,9 @@ importers:
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
+      svelte:
+        specifier: ^5.36.8
+        version: 5.36.8
       svelte-portal:
         specifier: ^2.2.1
         version: 2.2.1
@@ -126,9 +129,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.6.14
         version: 0.6.14(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.36.8))(prettier@3.6.2)
-      svelte:
-        specifier: ^5.36.8
-        version: 5.36.8
       svelte-check:
         specifier: ^4.3.0
         version: 4.3.0(picomatch@4.0.3)(svelte@5.36.8)(typescript@5.8.3)
@@ -186,8 +186,8 @@ packages:
   '@automerge/automerge-repo@2.1.0':
     resolution: {integrity: sha512-gqJkyM6Adbgqx7amn4uuz9ezuJHkiYRd9Ad5Z1xoKLq2GjlIIXDvW/NEHGP12CAS3pAbXJsBD0KyP949KvgywA==}
 
-  '@automerge/automerge@2.2.9':
-    resolution: {integrity: sha512-6HM52Ops79hAQBWMg/t0MNfGOdEiXyenQjO9F1hKZq0RWDsMLpPa1SzRy/C4/4UyX67sTHuA5CwBpH34SpfZlA==}
+  '@automerge/automerge@3.0.0':
+    resolution: {integrity: sha512-vp/LrAzOyS4J+YmEKRjnCjCUqN6itzz9nKvPEcSLJuapZXfPmY72TYg0F05DVnLCvGe+sLuVAoVntJT6K0qutQ==}
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     resolution: {integrity: sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==}
@@ -2435,7 +2435,7 @@ snapshots:
 
   '@automerge/automerge-repo@2.1.0':
     dependencies:
-      '@automerge/automerge': 2.2.9
+      '@automerge/automerge': 3.0.0
       bs58check: 3.0.1
       cbor-x: 1.6.0
       debug: 4.4.1
@@ -2446,9 +2446,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@automerge/automerge@2.2.9':
-    dependencies:
-      uuid: 9.0.1
+  '@automerge/automerge@3.0.0': {}
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     optional: true
