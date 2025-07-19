@@ -45,7 +45,7 @@ export default defineConfig(async ({ mode }) => {
 				ignored: ['**/src-tauri/**']
 			}
 		},
-		envPrefix: ['VITE_', 'TAURI_*'],
+		envPrefix: ['VITE_', 'TAURI_'],
 		plugins: [
 			tailwindcss(),
 			sveltekit(),

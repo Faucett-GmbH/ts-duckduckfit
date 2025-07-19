@@ -18,18 +18,22 @@
 		type SyncDevice
 	} from '$lib/state/sync.svelte';
 	import type { AutomergeDocHandle } from '$lib/repo';
-	import Modal from '$lib/components/Modal.svelte';
 	import AddSyncDevice from './_AddSyncDevice.svelte';
 	import type { CurrentUserDocument } from '$lib/state/userDocument.svelte';
 	import Trash from 'lucide-svelte/icons/trash';
 	import RemoveSyncDevice from './_RemoveSyncDevice.svelte';
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import EditSyncDevice from './_EditSyncDevice.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let { currentDeviceId, sync, currentUserDocument }: SyncProps = $props();
 
 	const syncState = automergeDocHandleState(sync);
 
+	let addSyncDeviceComponent: AddSyncDevice;
+	function onCloseAddDevice() {
+		addSyncDeviceComponent.onDoNotAllow();
+	}
 	let addDeviceOpen = $state(false);
 	function onOpenAddDevice() {
 		addDeviceOpen = true;
@@ -116,27 +120,22 @@
 	</tbody>
 </table>
 
-<Modal bind:open={addDeviceOpen}>
+<Modal bind:open={addDeviceOpen} onClose={onCloseAddDevice}>
 	{#snippet title()}
 		<h1>{m.sync_add_device_title()}</h1>
 	{/snippet}
-	<AddSyncDevice {currentUserDocument} {currentDeviceId} onAdd={onAddDevice} />
+	<AddSyncDevice
+		bind:this={addSyncDeviceComponent}
+		bind:open={addDeviceOpen}
+		{currentUserDocument}
+		{currentDeviceId}
+		onAdd={onAddDevice}
+	/>
 </Modal>
 
-<Modal bind:open={editDeviceOpen}>
-	{#snippet title()}
-		<h1>{m.sync_edit_device_title()}</h1>
-	{/snippet}
-	{#if deviceToEdit}
-		<EditSyncDevice name={deviceToEdit.name} onEdit={onEditDevice} />
-	{/if}
-</Modal>
-
-<Modal bind:open={removeDeviceOpen}>
-	{#snippet title()}
-		<h1>{m.sync_remove_device_title()}</h1>
-	{/snippet}
-	{#if deviceToRemove}
-		<RemoveSyncDevice name={deviceToRemove.name} onRemove={onRemoveDevice} />
-	{/if}
-</Modal>
+<EditSyncDevice bind:open={editDeviceOpen} name={deviceToEdit?.name || ''} onEdit={onEditDevice} />
+<RemoveSyncDevice
+	bind:open={removeDeviceOpen}
+	name={deviceToRemove?.name || ''}
+	onRemove={onRemoveDevice}
+/>

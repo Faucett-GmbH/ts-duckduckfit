@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	export interface AddSyncDeviceProps {
+		open?: boolean;
 		currentUserDocument: CurrentUserDocument;
 		currentDeviceId: string;
 		onAdd(newDeviceId: string, name: string): void;
@@ -41,15 +42,21 @@
 	import { copyToClipboard } from '$lib/util';
 	import { createNotification } from '$lib/state/notifications.svelte';
 	import type { SyncMessage, SyncMessageDevice } from '../../../sync/+page.svelte';
+	import { getDeviceName } from '$lib/state/fingerprintjs.svelte';
 
-	let { currentUserDocument, currentDeviceId, onAdd }: AddSyncDeviceProps = $props();
+	let {
+		open = $bindable(),
+		currentUserDocument,
+		currentDeviceId,
+		onAdd
+	}: AddSyncDeviceProps = $props();
 
 	let room = v7();
 	let roomPassword = v7();
 	let newDevice = $state<SyncMessageDevice['payload']>();
 	let url = $state('');
 
-	function onDoNotAllow() {
+	export function onDoNotAllow() {
 		if (websocket) {
 			websocket.send(
 				JSON.stringify({
@@ -57,6 +64,7 @@
 				} as AddSyncMessageNotAllowed)
 			);
 		}
+		open = false;
 	}
 
 	function onAllow() {
@@ -108,7 +116,7 @@
 												room: sync.room,
 												password: sync.password,
 												deviceId: currentDeviceId,
-												name: navigator.userAgent
+												name: getDeviceName(navigator.userAgent)
 											}
 										} as AddSyncMessageAdded)
 									);
@@ -145,7 +153,7 @@
 
 <div class="flex flex-col items-center justify-center">
 	{#if newDevice}
-		<form class="flex flex-col" onsubmit={onSubmitNewDevice}>
+		<form class="flex w-full grow flex-col" onsubmit={onSubmitNewDevice}>
 			<p>{m.sync_add_device({ name: newDevice.name })}</p>
 			<EditSyncDeviceForm bind:this={editSyncDeviceForm} bind:name={newDevice.name} />
 			<div class="flex flex-row justify-end">

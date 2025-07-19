@@ -21,7 +21,7 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import type { PageData } from './$types';
 	import { page } from '$app/state';
-	import { getDeviceId } from '$lib/state/fingerprintjs.svelte';
+	import { getDeviceId, getDeviceName } from '$lib/state/fingerprintjs.svelte';
 	import type { AddSyncMessage } from '../(initted)/settings/sync/_AddSyncDevice.svelte';
 	import { setUserDocumentId } from '$lib/state/userDocument.svelte';
 	import { goto } from '$app/navigation';
@@ -29,6 +29,8 @@
 	import { onMount } from 'svelte';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
 	import { getWebRTCClientAdapter } from '$lib/sync';
+	import { createNotification } from '$lib/state/notifications.svelte';
+	import { waitMS } from '$lib/util';
 
 	let room = $state('');
 	let roomPassword = $state('');
@@ -55,6 +57,9 @@
 								break;
 							}
 							case 'not-allowed': {
+								createNotification(m.sync_rejected_sync_request(), 'error');
+								await waitMS(3000);
+								window.close();
 								break;
 							}
 							case 'added': {
@@ -80,7 +85,7 @@
 					type: 'device',
 					payload: {
 						deviceId,
-						name: navigator.userAgent
+						name: getDeviceName(navigator.userAgent)
 					}
 				} as SyncMessageDevice)
 			);

@@ -1,7 +1,7 @@
 import type { DocHandleChangePayload } from '@automerge/automerge-repo/slim';
 import type { AutomergeDocHandle } from '$lib/repo';
 import { v7 } from 'uuid';
-import { getDeviceId } from './fingerprintjs.svelte';
+import { getDeviceId, getDeviceName } from './fingerprintjs.svelte';
 import { getWebRTCClientAdapter } from '$lib/sync';
 import { debounce } from '@aicacia/debounce';
 
@@ -25,7 +25,8 @@ export const syncConfig = {
 			return (sync: Sync) => {
 				sync.devices = {};
 				sync.devices[deviceId] = {
-					name: navigator.userAgent,
+					name: getDeviceName(navigator.userAgent),
+					// eslint-disable-next-line svelte/prefer-svelte-reactivity
 					createdAt: new Date()
 				};
 			};
@@ -75,6 +76,7 @@ export async function addSyncDevice(
 	docHandle.change((doc) => {
 		doc.devices[deviceId] = {
 			name,
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			createdAt: new Date()
 		};
 		return doc;

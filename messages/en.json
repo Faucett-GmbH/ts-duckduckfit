@@ -166,5 +166,6 @@
 	"workouts_set_duplicate": "Duplicate",
 	"workouts_set_reset_timer": "Reset Timer",
 	"workouts_set_notes_placeholder": "Notes...",
-	"workouts_set_incomplete_letter": "I"
+	"workouts_set_incomplete_letter": "I",
+	"sync_rejected_sync_request": "Rejected Sync Request"
 }
