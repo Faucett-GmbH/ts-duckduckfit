@@ -5,6 +5,15 @@
 	"windows": [
 		"main"
 	],
+	"remote": {
+		"urls": [
+			"https://corsproxy.io"
+		]
+	},
+	"platforms": [
+		"iOS",
+		"android"
+	],
 	"permissions": [
 		"core:default",
 		"deep-link:default",

@@ -62,11 +62,12 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		return new Promise<void>((resolve) => this.#emitter.once('ready', resolve));
 	}
 
-	init(deviceId: string, room: string, password: string) {
+	async init(deviceId: string, room: string, password: string, deviceIds: string[]) {
 		this.#deviceId = deviceId;
 		this.#room = room;
 		this.#password = password;
 		this.#emitter.emit('init');
+		await this.setDeviceIds(deviceIds);
 	}
 
 	async setDeviceIds(deviceIds: string[]) {
@@ -119,9 +120,16 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 	connect(peerId: PeerId, peerMetadata?: PeerMetadata) {
 		this.peerId = peerId;
 		this.peerMetadata = peerMetadata;
-		this.#join().catch((error) => {
-			console.error(`failed to join`, error);
-		});
+		this.#join()
+			.catch((error) => {
+				console.error(`failed to join`, error);
+			})
+			.then(() => {
+				if (this.#deviceIds.size === 0 && !this.#ready) {
+					this.#ready = true;
+					this.#emitter.emit('ready');
+				}
+			});
 	}
 
 	async #join() {
@@ -138,6 +146,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		}
 		this.#remotePeers.clear();
 		this.#remotePeerIds.clear();
+		this.#ready = false;
 		this.emit('close');
 	}
 

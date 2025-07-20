@@ -1,13 +1,13 @@
 import wasmUrl from "@automerge/automerge/automerge.wasm?url";
 import {
-	initializeWasm,
+	next as Automerge,
 	type ChangeFn,
 	type Doc,
 } from "@automerge/automerge/slim";
 import {
-	type DocHandle,
 	Repo,
-	type DocumentId,
+	type DocHandle,
+	type DocumentId
 } from "@automerge/automerge-repo/slim";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import { lazy } from "./lazy";
@@ -21,7 +21,7 @@ export type AutomergeDocHandle<T> = DocHandle<T> & {
 };
 
 export const initAutomerge = lazy(
-	async () => await initializeWasm(wasmUrl),
+	async () => await Automerge.initializeWasm(wasmUrl),
 );
 
 export const getRepo = lazy(
@@ -40,10 +40,10 @@ export async function findDocument<T>(
 }
 
 export function createDocument<T>(
-	initialValue?: Partial<T>,
+	initialValue: Partial<T>,
 	repo = getRepo(),
 ): AutomergeDocHandle<T> {
-	return repo.create<T>(initialValue as T) as AutomergeDocHandle<T>;
+	return repo.create<Partial<T>>(initialValue) as AutomergeDocHandle<T>;
 }
 
 export async function deleteDocument<T>(

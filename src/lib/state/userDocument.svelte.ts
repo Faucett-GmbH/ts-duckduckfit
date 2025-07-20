@@ -32,12 +32,12 @@ export const userDocumentConfig = {
 			const repo = getRepo();
 
 			return (userDocument: UserDocument) => {
-				userDocument.settings = createDocument<Settings>({}, repo).documentId;
-				userDocument.user = createDocument<User>({}, repo).documentId;
-				userDocument.sync = createDocument<Sync>({}, repo).documentId;
-				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({}, repo).documentId;
-				userDocument.workouts = createDocument<Workouts>({}, repo).documentId;
-				userDocument.exercises = createDocument<Exercises>({}, repo).documentId;
+				userDocument.settings = createDocument<Settings>({ version: 0 }, repo).documentId;
+				userDocument.user = createDocument<User>({ version: 0 }, repo).documentId;
+				userDocument.sync = createDocument<Sync>({ version: 0 }, repo).documentId;
+				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({ version: 0 }, repo).documentId;
+				userDocument.workouts = createDocument<Workouts>({ version: 0 }, repo).documentId;
+				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
 			}
 		}
 	}
@@ -126,7 +126,7 @@ export const userDocument = {
 
 async function initUserDocument() {
 	if (currentUserDocumentId.value == null) {
-		const userDocument = createDocument<UserDocument>();
+		const userDocument = createDocument<UserDocument>({ version: 0 });
 		await userDocument.whenReady();
 		await initAllDocuments(userDocument);
 		currentUserDocumentId.value = userDocument.documentId;

@@ -39,11 +39,7 @@ export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
 
 	const onChange = debounce((event: DocHandleChangePayload<Sync>) => {
 		if (event.doc.room && event.doc.password) {
-			getWebRTCClientAdapter().init(deviceId, event.doc.room, event.doc.password);
-		}
-		const deviceIds = Object.keys(event.doc.devices);
-		if (deviceIds.length > 0) {
-			getWebRTCClientAdapter().setDeviceIds(deviceIds);
+			getWebRTCClientAdapter().init(deviceId, event.doc.room, event.doc.password, Object.keys(event.doc.devices));
 		}
 	}, 0);
 
@@ -63,8 +59,7 @@ export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
 		});
 		await docHandle.whenReady();
 	} else if (sync) {
-		getWebRTCClientAdapter().init(deviceId, sync.room, sync.password);
-		getWebRTCClientAdapter().setDeviceIds(Object.keys(sync.devices));
+		await getWebRTCClientAdapter().init(deviceId, sync.room, sync.password, Object.keys(sync.devices));
 	}
 }
 
