@@ -67,15 +67,13 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		this.#room = room;
 		this.#password = password;
 		this.#emitter.emit('init');
+		deviceIds.push(deviceId);
 		await this.setDeviceIds(deviceIds);
 	}
 
 	async setDeviceIds(deviceIds: string[]) {
 		const newDeviceIds = new Set<string>();
 		for (const deviceId of deviceIds) {
-			if (this.#deviceId === deviceId) {
-				continue;
-			}
 			if (!this.#deviceIds.has(deviceId)) {
 				this.#newDeviceIds.add(deviceId);
 			}
@@ -96,7 +94,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		await this.#join();
 	}
 	async addDeviceId(deviceId: string) {
-		if (this.#deviceId === deviceId) {
+		if (this.#deviceIds.has(deviceId) || this.#newDeviceIds.has(deviceId)) {
 			return;
 		}
 		this.#deviceIds.add(deviceId);
@@ -104,9 +102,6 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		await this.#join();
 	}
 	removeDeviceId(deviceId: string) {
-		if (this.#deviceId === deviceId) {
-			return;
-		}
 		this.#deviceIds.delete(deviceId);
 		this.#newDeviceIds.delete(deviceId);
 		const peer = this.#remotePeers.get(deviceId);
@@ -123,19 +118,13 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		this.#join()
 			.catch((error) => {
 				console.error(`failed to join`, error);
-			})
-			.then(() => {
-				if (this.#deviceIds.size === 0 && !this.#ready) {
-					this.#ready = true;
-					this.#emitter.emit('ready');
-				}
 			});
 	}
 
 	async #join() {
 		const newDeviceIds = [...this.#newDeviceIds.values()];
 		this.#newDeviceIds.clear();
-		await Promise.all(newDeviceIds.map((deviceId) => this.#createPeer(deviceId)));
+		await Promise.all(newDeviceIds.map(this.#createPeer));
 	}
 
 	disconnect() {
@@ -223,13 +212,18 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		}
 	}
 
-	async #createPeer(deviceId: string) {
+	#createPeer = async (deviceId: string) => {
 		this.#remotePeers.get(deviceId)?.close();
 
 		const peer = new Peer({ id: deviceId });
 		this.#remotePeers.set(deviceId, peer);
 
 		peer.on('signal', async (payload) => {
+			if (this.#deviceId === deviceId || deviceId === 'self') {
+				const selfPeer = this.#remotePeers.get(deviceId === 'self' ? this.#deviceId! : 'self');
+				selfPeer!.signal(payload);
+				return;
+			}
 			const websocket = await this.#getWebSocket();
 			const message: RoomSignalMessage = {
 				type: 'signal',
@@ -249,11 +243,25 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			this.#remotePeerIds.delete(deviceId);
 		});
 		const websocket = await this.#getWebSocket();
-		websocket.send(
-			JSON.stringify({
-				type: 'peer'
-			})
-		);
+		if (this.#deviceId === deviceId) {
+			this.#createPeer('self');
+			websocket.emit(
+				'message',
+				JSON.stringify({
+					from: 'self',
+					type: 'message',
+					payload: {
+						type: 'peer'
+					}
+				} as P2pMessage)
+			);
+		} else {
+			websocket.send(
+				JSON.stringify({
+					type: 'peer'
+				} as RoomMessage)
+			);
+		}
 
 		return peer;
 	}
@@ -273,7 +281,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			this.#websocket.on('message', async (data) => {
 				const p2pMessage = JSON.parse(data as string) as P2pMessage;
 				const fromDeviceId = p2pMessage.from;
-				if (!this.#deviceIds.has(fromDeviceId)) {
+				if (fromDeviceId !== 'self' && !this.#deviceIds.has(fromDeviceId)) {
 					return;
 				}
 				switch (p2pMessage.type) {

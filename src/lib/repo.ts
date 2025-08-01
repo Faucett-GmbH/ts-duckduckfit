@@ -92,3 +92,6 @@ export async function initDocument<T extends { version: number }>(
 	await migrate(docHandle, config.migrations);
 	config.onReady?.(docHandle.doc());
 }
+
+// @ts-expect-error test
+window.findDocument = findDocument; 

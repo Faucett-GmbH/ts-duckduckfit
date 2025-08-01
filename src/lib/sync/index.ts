@@ -5,6 +5,7 @@ import { userDocument } from '$lib/state/userDocument.svelte';
 import { createNotification } from '$lib/state/notifications.svelte';
 import { m } from '$lib/paraglide/messages';
 import { lazy } from '$lib/lazy';
+import { getDeviceId } from '$lib/state/fingerprintjs.svelte';
 
 export const getWebRTCClientAdapter = lazy(() => new WebRTCClientAdapter());
 
@@ -12,6 +13,9 @@ if (browser) {
 	getWebRTCClientAdapter().on('peer-candidate', async (payload: PeerCandidatePayload) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const deviceId = (payload as any).deviceId as string;
+		if (deviceId === 'self' || deviceId === await getDeviceId()) {
+			return;
+		}
 		const sync = await userDocument.current?.sync();
 		if (sync) {
 			const doc = await sync.doc();
@@ -24,6 +28,9 @@ if (browser) {
 	getWebRTCClientAdapter().on('peer-disconnected', async (payload: PeerDisconnectedPayload) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const deviceId = (payload as any).deviceId as string;
+		if (deviceId === 'self' || deviceId === await getDeviceId()) {
+			return;
+		}
 		const sync = await userDocument.current?.sync();
 		if (sync) {
 			const doc = await sync.doc();

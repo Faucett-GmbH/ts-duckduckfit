@@ -37,30 +37,29 @@ export const syncConfig = {
 export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
 	const deviceId = await getDeviceId();
 
+	async function initWebRTCClientAdapter(sync: Sync) {
+		await getWebRTCClientAdapter().init(deviceId, sync.room, sync.password, Object.keys(sync.devices));
+	}
 	const onChange = debounce((event: DocHandleChangePayload<Sync>) => {
 		if (event.doc.room && event.doc.password) {
-			getWebRTCClientAdapter().init(deviceId, event.doc.room, event.doc.password, Object.keys(event.doc.devices));
+			initWebRTCClientAdapter(event.doc);
 		}
 	}, 0);
 
 	docHandle.on('change', onChange);
 
 	const sync = await docHandle.doc();
-	let room = sync?.room || '';
-	let password = sync?.password || '';
 
-	if (!room || !password) {
-		room = v7();
-		password = v7();
+	if (!sync?.room || !sync?.password) {
 		docHandle.change((doc) => {
-			doc.room = room;
-			doc.password = password;
+			doc.room = v7();
+			doc.password = v7();
 			return doc;
 		});
-		await docHandle.whenReady();
 	} else if (sync) {
-		await getWebRTCClientAdapter().init(deviceId, sync.room, sync.password, Object.keys(sync.devices));
+		await initWebRTCClientAdapter(sync);
 	}
+	await docHandle.whenReady();
 }
 
 export async function addSyncDevice(
