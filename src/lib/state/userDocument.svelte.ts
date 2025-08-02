@@ -24,6 +24,8 @@ export interface UserDocument {
 	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
 	workouts: AutomergeDocumentId<Workouts>;
 	exercises: AutomergeDocumentId<Exercises>;
+	updatedAt: Date;
+	createdAt: Date;
 }
 
 export const userDocumentConfig = {
@@ -38,6 +40,10 @@ export const userDocumentConfig = {
 				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({ version: 0 }, repo).documentId;
 				userDocument.workouts = createDocument<Workouts>({ version: 0 }, repo).documentId;
 				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				userDocument.updatedAt = new Date();
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				userDocument.createdAt = new Date();
 			}
 		}
 	}

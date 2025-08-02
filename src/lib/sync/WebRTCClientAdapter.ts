@@ -62,13 +62,18 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		return new Promise<void>((resolve) => this.#emitter.once('ready', resolve));
 	}
 
-	async init(deviceId: string, room: string, password: string, deviceIds: string[]) {
+	async init(deviceId: string, room: string, password: string) {
+		this.disconnect();
+
 		this.#deviceId = deviceId;
 		this.#room = room;
 		this.#password = password;
+
 		this.#emitter.emit('init');
-		deviceIds.push(deviceId);
-		await this.setDeviceIds(deviceIds);
+
+		if (this.#deviceIds.size === 0) {
+			this.setDeviceIds([deviceId]);
+		}
 	}
 
 	async setDeviceIds(deviceIds: string[]) {
@@ -180,10 +185,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 					);
 				}
 				this.#remotePeerIds.set(fromDeviceId, message.senderId);
-				if (!this.#ready) {
-					this.#ready = true;
-					this.#emitter.emit('ready');
-				}
+				this.#forceReady();
 				this.emit('peer-candidate', {
 					peerId: message.senderId,
 					peerMetadata: message.peerMetadata,
@@ -194,10 +196,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			case 'welcome': {
 				const message = syncMessage as WelcomeSyncMessage;
 				this.#remotePeerIds.set(fromDeviceId, message.senderId);
-				if (!this.#ready) {
-					this.#ready = true;
-					this.#emitter.emit('ready');
-				}
+				this.#forceReady();
 				this.emit('peer-candidate', {
 					peerId: message.senderId,
 					peerMetadata: message.peerMetadata,
@@ -209,6 +208,13 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 				this.emit('message', syncMessage as Message);
 				break;
 			}
+		}
+	}
+
+	#forceReady = () => {
+		if (!this.#ready) {
+			this.#ready = true;
+			this.#emitter.emit('ready');
 		}
 	}
 

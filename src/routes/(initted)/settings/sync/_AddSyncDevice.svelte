@@ -43,6 +43,7 @@
 	import { createNotification } from '$lib/state/notifications.svelte';
 	import type { SyncMessage, SyncMessageDevice } from '../../../sync/+page.svelte';
 	import { getDeviceName } from '$lib/state/fingerprintjs.svelte';
+	import { syncRoomPassword } from '$lib/state/sync.svelte';
 
 	let {
 		open = $bindable(),
@@ -113,8 +114,8 @@
 											type: 'added',
 											payload: {
 												userDocumentId: currentUserDocument.userDocumentId(),
-												room: sync.room,
-												password: sync.password,
+												room: syncRoomPassword.room,
+												password: syncRoomPassword.password,
 												deviceId: currentDeviceId,
 												name: getDeviceName(navigator.userAgent)
 											}

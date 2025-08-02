@@ -4,6 +4,36 @@ import { v7 } from 'uuid';
 import { getDeviceId, getDeviceName } from './fingerprintjs.svelte';
 import { getWebRTCClientAdapter } from '$lib/sync';
 import { debounce } from '@aicacia/debounce';
+import { localStorageState } from '$lib/localStorageState.svelte';
+import { browser } from '$app/environment';
+
+export interface SyncState {
+	room: string;
+	password: string;
+}
+
+const syncRoomPasswordState = localStorageState<SyncState>(
+	'user-sync',
+	{
+		room: v7(),
+		password: v7(),
+	}
+);
+
+export const syncRoomPassword = {
+	get room() {
+		return syncRoomPasswordState.value.room;
+	},
+	get password() {
+		return syncRoomPasswordState.value.password;
+	},
+	setRoomPassword(room: string, password: string) {
+		syncRoomPasswordState.value = {
+			room,
+			password
+		};
+	}
+};
 
 export interface SyncDevice {
 	name: string;
@@ -12,8 +42,6 @@ export interface SyncDevice {
 
 export interface Sync {
 	version: number;
-	room: string;
-	password: string;
 	devices: { [deviceId: string]: SyncDevice };
 }
 
@@ -35,30 +63,18 @@ export const syncConfig = {
 };
 
 export async function initSync(docHandle: AutomergeDocHandle<Sync>) {
-	const deviceId = await getDeviceId();
-
 	async function initWebRTCClientAdapter(sync: Sync) {
-		await getWebRTCClientAdapter().init(deviceId, sync.room, sync.password, Object.keys(sync.devices));
+		await getWebRTCClientAdapter().setDeviceIds(Object.keys(sync.devices));
 	}
 	const onChange = debounce((event: DocHandleChangePayload<Sync>) => {
-		if (event.doc.room && event.doc.password) {
-			initWebRTCClientAdapter(event.doc);
-		}
+		initWebRTCClientAdapter(event.doc);
 	}, 0);
 
 	docHandle.on('change', onChange);
 
 	const sync = await docHandle.doc();
 
-	if (!sync?.room || !sync?.password) {
-		docHandle.change((doc) => {
-			doc.room = v7();
-			doc.password = v7();
-			return doc;
-		});
-	} else if (sync) {
-		await initWebRTCClientAdapter(sync);
-	}
+	await initWebRTCClientAdapter(sync);
 	await docHandle.whenReady();
 }
 
@@ -75,7 +91,6 @@ export async function addSyncDevice(
 		};
 		return doc;
 	});
-	getWebRTCClientAdapter().addDeviceId(deviceId);
 }
 
 export async function updateSyncDevice(
@@ -90,9 +105,18 @@ export async function updateSyncDevice(
 }
 
 export function removeSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: string) {
-	getWebRTCClientAdapter().removeDeviceId(deviceId);
 	docHandle.change((doc) => {
 		delete doc.devices[deviceId];
 		return doc;
 	});
+}
+
+if (browser) {
+	getDeviceId().then(deviceId => {
+		$effect.root(() => {
+			$effect(() => {
+				getWebRTCClientAdapter().init(deviceId, syncRoomPasswordState.value.room, syncRoomPasswordState.value.password)
+			});
+		});
+	})
 }

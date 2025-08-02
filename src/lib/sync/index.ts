@@ -10,34 +10,35 @@ import { getDeviceId } from '$lib/state/fingerprintjs.svelte';
 export const getWebRTCClientAdapter = lazy(() => new WebRTCClientAdapter());
 
 if (browser) {
-	getWebRTCClientAdapter().on('peer-candidate', async (payload: PeerCandidatePayload) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const deviceId = (payload as any).deviceId as string;
-		if (deviceId === 'self' || deviceId === await getDeviceId()) {
-			return;
-		}
-		const sync = await userDocument.current?.sync();
-		if (sync) {
-			const doc = await sync.doc();
-			const device = doc.devices[deviceId];
-			if (device) {
-				createNotification(m.sync_device_connected({ name: device.name }), 'info');
+	getWebRTCClientAdapter()
+		.on('peer-candidate', async (payload: PeerCandidatePayload) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const deviceId = (payload as any).deviceId as string;
+			if (deviceId === 'self' || deviceId === (await getDeviceId())) {
+				return;
 			}
-		}
-	});
-	getWebRTCClientAdapter().on('peer-disconnected', async (payload: PeerDisconnectedPayload) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const deviceId = (payload as any).deviceId as string;
-		if (deviceId === 'self' || deviceId === await getDeviceId()) {
-			return;
-		}
-		const sync = await userDocument.current?.sync();
-		if (sync) {
-			const doc = await sync.doc();
-			const device = doc.devices[deviceId];
-			if (device) {
-				createNotification(m.sync_device_disconnected({ name: device.name }), 'info');
+			const sync = await userDocument.current?.sync();
+			if (sync) {
+				const doc = await sync.doc();
+				const device = doc.devices[deviceId];
+				if (device) {
+					createNotification(m.sync_device_connected({ name: device.name }), 'info');
+				}
 			}
-		}
-	});
+		})
+		.on('peer-disconnected', async (payload: PeerDisconnectedPayload) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const deviceId = (payload as any).deviceId as string;
+			if (deviceId === 'self' || deviceId === (await getDeviceId())) {
+				return;
+			}
+			const sync = await userDocument.current?.sync();
+			if (sync) {
+				const doc = await sync.doc();
+				const device = doc.devices[deviceId];
+				if (device) {
+					createNotification(m.sync_device_disconnected({ name: device.name }), 'info');
+				}
+			}
+		});
 }

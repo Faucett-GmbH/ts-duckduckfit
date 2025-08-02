@@ -10,6 +10,7 @@ import {
 	type DocumentId
 } from "@automerge/automerge-repo/slim";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+// import { WebSocketClientAdapter } from '@automerge/automerge-repo-network-websocket'
 import { lazy } from "./lazy";
 import { getWebRTCClientAdapter } from "./sync";
 
@@ -25,11 +26,10 @@ export const initAutomerge = lazy(
 );
 
 export const getRepo = lazy(
-	() =>
-		new Repo({
-			network: [getWebRTCClientAdapter()],
-			storage: new IndexedDBStorageAdapter(),
-		}),
+	() => new Repo({
+		network: [getWebRTCClientAdapter()],
+		storage: new IndexedDBStorageAdapter('duckduckfit', 'automerge'),
+	}),
 );
 
 export async function findDocument<T>(
@@ -63,9 +63,11 @@ export async function migrate<T extends { version: number }>(
 	migrations: Migrations<T>,
 ) {
 	let doc = docHandle.doc();
+	const migrationsSize = Object.keys(migrations).length;
+	let updated = false;
 	for (
 		let version = (doc.version || 0) + 1;
-		version <= Object.keys(migrations).length;
+		version <= migrationsSize;
 		version++
 	) {
 		const migrationFn = migrations[version];
@@ -76,8 +78,10 @@ export async function migrate<T extends { version: number }>(
 				state.version = version;
 			});
 			doc = docHandle.doc();
+			updated = true;
 		}
 	}
+	return updated;
 }
 
 export interface RepoConfig<T> {
@@ -89,9 +93,7 @@ export async function initDocument<T extends { version: number }>(
 	docHandle: AutomergeDocHandle<T>,
 	config: RepoConfig<T>,
 ) {
-	await migrate(docHandle, config.migrations);
+	const updated = await migrate(docHandle, config.migrations);
 	config.onReady?.(docHandle.doc());
+	return updated;
 }
-
-// @ts-expect-error test
-window.findDocument = findDocument; 

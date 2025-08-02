@@ -63,12 +63,13 @@
 								break;
 							}
 							case 'added': {
-								await getWebRTCClientAdapter().init(
+								const webRTCClientAdapter = getWebRTCClientAdapter();
+								await webRTCClientAdapter.init(
 									deviceId,
 									message.payload.room,
-									message.payload.password,
-									[message.payload.deviceId]
+									message.payload.password
 								);
+								await webRTCClientAdapter.setDeviceIds([message.payload.deviceId]);
 
 								await setUserDocumentId(message.payload.userDocumentId);
 								await goto(`${base}/settings/profile`);
