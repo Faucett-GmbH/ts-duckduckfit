@@ -9,7 +9,7 @@ import {
 	type AutomergeDocHandle
 } from '$lib/repo';
 import { userConfig, type User } from './user.svelte';
-import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplates.svelte';
+import { trainingSessionTemplatesConfig, type TrainingSessionTemplates } from './trainingSessionTemplates.svelte';
 import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
@@ -21,8 +21,8 @@ export interface UserDocument {
 	settings: AutomergeDocumentId<Settings>;
 	user: AutomergeDocumentId<User>;
 	sync: AutomergeDocumentId<Sync>;
-	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
-	workouts: AutomergeDocumentId<Workouts>;
+	trainingSessionTemplates: AutomergeDocumentId<TrainingSessionTemplates>;
+	trainingSessions: AutomergeDocumentId<Workouts>;
 	exercises: AutomergeDocumentId<Exercises>;
 	updatedAt: Date;
 	createdAt: Date;
@@ -37,8 +37,8 @@ export const userDocumentConfig = {
 				userDocument.settings = createDocument<Settings>({ version: 0 }, repo).documentId;
 				userDocument.user = createDocument<User>({ version: 0 }, repo).documentId;
 				userDocument.sync = createDocument<Sync>({ version: 0 }, repo).documentId;
-				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({ version: 0 }, repo).documentId;
-				userDocument.workouts = createDocument<Workouts>({ version: 0 }, repo).documentId;
+				userDocument.trainingSessionTemplates = createDocument<TrainingSessionTemplates>({ version: 0 }, repo).documentId;
+				userDocument.trainingSessions = createDocument<Workouts>({ version: 0 }, repo).documentId;
 				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
 				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				userDocument.updatedAt = new Date();
@@ -58,8 +58,8 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	await initDocument(await findDocument(userDocument.settings), settingsConfig);
 	await initDocument(await findDocument(userDocument.user), userConfig);
 	await initDocument(await findDocument(userDocument.sync), syncConfig);
-	await initDocument(await findDocument(userDocument.workoutTemplates), workoutTemplatesConfig);
-	await initDocument(await findDocument(userDocument.workouts), workoutsConfig);
+	await initDocument(await findDocument(userDocument.trainingSessionTemplates), trainingSessionTemplatesConfig);
+	await initDocument(await findDocument(userDocument.trainingSessions), workoutsConfig);
 	await initDocument(await findDocument(userDocument.exercises), exercisesConfig);
 }
 
@@ -102,11 +102,11 @@ export class CurrentUserDocument {
 	async sync() {
 		return findDocument((await this.userDocument()).sync);
 	}
-	async workoutTemplates() {
-		return findDocument((await this.userDocument()).workoutTemplates);
+	async trainingSessionTemplates() {
+		return findDocument((await this.userDocument()).trainingSessionTemplates);
 	}
-	async workouts() {
-		return findDocument((await this.userDocument()).workouts);
+	async trainingSessions() {
+		return findDocument((await this.userDocument()).trainingSessions);
 	}
 	async exercises() {
 		return findDocument((await this.userDocument()).exercises);
