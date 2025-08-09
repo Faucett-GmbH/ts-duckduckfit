@@ -8,95 +8,93 @@ import {
 	type AutomergeDocHandle
 } from '$lib/repo';
 import { userDocument } from './userDocument.svelte';
-import type { SetGroupTemplate, SetTemplate, WorkoutTemplate } from './workoutTemplates.svelte';
+import type { SetSeriesTemplate, SetTemplate, TrainingSessionTemplate, RPERange, NoteTranslation } from './trainingSessionTemplates.svelte';
 import { getAndApplyChanges } from '$lib/diff';
 
-export type SetStatusType = 'success' | 'failed';
+type SetResultType = "completed" | "failed" | "skipped";
 
-export interface AttemptedSet extends SetTemplate {
-	attemptedDistanceInMeters: number | null;
-	attemptedRateOfPerceivedExertion: number | null;
-	attemptedReps: number | null;
-	attemptedRepsInReserve: number | null;
-	attemptedTimeInSeconds: number | null;
-	attemptedWeightInKilograms: number | null;
-	durationInSeconds: number | null;
-	status: SetStatusType | null;
-	notes: WorkoutNote[];
-	startedAt: Date | null;
-	completedAt: Date | null;
+export interface LoggedSet extends SetTemplate {
+	actualReps: number | null;
+	actualWeight: number | null;
+	actualRPE: RPERange | null;
+	setResultType: SetResultType | null;
+	note: string | null;
 }
 
-export interface AttemptedSetGroup extends Omit<SetGroupTemplate, 'setTemplates'> {
-	sets: AttemptedSet[];
+export interface LoggedSetSeries extends Omit<SetSeriesTemplate, 'setTemplates'> {
+	setSeriesTemplateId: AutomergeDocumentId<SetSeriesTemplate> | null;
+	position: number;
+	sets: LoggedSet[];
 }
 
-export interface WorkoutTranslation {
-	name: string;
+export interface TrainingSessionTranslation {
 	locale: Locale;
+	name: string;
 	description: string | null;
 }
 
-export interface WorkoutNote {
-	locale: Locale;
-	note: string;
+export interface ActiveTrainingDuration {
+	from: Date;
+	to: Date | null;
 }
 
-export interface Workout {
-	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate> | null;
-	translations: WorkoutTranslation[];
-	notes: WorkoutNote[];
-	setGroups: AttemptedSetGroup[];
+export interface TrainingSession {
+	trainingSessionTemplateId: AutomergeDocumentId<TrainingSessionTemplate> | null;
+	translations: TrainingSessionTranslation[];
+	notes: NoteTranslation[];
+	setSeries: LoggedSetSeries[];
+	activeTrainingDurations: ActiveTrainingDuration[];
 	durationInSeconds: number | null;
 	startedAt: Date;
-	completedAt: Date | null;
+	finishedAt: Date | null;
+
 	updatedAt: Date;
 	createdAt: Date;
 }
 
-export interface Workouts {
+export interface TrainingSessions {
 	version: number;
-	workoutsById: Record<AutomergeDocumentId<Workout>, boolean>;
-	workoutsByWorkoutTemplateId: Record<
-		AutomergeDocumentId<WorkoutTemplate>,
-		AutomergeDocumentId<Workout>
+	trainingSessionsById: Record<AutomergeDocumentId<TrainingSession>, boolean>;
+	trainingSessionsByTrainingSessionTemplateId: Record<
+		AutomergeDocumentId<TrainingSessionTemplate>,
+		AutomergeDocumentId<TrainingSession>
 	>;
 }
 
-export const workoutsConfig = {
+export const trainingSessionsConfig = {
 	migrations: {
-		1: () => (workouts: Workouts) => {
-			workouts.workoutsById = {};
-			workouts.workoutsByWorkoutTemplateId = {};
+		1: () => (trainingSessions: TrainingSessions) => {
+			trainingSessions.trainingSessionsById = {};
+			trainingSessions.trainingSessionsByTrainingSessionTemplateId = {};
 		}
 	}
 };
 
-export async function getWorkouts(
+export async function getTrainingSessions(
 	offset: number,
 	limit: number
-): Promise<[key: AutomergeDocumentId<Workout>, value: Workout][]> {
-	const workouts = (await userDocument.current!.workouts()).doc();
+): Promise<[key: AutomergeDocumentId<TrainingSession>, value: TrainingSession][]> {
+	const trainingSessions = (await userDocument.current!.trainingSessions()).doc();
 	const startOffset = offset * limit;
 	const endOffset = startOffset + limit - 1;
-	const workoutIds = Object.keys(workouts.workoutsById).slice(
+	const trainingSessionIds = Object.keys(trainingSessions.trainingSessionsById).slice(
 		startOffset,
 		endOffset
-	) as AutomergeDocumentId<Workout>[];
+	) as AutomergeDocumentId<TrainingSession>[];
 	const repo = getRepo();
 	return await Promise.all(
-		workoutIds.map(async (id) => [id, (await findDocument(id, repo)).doc()])
+		trainingSessionIds.map(async (id) => [id, (await findDocument(id, repo)).doc()])
 	);
 }
 
 export async function getWorkoutById(
-	workoutId: AutomergeDocumentId<Workout>
-): Promise<Workout | null> {
-	const workoutDocHandle = await findDocument(workoutId);
-	if (!workoutDocHandle) {
+	trainingSessionId: AutomergeDocumentId<TrainingSession>
+): Promise<TrainingSession | null> {
+	const trainingSessionDocHandle = await findDocument(trainingSessionId);
+	if (!trainingSessionDocHandle) {
 		return null;
 	}
-	return workoutDocHandle.doc() || null;
+	return trainingSessionDocHandle.doc() || null;
 }
 
 export async function getActiveWorkoutByWorkoutTemplateId(

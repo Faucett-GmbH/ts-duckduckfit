@@ -10,7 +10,7 @@
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
 	import { getWorkoutTemplates, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
-	import WorkoutTemplateComponent from '$lib/components/workout/WorkoutTemplate.svelte';
+	import WorkoutTemplateComponent from '$lib/components/training_session/WorkoutTemplate.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { getExerciseByGuid } from '$lib/state/exercises.svelte';

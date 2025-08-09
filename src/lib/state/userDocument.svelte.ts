@@ -14,7 +14,7 @@ import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
 import { settingsConfig, type Settings } from './settings.svelte';
-import { workoutsConfig, type Workouts } from './workouts.svelte';
+import { workoutsConfig, type Workouts } from './trainingSessions.svelte';
 
 export interface UserDocument {
 	version: number;

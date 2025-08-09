@@ -14,7 +14,7 @@ export type SetSeriesType = 'standard' | 'superset' | 'circuit';
 export type SetType = 'warmup' | 'working_set';
 export type RPERange = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
-interface NoteTranslation {
+export interface NoteTranslation {
 	locale: Locale
 	value: string | null
 }
@@ -22,13 +22,14 @@ interface NoteTranslation {
 export interface SetTemplate {
 	id: string;
 	exerciseGuid: string;
+	position: number
 	setType: SetType;
 
 	targetReps: number | null;
 	targetWeight: number | null;
 	targetRPE: RPERange | null;
 
-	note: NoteTranslation | null;
+	trainingNote: NoteTranslation[] | null;
 }
 
 export interface SetSeriesTemplate {
@@ -38,12 +39,13 @@ export interface SetSeriesTemplate {
 }
 
 export interface TrainingSessionTemplateTranslation {
-	name: string;
 	locale: Locale;
+	title: string;
 	description: string | null;
 }
 
 export interface TrainingSessionTemplate {
+	id: string;
 	translations: TrainingSessionTemplateTranslation[];
 	setSeriesTemplates: SetSeriesTemplate[];
 	updatedAt: Date;
