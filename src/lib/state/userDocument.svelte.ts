@@ -15,6 +15,8 @@ import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
 import { settingsConfig, type Settings } from './settings.svelte';
 import { workoutsConfig, type Workouts } from './workouts.svelte';
+import { lazy } from '$lib/lazy';
+import { getWebRTCClientAdapter } from '$lib/sync';
 
 export interface UserDocument {
 	version: number;
@@ -30,21 +32,24 @@ export interface UserDocument {
 
 export const userDocumentConfig = {
 	migrations: {
-		1: () => {
+		1: async () => {
 			const repo = getRepo();
 
 			return (userDocument: UserDocument) => {
 				userDocument.settings = createDocument<Settings>({ version: 0 }, repo).documentId;
 				userDocument.user = createDocument<User>({ version: 0 }, repo).documentId;
 				userDocument.sync = createDocument<Sync>({ version: 0 }, repo).documentId;
-				userDocument.workoutTemplates = createDocument<WorkoutTemplates>({ version: 0 }, repo).documentId;
+				userDocument.workoutTemplates = createDocument<WorkoutTemplates>(
+					{ version: 0 },
+					repo
+				).documentId;
 				userDocument.workouts = createDocument<Workouts>({ version: 0 }, repo).documentId;
 				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
 				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				userDocument.updatedAt = new Date();
 				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				userDocument.createdAt = new Date();
-			}
+			};
 		}
 	}
 };
@@ -55,12 +60,16 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	if (!userDocument) {
 		throw InternalError.from('errors_name_application', 'errors_message_application');
 	}
-	await initDocument(await findDocument(userDocument.settings), settingsConfig);
-	await initDocument(await findDocument(userDocument.user), userConfig);
-	await initDocument(await findDocument(userDocument.sync), syncConfig);
-	await initDocument(await findDocument(userDocument.workoutTemplates), workoutTemplatesConfig);
-	await initDocument(await findDocument(userDocument.workouts), workoutsConfig);
-	await initDocument(await findDocument(userDocument.exercises), exercisesConfig);
+	const repo = getRepo();
+	await initDocument(await findDocument(userDocument.settings, repo), settingsConfig);
+	await initDocument(await findDocument(userDocument.user, repo), userConfig);
+	await initDocument(await findDocument(userDocument.sync, repo), syncConfig);
+	await initDocument(
+		await findDocument(userDocument.workoutTemplates, repo),
+		workoutTemplatesConfig
+	);
+	await initDocument(await findDocument(userDocument.workouts, repo), workoutsConfig);
+	await initDocument(await findDocument(userDocument.exercises, repo), exercisesConfig);
 }
 
 export class CurrentUserDocument {
@@ -69,7 +78,7 @@ export class CurrentUserDocument {
 
 	constructor(userDocumentId: AutomergeDocumentId<UserDocument>) {
 		this.#userDocumentId = userDocumentId;
-		this.#userDocumentDocHandle = findDocument(userDocumentId);
+		this.#userDocumentDocHandle = findDocument(userDocumentId, getRepo());
 	}
 
 	syncUrl(room: string, password: string) {
@@ -94,22 +103,22 @@ export class CurrentUserDocument {
 		return userDocument;
 	}
 	async settings() {
-		return findDocument((await this.userDocument()).settings);
+		return findDocument((await this.userDocument()).settings, getRepo());
 	}
 	async user() {
-		return findDocument((await this.userDocument()).user);
+		return findDocument((await this.userDocument()).user, getRepo());
 	}
 	async sync() {
-		return findDocument((await this.userDocument()).sync);
+		return findDocument((await this.userDocument()).sync, getRepo());
 	}
 	async workoutTemplates() {
-		return findDocument((await this.userDocument()).workoutTemplates);
+		return findDocument((await this.userDocument()).workoutTemplates, getRepo());
 	}
 	async workouts() {
-		return findDocument((await this.userDocument()).workouts);
+		return findDocument((await this.userDocument()).workouts, getRepo());
 	}
 	async exercises() {
-		return findDocument((await this.userDocument()).exercises);
+		return findDocument((await this.userDocument()).exercises, getRepo());
 	}
 }
 
@@ -131,13 +140,17 @@ export const userDocument = {
 };
 
 async function initUserDocument() {
+	const repo = getRepo();
+
+	await getWebRTCClientAdapter().whenReady();
+
 	if (currentUserDocumentId.value == null) {
-		const userDocument = createDocument<UserDocument>({ version: 0 });
+		const userDocument = createDocument<UserDocument>({ version: 0 }, repo);
 		await userDocument.whenReady();
 		await initAllDocuments(userDocument);
 		currentUserDocumentId.value = userDocument.documentId;
 	} else {
-		const userDocument = await findDocument(currentUserDocumentId.value);
+		const userDocument = await findDocument(currentUserDocumentId.value, repo);
 		await userDocument.whenReady();
 		await initAllDocuments(userDocument);
 	}
@@ -145,18 +158,11 @@ async function initUserDocument() {
 	return currentUserDocument!;
 }
 
-let userDocumentPromise: Promise<CurrentUserDocument>;
-
-export async function getUserDocument() {
-	if (!userDocumentPromise) {
-		userDocumentPromise = initUserDocument();
-	}
-	return userDocumentPromise;
-}
+export const getUserDocument = lazy(initUserDocument);
 
 export async function setUserDocumentId(userDocumentId: AutomergeDocumentId<UserDocument>) {
 	currentUserDocumentId.value = userDocumentId;
-	const userDocument = await findDocument(userDocumentId);
+	const userDocument = await findDocument(userDocumentId, getRepo());
 	await userDocument.whenReady();
 	await initAllDocuments(userDocument);
 	return currentUserDocument!;

@@ -43,7 +43,7 @@
 	import { createNotification } from '$lib/state/notifications.svelte';
 	import type { SyncMessage, SyncMessageDevice } from '../../../sync/+page.svelte';
 	import { getDeviceName } from '$lib/state/fingerprintjs.svelte';
-	import { syncRoomPassword } from '$lib/state/sync.svelte';
+	import { sync } from '$lib/state/sync.svelte';
 
 	let {
 		open = $bindable(),
@@ -88,7 +88,7 @@
 
 	let websocket = $state<KeepAliveWebSocket>();
 	$effect(() => {
-		url = currentUserDocument.syncUrl(room, roomPassword);
+		url = sync.syncUrl(room, roomPassword);
 	});
 
 	$effect(() => {
@@ -105,23 +105,19 @@
 						}
 						case 'created': {
 							if (newDevice) {
-								const syncHandle = await currentUserDocument.sync();
-								const sync = syncHandle.doc();
-								if (sync) {
-									onAdd(newDevice.deviceId, newDevice.name);
-									ws.send(
-										JSON.stringify({
-											type: 'added',
-											payload: {
-												userDocumentId: currentUserDocument.userDocumentId(),
-												room: syncRoomPassword.room,
-												password: syncRoomPassword.password,
-												deviceId: currentDeviceId,
-												name: getDeviceName(navigator.userAgent)
-											}
-										} as AddSyncMessageAdded)
-									);
-								}
+								onAdd(newDevice.deviceId, newDevice.name);
+								ws.send(
+									JSON.stringify({
+										type: 'added',
+										payload: {
+											userDocumentId: currentUserDocument.userDocumentId(),
+											room: sync.room,
+											password: sync.password,
+											deviceId: currentDeviceId,
+											name: getDeviceName(navigator.userAgent)
+										}
+									} as AddSyncMessageAdded)
+								);
 							}
 							break;
 						}

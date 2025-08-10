@@ -6,9 +6,11 @@ import {
 } from '@automerge/automerge-repo/slim';
 import type { KeepAliveWebSocket } from '@aicacia/keepalivewebsocket';
 import EventEmitter from 'eventemitter3';
-import { createWebSocket, type P2pMessage } from './websocket';
+import type { P2pMessage } from './websocket';
 import { Peer, type SignalMessage } from '@aicacia/peer';
 import { decode, encode, toArrayBuffer } from './util';
+import { getDeviceId } from '$lib/state/fingerprintjs.svelte';
+import { sync } from '$lib/state/sync.svelte';
 
 export type ArriveSyncMessage = Omit<Message, 'targetId'> & {
 	type: 'arrive';
@@ -34,7 +36,6 @@ export type RoomPeerMessage = {
 export type RoomMessage = RoomSignalMessage | RoomPeerMessage;
 
 interface WebRTCClientAdapterInternalEvents {
-	init(): void;
 	ready(): void;
 }
 
@@ -42,19 +43,18 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 	#ready = false;
 	#emitter = new EventEmitter<WebRTCClientAdapterInternalEvents>();
 
-	#websocket?: KeepAliveWebSocket;
 	#remotePeers: Map<string, Peer> = new Map();
 	#remotePeerIds: Map<string, string> = new Map();
 
 	#deviceIds = new Set<string>();
 	#newDeviceIds = new Set<string>();
-	#room?: string;
-	#password?: string;
-	#deviceId?: string;
+
+	#websocket: KeepAliveWebSocket | undefined;
 
 	isReady() {
 		return this.#ready;
 	}
+
 	whenReady() {
 		if (this.#ready) {
 			return Promise.resolve();
@@ -62,30 +62,19 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		return new Promise<void>((resolve) => this.#emitter.once('ready', resolve));
 	}
 
-	async init(deviceId: string, room: string, password: string) {
-		this.disconnect();
-
-		this.#deviceId = deviceId;
-		this.#room = room;
-		this.#password = password;
-
-		this.#emitter.emit('init');
-
-		if (this.#deviceIds.size === 0) {
-			this.setDeviceIds([deviceId]);
-		}
-	}
-
-	async setDeviceIds(deviceIds: string[]) {
-		const newDeviceIds = new Set<string>();
-		for (const deviceId of deviceIds) {
+	async setDeviceIds(deviceIdList: string[]) {
+		const deviceIds = new Set<string>();
+		for (const deviceId of deviceIdList) {
+			if ((await getDeviceId()) === deviceId) {
+				continue;
+			}
 			if (!this.#deviceIds.has(deviceId)) {
 				this.#newDeviceIds.add(deviceId);
 			}
-			newDeviceIds.add(deviceId);
+			deviceIds.add(deviceId);
 		}
 		for (const deviceId of this.#deviceIds) {
-			if (newDeviceIds.has(deviceId)) {
+			if (deviceIds.has(deviceId)) {
 				continue;
 			}
 			const peer = this.#remotePeers.get(deviceId);
@@ -95,9 +84,10 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 				this.#remotePeerIds.delete(deviceId);
 			}
 		}
-		this.#deviceIds = newDeviceIds;
+		this.#deviceIds = deviceIds;
 		await this.#join();
 	}
+
 	async addDeviceId(deviceId: string) {
 		if (this.#deviceIds.has(deviceId) || this.#newDeviceIds.has(deviceId)) {
 			return;
@@ -106,6 +96,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		this.#newDeviceIds.add(deviceId);
 		await this.#join();
 	}
+
 	removeDeviceId(deviceId: string) {
 		this.#deviceIds.delete(deviceId);
 		this.#newDeviceIds.delete(deviceId);
@@ -117,16 +108,27 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		}
 	}
 
-	connect(peerId: PeerId, peerMetadata?: PeerMetadata) {
+	async connect(peerId: PeerId, peerMetadata?: PeerMetadata) {
 		this.peerId = peerId;
 		this.peerMetadata = peerMetadata;
-		this.#join()
-			.catch((error) => {
-				console.error(`failed to join`, error);
-			});
+
+		await this.#join().catch((error) => {
+			console.error(`failed to join`, error);
+		});
+
+		this.emit('peer-candidate', {
+			peerId: peerId,
+			peerMetadata: peerMetadata,
+			deviceId: await getDeviceId()
+		} as never);
+
+		this.#forceReady();
 	}
 
 	async #join() {
+		if (!this.peerId) {
+			return;
+		}
 		const newDeviceIds = [...this.#newDeviceIds.values()];
 		this.#newDeviceIds.clear();
 		await Promise.all(newDeviceIds.map(this.#createPeer));
@@ -144,8 +146,12 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 		this.emit('close');
 	}
 
-	send(message: Message) {
-		Promise.all(
+	async send(message: Message) {
+		if (message.senderId === this.peerId && message.targetId === this.peerId) {
+			this.receive(await getDeviceId(), new Uint8Array(toArrayBuffer(encode(message))));
+			return;
+		}
+		await Promise.all(
 			[...this.#deviceIds.values()].map(async (deviceId) => {
 				try {
 					const peer = this.#remotePeers.get(deviceId);
@@ -180,28 +186,28 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 								senderId: this.peerId!,
 								targetId: message.senderId,
 								peerMetadata: this.peerMetadata!
-							})
+							} as WelcomeSyncMessage)
 						)
 					);
 				}
 				this.#remotePeerIds.set(fromDeviceId, message.senderId);
-				this.#forceReady();
 				this.emit('peer-candidate', {
 					peerId: message.senderId,
 					peerMetadata: message.peerMetadata,
 					deviceId: fromDeviceId
 				} as never);
+				this.#forceReady();
 				break;
 			}
 			case 'welcome': {
 				const message = syncMessage as WelcomeSyncMessage;
 				this.#remotePeerIds.set(fromDeviceId, message.senderId);
-				this.#forceReady();
 				this.emit('peer-candidate', {
 					peerId: message.senderId,
 					peerMetadata: message.peerMetadata,
 					deviceId: fromDeviceId
 				} as never);
+				this.#forceReady();
 				break;
 			}
 			default: {
@@ -216,26 +222,24 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			this.#ready = true;
 			this.#emitter.emit('ready');
 		}
-	}
+	};
 
 	#createPeer = async (deviceId: string) => {
+		console.assert(this.peerId, 'peerId is not set');
+
 		this.#remotePeers.get(deviceId)?.close();
 
 		const peer = new Peer({ id: deviceId });
 		this.#remotePeers.set(deviceId, peer);
 
-		peer.on('signal', async (payload) => {
-			if (this.#deviceId === deviceId || deviceId === 'self') {
-				const selfPeer = this.#remotePeers.get(deviceId === 'self' ? this.#deviceId! : 'self');
-				selfPeer!.signal(payload);
-				return;
-			}
+		peer.on('signal', async (signalPayload) => {
 			const websocket = await this.#getWebSocket();
-			const message: RoomSignalMessage = {
-				type: 'signal',
-				payload
-			};
-			websocket.send(JSON.stringify(message));
+			websocket.send(
+				JSON.stringify({
+					type: 'signal',
+					payload: signalPayload
+				} as RoomSignalMessage)
+			);
 		});
 		peer.on('data', (data) => {
 			this.receive(peer.getId(), new Uint8Array(data as ArrayBufferLike));
@@ -248,88 +252,73 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			this.#remotePeers.delete(deviceId);
 			this.#remotePeerIds.delete(deviceId);
 		});
+
 		const websocket = await this.#getWebSocket();
-		if (this.#deviceId === deviceId) {
-			this.#createPeer('self');
-			websocket.emit(
-				'message',
-				JSON.stringify({
-					from: 'self',
-					type: 'message',
-					payload: {
-						type: 'peer'
-					}
-				} as P2pMessage)
-			);
-		} else {
-			websocket.send(
-				JSON.stringify({
-					type: 'peer'
-				} as RoomMessage)
-			);
-		}
+
+		websocket.send(
+			JSON.stringify({
+				type: 'peer'
+			} as RoomMessage)
+		);
 
 		return peer;
-	}
-
-	async #waitForRoom() {
-		if (this.#room && this.#password && this.#deviceId) {
-			return;
-		}
-		return new Promise<void>((resolve) => this.#emitter.once('init', resolve));
-	}
+	};
 
 	async #getWebSocket() {
-		await this.#waitForRoom();
+		const websocket = await sync.getWebSocket();
 
-		if (!this.#websocket) {
-			this.#websocket = createWebSocket(this.#room!, this.#password!, this.#deviceId!);
-			this.#websocket.on('message', async (data) => {
-				const p2pMessage = JSON.parse(data as string) as P2pMessage;
-				const fromDeviceId = p2pMessage.from;
-				if (fromDeviceId !== 'self' && !this.#deviceIds.has(fromDeviceId)) {
-					return;
-				}
-				switch (p2pMessage.type) {
-					case 'message': {
-						const p2pPayload = p2pMessage.payload as RoomMessage;
-						switch (p2pPayload.type) {
-							case 'signal': {
-								const peer = this.#remotePeers.get(fromDeviceId);
-								if (peer) {
-									peer.signal(p2pPayload.payload as SignalMessage);
-								}
-								break;
-							}
-							case 'peer': {
-								let peer = this.#remotePeers.get(fromDeviceId);
-								if (peer) {
-									if (!peer.isInitiator()) {
-										await peer.init();
-										peer.once('connect', () => {
-											peer!.send(
-												toArrayBuffer(
-													encode({
-														type: 'arrive',
-														senderId: this.peerId!,
-														peerId: this.peerId!,
-														peerMetadata: this.peerMetadata!
-													})
-												)
-											);
-										});
-									}
-								} else {
-									peer = await this.#createPeer(fromDeviceId);
-								}
-								await peer.ready();
-								break;
-							}
+		if (websocket !== this.#websocket) {
+			if (this.#websocket) {
+				this.#websocket.off('message', this.#onWebSocketMessage);
+			}
+			websocket.on('message', this.#onWebSocketMessage);
+			this.#websocket = websocket;
+		}
+		return websocket;
+	}
+
+	#onWebSocketMessage = async (
+		data: string | ArrayBufferLike | Blob | ArrayBufferView<ArrayBufferLike>
+	) => {
+		const p2pMessage = JSON.parse(data as string) as P2pMessage;
+		const fromDeviceId = p2pMessage.from;
+		switch (p2pMessage.type) {
+			case 'message': {
+				const p2pPayload = p2pMessage.payload as RoomMessage;
+				switch (p2pPayload.type) {
+					case 'signal': {
+						const peer = this.#remotePeers.get(fromDeviceId);
+
+						if (peer) {
+							peer.signal(p2pPayload.payload as SignalMessage);
 						}
+						break;
+					}
+					case 'peer': {
+						const peer =
+							this.#remotePeers.get(fromDeviceId) ?? (await this.#createPeer(fromDeviceId));
+
+						if (!peer.isInitiator()) {
+							await peer.init();
+							peer.once('connect', () => {
+								console.assert(this.peerId, 'peerId is not set');
+								peer.send(
+									toArrayBuffer(
+										encode({
+											type: 'arrive',
+											senderId: this.peerId!,
+											peerId: this.peerId!,
+											peerMetadata: this.peerMetadata!
+										} as ArriveSyncMessage)
+									)
+								);
+							});
+						}
+						await peer.ready();
+						break;
 					}
 				}
-			});
+			}
 		}
-		return this.#websocket;
-	}
+	};
 }

@@ -5,22 +5,28 @@ import { getDeviceId, getDeviceName } from './fingerprintjs.svelte';
 import { getWebRTCClientAdapter } from '$lib/sync';
 import { debounce } from '@aicacia/debounce';
 import { localStorageState } from '$lib/localStorageState.svelte';
-import { browser } from '$app/environment';
+import { createWebSocket } from '$lib/sync/websocket';
+import { PUBLIC_URL } from '$env/static/public';
 
 export interface SyncState {
 	room: string;
 	password: string;
 }
 
-const syncRoomPasswordState = localStorageState<SyncState>(
-	'user-sync',
-	{
-		room: v7(),
-		password: v7(),
-	}
+const syncRoomPasswordState = localStorageState<SyncState>('user-sync', {
+	room: v7(),
+	password: v7()
+});
+
+const syncWebSocket = $derived.by(async () =>
+	createWebSocket(
+		syncRoomPasswordState.value.room,
+		syncRoomPasswordState.value.password,
+		await getDeviceId()
+	)
 );
 
-export const syncRoomPassword = {
+export const sync = {
 	get room() {
 		return syncRoomPasswordState.value.room;
 	},
@@ -32,6 +38,16 @@ export const syncRoomPassword = {
 			room,
 			password
 		};
+	},
+	syncUrl(room: string, password: string) {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const url = new URL(`${PUBLIC_URL}/sync`);
+		url.searchParams.set('room', room);
+		url.searchParams.set('password', password);
+		return url.toString();
+	},
+	getWebSocket() {
+		return syncWebSocket;
 	}
 };
 
@@ -109,14 +125,4 @@ export function removeSyncDevice(docHandle: AutomergeDocHandle<Sync>, deviceId: 
 		delete doc.devices[deviceId];
 		return doc;
 	});
-}
-
-if (browser) {
-	getDeviceId().then(deviceId => {
-		$effect.root(() => {
-			$effect(() => {
-				getWebRTCClientAdapter().init(deviceId, syncRoomPasswordState.value.room, syncRoomPasswordState.value.password)
-			});
-		});
-	})
 }

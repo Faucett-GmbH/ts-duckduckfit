@@ -14,7 +14,7 @@ if (browser) {
 		.on('peer-candidate', async (payload: PeerCandidatePayload) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const deviceId = (payload as any).deviceId as string;
-			if (deviceId === 'self' || deviceId === (await getDeviceId())) {
+			if (deviceId === (await getDeviceId())) {
 				return;
 			}
 			const sync = await userDocument.current?.sync();
@@ -29,7 +29,7 @@ if (browser) {
 		.on('peer-disconnected', async (payload: PeerDisconnectedPayload) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const deviceId = (payload as any).deviceId as string;
-			if (deviceId === 'self' || deviceId === (await getDeviceId())) {
+			if (deviceId === (await getDeviceId())) {
 				return;
 			}
 			const sync = await userDocument.current?.sync();

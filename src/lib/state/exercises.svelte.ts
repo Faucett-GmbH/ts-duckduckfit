@@ -69,6 +69,7 @@ export async function getExercises(
 	);
 	if (search) {
 		exercisesAndIds = exercisesAndIds
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			.filter(([_id, exercise]) => exercise.translations.some((t) => fuzzyEquals(search, t.name)))
 			.slice(startOffset, endOffset);
 	}
@@ -81,7 +82,7 @@ export async function getExerciseByGuid(exerciseGuid: string): Promise<Exercise 
 	if (!exerciseId) {
 		return null;
 	}
-	const exerciseDocHandle = await findDocument(exerciseId);
+	const exerciseDocHandle = await findDocument(exerciseId, getRepo());
 	if (!exerciseDocHandle) {
 		return null;
 	}
@@ -93,7 +94,7 @@ export async function deleteExercise(exerciseGuid: AutomergeDocumentId<Exercise>
 	exercises.change((wts) => {
 		delete wts.exerciseByGuid[exerciseGuid];
 	});
-	deleteDocument(exerciseGuid);
+	await deleteDocument(exerciseGuid, getRepo());
 }
 
 export async function upsertExercise(
@@ -103,14 +104,14 @@ export async function upsertExercise(
 	const exercises = await userDocument.current!.exercises();
 	let exerciseDocument: AutomergeDocHandle<Exercise>;
 	if (!exerciseDocumentId) {
-		exerciseDocument = createDocument<Exercise>(exercise);
+		exerciseDocument = createDocument<Exercise>(exercise, getRepo());
 		exerciseDocumentId = exerciseDocument.documentId as AutomergeDocumentId<Exercise>;
 		const documentId = exerciseDocumentId;
 		exercises.change((wts) => {
 			wts.exerciseByGuid[exercise.guid] = documentId;
 		});
 	} else {
-		exerciseDocument = await findDocument(exerciseDocumentId);
+		exerciseDocument = await findDocument(exerciseDocumentId, getRepo());
 		exerciseDocument.change((e) => {
 			getAndApplyChanges(e, exercise, getId as GetKeyFn);
 		});

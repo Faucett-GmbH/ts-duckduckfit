@@ -5,7 +5,6 @@ export type P2pMessage =
 	| {
 			type: 'self';
 			from: string;
-			payload: unknown;
 	  }
 	| {
 			type: 'join';

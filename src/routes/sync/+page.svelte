@@ -25,12 +25,12 @@
 	import type { AddSyncMessage } from '../(initted)/settings/sync/_AddSyncDevice.svelte';
 	import { setUserDocumentId } from '$lib/state/userDocument.svelte';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { createWebSocket, type P2pMessage } from '$lib/sync/websocket';
 	import { getWebRTCClientAdapter } from '$lib/sync';
 	import { createNotification } from '$lib/state/notifications.svelte';
 	import { waitMS } from '$lib/util';
+	import { resolve } from '$app/paths';
 
 	let room = $state('');
 	let roomPassword = $state('');
@@ -63,16 +63,10 @@
 								break;
 							}
 							case 'added': {
-								const webRTCClientAdapter = getWebRTCClientAdapter();
-								await webRTCClientAdapter.init(
-									deviceId,
-									message.payload.room,
-									message.payload.password
-								);
-								await webRTCClientAdapter.setDeviceIds([message.payload.deviceId]);
+								await getWebRTCClientAdapter().setDeviceIds([deviceId, message.payload.deviceId]);
 
 								await setUserDocumentId(message.payload.userDocumentId);
-								await goto(`${base}/settings/profile`);
+								await goto(resolve(`/settings/profile`));
 								break;
 							}
 						}
