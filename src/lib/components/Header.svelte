@@ -48,36 +48,25 @@
 				{/snippet}
 
 				<a
-					href={`${base}/workouts`}
+					href={`${base}/training-sessions`}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(initted)/workouts'
+						'bg-black/10': page.route.id === '/(initted)/training-sessions'
 					}}
 					onclick={onGoto}
 				>
-					<Dumbbell /><span class="ms-4">{m.workouts_title()}</span>
+					<Dumbbell /><span class="ms-4">{m.training_sessions_title()}</span>
 				</a>
 
 				<a
-					href={`${base}/workout-templates`}
+					href={`${base}/training-session-templates`}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(initted)/workout-templates'
+						'bg-black/10': page.route.id === '/(initted)/training-session-templates'
 					}}
 					onclick={onGoto}
 				>
-					<Repeat /><span class="ms-4">{m.workout_templates_title()}</span>
-				</a>
-
-				<a
-					href={`${base}/weight-tracker`}
-					class={{
-						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id?.startsWith('/(initted)/weight-tracker')
-					}}
-					onclick={onGoto}
-				>
-					<Weight /><span class="ms-4">{m.weight_tracker_title()}</span>
+					<Repeat /><span class="ms-4">{m.training_session_templates_title()}</span>
 				</a>
 
 				<a

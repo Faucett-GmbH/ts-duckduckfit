@@ -1,7 +1,7 @@
 <script lang="ts" module>
-	export interface WorkoutTemplateProps {
-		workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>;
-		workoutTemplate: WorkoutTemplate;
+	export interface TrainingSessionTemplateProps {
+		trainingSessionTemplateId: AutomergeDocumentId<TrainingSessionTemplate>;
+		trainingSessionTemplate: TrainingSessionTemplate;
 		exerciseByGuid: { [exerciseGuid: string]: Exercise };
 		editReferrer?: string;
 		onDelete?(): Promise<void>;
@@ -17,7 +17,10 @@
 	import SetAmounts from './SetAmounts.svelte';
 	import SetTypeComponent from './SetType.svelte';
 	import { getRealSetPosition } from './util';
-	import { deleteWorkoutTemplate, type WorkoutTemplate } from '$lib/state/workoutTemplates.svelte';
+	import {
+		deleteTrainingSessionTemplate,
+		type TrainingSessionTemplate
+	} from '$lib/state/trainingSessionTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import type { Exercise } from '$lib/state/exerciseTypes';
@@ -33,7 +36,7 @@
 
 	async function onDeleteInternal() {
 		try {
-			await deleteWorkoutTemplate(workoutTemplateId);
+			await deleteTrainingSessionTemplate(workoutTemplateId);
 			deleteOpen = false;
 			if (onDelete) {
 				await onDelete();

@@ -1,9 +1,9 @@
 <script lang="ts" module>
-	export interface AttemptedSetGroupProps {
-		setGroup: SetGroupParams;
-		setGroupIndex: number;
+	export interface LoggedSetSeriesProps {
+		setSeries: SetSeriesParams;
+		setSeriesIndex: number;
 		activeSetIndex: number;
-		activeSetGroupIndex: number;
+		activeSetSeriesIndex: number;
 		activeSetDuration: number;
 		exerciseByGuid: { [guid: string]: Exercise };
 		open?: boolean;
@@ -13,21 +13,21 @@
 		onDragEnd: EventHandler<DragEvent>;
 		onDragLeave: EventHandler<DragEvent>;
 		onDragOver: EventHandler<DragEvent>;
-		deleteSetGroup: (groupIndex: number) => Promise<void>;
-		createSets: (groupIndex: number, newSets: SetParams[]) => Promise<void>;
-		moveSets: (groupIndex: number, fromIndex: number, toIndex: number) => Promise<void>;
-		createOnSelectSet: (setGroupIndex: number, setIndex: number) => () => void;
+		deleteSetSeries: (seriesIndex: number) => Promise<void>;
+		createSets: (seriesIndex: number, newSets: SetParams[]) => Promise<void>;
+		moveSets: (seriesIndex: number, fromIndex: number, toIndex: number) => Promise<void>;
+		createOnSelectSet: (setSeriesIndex: number, setIndex: number) => () => void;
 		createUpdate: (
-			setGroupIndex: number,
+			setSeriesIndex: number,
 			setIndex: number
-		) => (updateFn: (set: AttemptedSet) => AttemptedSet, debounce?: boolean) => void;
-		createCopySet: (setGroupIndex: number, setIndex: number) => () => Promise<void>;
-		createDeleteSet: (setGroupIndex: number, setIndex: number) => () => Promise<void>;
+		) => (updateFn: (set: LoggedSet) => LoggedSet, debounce?: boolean) => void;
+		createCopySet: (setSeriesIndex: number, setIndex: number) => () => Promise<void>;
+		createDeleteSet: (setSeriesIndex: number, setIndex: number) => () => Promise<void>;
 	}
 </script>
 
 <script lang="ts">
-	import AttemptedSetComponent from '$lib/components/workout/AttemptedSet.svelte';
+	import LoggedSetComponent from '$lib/components/training_session/LoggedSet.svelte';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
@@ -42,18 +42,18 @@
 	import type { SetParams } from './edit/EditSet.svelte';
 	import { handleError } from '$lib/error';
 	import SetTypeComponent from './SetType.svelte';
-	import type { SetGroupParams } from './edit/EditSetGroup.svelte';
-	import type { AttemptedSet } from '$lib/state/workouts.svelte';
+	import type { SetSeriesParams } from './edit/EditSetSeries.svelte';
+	import type { LoggedSet } from '$lib/state/trainingSessions.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
-	import type { SetTemplate } from '$lib/state/workoutTemplates.svelte';
+	import type { SetTemplate } from '$lib/state/trainingSessionTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { EventHandler } from 'svelte/elements';
 
 	let {
-		setGroup,
-		setGroupIndex,
+		setSeries,
+		setSeriesIndex,
 		activeSetIndex,
-		activeSetGroupIndex,
+		activeSetSeriesIndex,
 		activeSetDuration = $bindable(),
 		open = $bindable(false),
 		exerciseByGuid = $bindable(),
@@ -63,17 +63,17 @@
 		onDragEnd,
 		onDragLeave,
 		onDragOver,
-		deleteSetGroup,
+		deleteSetSeries,
 		createSets,
 		moveSets,
 		createOnSelectSet,
 		createUpdate,
 		createCopySet,
 		createDeleteSet
-	}: AttemptedSetGroupProps = $props();
+	}: LoggedSetSeriesProps = $props();
 
 	let draggable = $state(false);
-	let exercises = $derived(getUniqueExercises(setGroup.sets, exerciseByGuid));
+	let exercises = $derived(getUniqueExercises(setSeries.sets, exerciseByGuid));
 
 	function onDraggable() {
 		draggable = true;
@@ -91,7 +91,7 @@
 	}
 
 	$effect(() => {
-		if (setGroupIndex === activeSetGroupIndex) {
+		if (setSeriesIndex === activeSetSeriesIndex) {
 			open = true;
 		}
 	});
@@ -105,10 +105,10 @@
 	}
 	function onDelete() {
 		open = false;
-		return deleteSetGroup(setGroupIndex);
+		return deleteSetSeries(setSeriesIndex);
 	}
 
-	let isActiveSetGroup = $derived(activeSetGroupIndex === setGroupIndex);
+	let isActiveSetGroup = $derived(activeSetSeriesIndex === setSeriesIndex);
 
 	let addSetsOpen = $state(false);
 	let addSetsValid = $state(false);
@@ -119,7 +119,7 @@
 		setTemplates = exercises.map(
 			(exercise) =>
 				({
-					...(setGroup.sets.findLast((s) => s.exerciseGuid === exercise.guid) || {}),
+					...(setSeries.sets.findLast((s) => s.exerciseGuid === exercise.guid) || {}),
 					id: unsafeId(),
 					notes: [],
 					status: null,
@@ -140,7 +140,7 @@
 		try {
 			addingSets = true;
 			await createSets(
-				setGroupIndex,
+				setSeriesIndex,
 				setTemplates.map(
 					(setTemplate) =>
 						({
@@ -198,11 +198,11 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={setGroupIndex + 1} />
+				<SetTypeComponent setType={'working_set'} position={setSeriesIndex + 1} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">
-			<h6 class="mb-0">{setGroup.setGroupType}</h6>
+			<h6 class="mb-0">{setSeries.setSeriesType}</h6>
 			<div class="flex-flex flex">
 				{#if exercises.length === 1}
 					{@const exercise = exercises[0]}
@@ -220,7 +220,7 @@
 		</div>
 	</div>
 	<div class="flex flex-col" role="list" class:hidden={!open}>
-		<Sortable id={`sets-${setGroup.id}`} items={setGroup.sets} getKey={getId} onMove={onMoveSets}>
+		<Sortable id={`sets-${setSeries.id}`} items={setSeries.sets} getKey={getId} onMove={onMoveSets}>
 			{#snippet children({
 				isDragging,
 				isDraggingOver,
@@ -231,9 +231,9 @@
 				onDragLeave,
 				onDragOver
 			})}
-				<AttemptedSetComponent
+				<LoggedSetComponent
 					bind:exerciseByGuid
-					{setGroup}
+					{setSeries}
 					set={item}
 					{index}
 					{activeSetDuration}
@@ -244,10 +244,10 @@
 					{onDragLeave}
 					{onDragOver}
 					active={isActiveSetGroup && activeSetIndex === index}
-					onSetActive={createOnSelectSet(setGroupIndex, index)}
-					update={createUpdate(setGroupIndex, index)}
-					copySet={createCopySet(setGroupIndex, index)}
-					deleteSet={createDeleteSet(setGroupIndex, index)}
+					onSetActive={createOnSelectSet(setSeriesIndex, index)}
+					update={createUpdate(setSeriesIndex, index)}
+					copySet={createCopySet(setSeriesIndex, index)}
+					deleteSet={createDeleteSet(setSeriesIndex, index)}
 				/>
 			{/snippet}
 		</Sortable>
@@ -255,14 +255,14 @@
 	<div class="mt-2 flex flex-row justify-center" class:hidden={!open}>
 		<button class="btn success flex flex-row" onclick={onOpenAddSet}>
 			<Plus />
-			{m.workouts_set_add_title()}
+			{m.training_sessions_set_add_title()}
 		</button>
 	</div>
 </div>
 
 <Modal bind:open={addSetsOpen}>
 	{#snippet title()}
-		<h5>{m.workouts_set_add_title()}</h5>
+		<h5>{m.training_sessions_set_add_title()}</h5>
 	{/snippet}
 	<NewSet {exercises} bind:valid={addSetsValid} bind:setTemplates oninput={onAddSetsInput} />
 	<div class="flex flex-row justify-end">
@@ -272,19 +272,19 @@
 			onclick={onAddSets}
 		>
 			{#if addingSets}<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>{/if}
-			{m.workouts_set_add_submit()}
+			{m.training_sessions_set_add_submit()}
 		</button>
 	</div>
 </Modal>
 
 <Modal bind:open={openDelete}>
 	{#snippet title()}
-		<h5>{m.workouts_set_group_delete_title()}</h5>
+		<h5>{m.training_sessions_set_group_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_group_delete_body()}</p>
+	<p>{m.training_sessions_set_group_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDelete}>
-			{m.workouts_set_group_delete_submit()}
+			{m.training_sessions_set_group_delete_submit()}
 		</button>
 	</div>
 </Modal>

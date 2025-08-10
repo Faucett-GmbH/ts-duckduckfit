@@ -1,21 +1,21 @@
 <script lang="ts" module>
 	import { create, test, enforce, only } from 'vest';
 
-	export type WorkoutTemplateProps = {
-		workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>;
-		workoutTemplate?: WorkoutTemplate;
+	export type TrainingSessionTemplateProps = {
+		trainingSessionTemplateId?: AutomergeDocumentId<TrainingSessionTemplate>;
+		trainingSessionTemplate?: TrainingSessionTemplate;
 		exerciseByGuid?: { [guid: string]: Exercise };
 	};
 
 	const createSuite = () =>
-		create((data: WorkoutTemplate, fields: string[]) => {
+		create((data: TrainingSessionTemplate, fields: string[]) => {
 			only(fields);
 
 			test('translations', m.errors_message_required(), () => {
-				enforce(data.translations[0].name).isNotBlank();
+				enforce(data.translations[0].title).isNotBlank();
 			});
-			test('setGroupTemplates', m.errors_message_required(), () => {
-				enforce(data.setGroupTemplates?.length).greaterThan(0);
+			test('setSeriesTemplates', m.errors_message_required(), () => {
+				enforce(data.setSeriesTemplates?.length).greaterThan(0);
 			});
 		});
 </script>
@@ -36,30 +36,30 @@
 	import { m } from '$lib/paraglide/messages';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import {
-		upsertWorkoutTemplate,
-		type SetGroupTemplate,
-		type WorkoutTemplate,
-		type WorkoutTemplateTranslation
-	} from '$lib/state/workoutTemplates.svelte';
+		upsertTrainingSessionTemplate,
+		type SetSeriesTemplate,
+		type TrainingSessionTemplate,
+		type TrainingSessionTemplateTranslation
+	} from '$lib/state/trainingSessionTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { getLocale } from '$lib/state/settings.svelte';
 
 	let {
-		workoutTemplateId,
-		workoutTemplate = $bindable({
+		trainingSessionTemplateId,
+		trainingSessionTemplate = $bindable({
 			translations: [
 				{
 					locale: getLocale(),
-					name: '',
+					title: '',
 					description: null
 				}
 			],
-			setGroupTemplates: [],
+			setSeriesTemplates: [],
 			updatedAt: new Date(),
 			createdAt: new Date()
 		}),
 		exerciseByGuid = $bindable({})
-	}: WorkoutTemplateProps = $props();
+	}: TrainingSessionTemplateProps = $props();
 	let setGroupTemplatesValid: Array<boolean | undefined> = [];
 
 	let valid: boolean | undefined = $state();
@@ -81,7 +81,7 @@
 	const validate = debounce(
 		() =>
 			new Promise<boolean>((resolve) => {
-				suite(workoutTemplate, Array.from(fields)).done((r) => {
+				suite(trainingSessionTemplate, Array.from(fields)).done((r) => {
 					result = r;
 					const newValid = result.isValid() && isSetGroupTemplatesValid();
 					if (valid !== newValid) {
@@ -94,8 +94,8 @@
 		300
 	);
 	function validateAll() {
-		for (const field of Object.keys(workoutTemplate)) {
-			fields.add(field as keyof WorkoutTemplate);
+		for (const field of Object.keys(trainingSessionTemplate)) {
+			fields.add(field as keyof TrainingSessionTemplate);
 		}
 		validate();
 		return validate.flush();
@@ -103,40 +103,40 @@
 	function onTranslationChange(
 		e: Event & { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }
 	) {
-		const field = e.currentTarget.name as keyof WorkoutTemplateTranslation;
-		workoutTemplate.translations[0][field] = e.currentTarget.value as never;
+		const field = e.currentTarget.name as keyof TrainingSessionTemplateTranslation;
+		trainingSessionTemplate.translations[0][field] = e.currentTarget.value as never;
 		fields.add(field);
 		validate();
 	}
-	function createOnSetGroupTemplateChange(index: number) {
-		return (params: SetGroupTemplate) => {
-			const setGroupTemplates = workoutTemplate.setGroupTemplates.slice();
-			setGroupTemplates[index] = params;
-			workoutTemplate = {
-				...workoutTemplate,
-				setGroupTemplates
+	function createOnSetSeriesTemplateChange(index: number) {
+		return (params: SetSeriesTemplate) => {
+			const setSeriesTemplates = trainingSessionTemplate.setSeriesTemplates.slice();
+			setSeriesTemplates[index] = params;
+			trainingSessionTemplate = {
+				...trainingSessionTemplate,
+				setSeriesTemplates
 			};
-			fields.add('setGroupTemplates');
+			fields.add('setSeriesTemplates');
 			validate();
 		};
 	}
-	function createOnSetGroupTemplateDelete(index: number) {
-		return (_params: SetGroupTemplate) => {
-			const setGroupTemplates = workoutTemplate.setGroupTemplates.slice();
-			setGroupTemplates.splice(index, 1);
-			workoutTemplate = {
-				...workoutTemplate,
-				setGroupTemplates
+	function createOnSetSeriesTemplateDelete(index: number) {
+		return (_params: SetSeriesTemplate) => {
+			const setSeriesTemplates = trainingSessionTemplate.setSeriesTemplates.slice();
+			setSeriesTemplates.splice(index, 1);
+			trainingSessionTemplate = {
+				...trainingSessionTemplate,
+				setSeriesTemplates
 			};
-			fields.add('setGroupTemplates');
+			fields.add('setSeriesTemplates');
 			validate();
 		};
 	}
-	function createOnSetGroupTemplateValid(index: number) {
+	function createOnSetSeriesTemplateValid(index: number) {
 		return (setGroupTemplateValid: boolean) => {
 			const newSetGroupTemplatesValid = setGroupTemplatesValid.slice(
 				0,
-				workoutTemplate.setGroupTemplates.length
+				trainingSessionTemplate.setSeriesTemplates.length
 			);
 			newSetGroupTemplatesValid[index] = setGroupTemplateValid;
 			setGroupTemplatesValid = newSetGroupTemplatesValid;
@@ -151,22 +151,24 @@
 		try {
 			loading = true;
 			if (await validateAll()) {
-				await upsertWorkoutTemplate(
+				await upsertTrainingSessionTemplate(
 					{
-						...workoutTemplate,
-						setGroupTemplates: workoutTemplate.setGroupTemplates.map((setGroupTemplate) => ({
-							...setGroupTemplate,
-							setTemplates: setGroupTemplate.setTemplates.map((setTemplate) => {
-								const newSetTemplate = { ...setTemplate };
-								// @ts-expect-error
-								delete newSetTemplate.exercise;
-								return newSetTemplate;
+						...trainingSessionTemplate,
+						setSeriesTemplates: trainingSessionTemplate.setSeriesTemplates.map(
+							(setSeriesTemplate) => ({
+								...setSeriesTemplate,
+								setTemplates: setSeriesTemplate.setTemplates.map((setTemplate) => {
+									const newSetTemplate = { ...setTemplate };
+									// @ts-expect-error
+									delete newSetTemplate.exercise;
+									return newSetTemplate;
+								})
 							})
-						}))
+						)
 					},
-					workoutTemplateId
+					trainingSessionTemplateId
 				);
-				await goto(`${base}/workout-templates`);
+				await goto(`${base}/training-session-templates`);
 			}
 		} catch (error) {
 			await handleError(error);
@@ -174,50 +176,53 @@
 			loading = false;
 		}
 	}
-	function isSetGroupTemplatesValid() {
+	function isSetSeriesTemplatesValid() {
 		return setGroupTemplatesValid.every((valid) => valid === true);
 	}
 
-	function onAddSetGroup(e: Event) {
+	function onAddSetSeries(e: Event) {
 		e.stopPropagation();
-		workoutTemplate = {
-			...workoutTemplate,
-			setGroupTemplates: [
-				...workoutTemplate.setGroupTemplates,
+		trainingSessionTemplate = {
+			...trainingSessionTemplate,
+			setSeriesTemplates: [
+				...trainingSessionTemplate.setSeriesTemplates,
 				{
 					id: unsafeId(),
-					setGroupType: 'straight',
+					setSeriesType: 'standard',
 					setTemplates: []
 				}
 			]
 		};
-		fields.add('setGroupTemplates');
+		fields.add('setSeriesTemplates');
 		validate();
 	}
 
-	function onMoveSetGroups(fromIndex: number, toIndex: number) {
-		const setGroupTemplate = workoutTemplate.setGroupTemplates[fromIndex];
-		const newSetGroupTemplates = workoutTemplate.setGroupTemplates.slice();
+	function onMoveSetSeries(fromIndex: number, toIndex: number) {
+		const setGroupTemplate = trainingSessionTemplate.setSeriesTemplates[fromIndex];
+		const newSetGroupTemplates = trainingSessionTemplate.setSeriesTemplates.slice();
 		newSetGroupTemplates.splice(fromIndex, 1);
 		newSetGroupTemplates.splice(toIndex, 0, setGroupTemplate);
-		workoutTemplate = { ...workoutTemplate, setGroupTemplates: newSetGroupTemplates };
+		trainingSessionTemplate = {
+			...trainingSessionTemplate,
+			setSeriesTemplates: newSetGroupTemplates
+		};
 	}
 
 	onMount(() => {
-		if (workoutTemplateId) {
+		if (trainingSessionTemplateId) {
 			validateAll();
 		}
 	});
 </script>
 
 <div class="mb-2">
-	<label for="name">{m.workouts_name_label()}</label>
+	<label for="title">{m.training_sessions_name_label()}</label>
 	<input
 		class="w-full {cn('name')}"
 		type="text"
-		name="name"
-		placeholder={m.workouts_name_placeholder()}
-		value={workoutTemplate.translations[0].name}
+		name="title"
+		placeholder={m.training_sessions_name_placeholder()}
+		value={trainingSessionTemplate.translations[0].title}
 		oninput={onTranslationChange}
 	/>
 	<InputResults name="name" {result} />
@@ -228,7 +233,7 @@
 		class="w-full {cn('description')}"
 		name="description"
 		placeholder={m.workouts_description_placeholder()}
-		value={workoutTemplate.translations[0].description || ''}
+		value={trainingSessionTemplate.translations[0].description || ''}
 		oninput={onTranslationChange}
 	></textarea>
 	<InputResults name="description" {result} />
@@ -236,7 +241,7 @@
 <div role="list">
 	<Sortable
 		id={`set-group-templates`}
-		items={workoutTemplate.setGroupTemplates}
+		items={trainingSessionTemplate.setSeriesTemplates}
 		getKey={getId}
 		onMove={onMoveSetGroups}
 	>
@@ -246,9 +251,9 @@
 				setGroupTemplate={item}
 				{index}
 				{...props}
-				oninput={createOnSetGroupTemplateChange(index)}
-				ondelete={createOnSetGroupTemplateDelete(index)}
-				onvalid={createOnSetGroupTemplateValid(index)}
+				oninput={createOnSetSeriesTemplateChange(index)}
+				ondelete={createOnSetSeriesTemplateDelete(index)}
+				onvalid={createOnSetSeriesTemplateValid(index)}
 			/>
 		{/snippet}
 	</Sortable>
@@ -265,6 +270,6 @@
 		{#if loading}<div class="mr-2 flex flex-row justify-center">
 				<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 			</div>{/if}
-		{#if workoutTemplateId}{m.workouts_edit_submit()}{:else}{m.workouts_new_submit()}{/if}
+		{#if trainingSessionTemplateId}{m.workouts_edit_submit()}{:else}{m.workouts_new_submit()}{/if}
 	</button>
 </div>

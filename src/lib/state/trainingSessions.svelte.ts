@@ -11,7 +11,7 @@ import { userDocument } from './userDocument.svelte';
 import type { SetSeriesTemplate, SetTemplate, TrainingSessionTemplate, RPERange, NoteTranslation } from './trainingSessionTemplates.svelte';
 import { getAndApplyChanges } from '$lib/diff';
 
-type SetResultType = "completed" | "failed" | "skipped";
+export type SetResultType = "completed" | "failed" | "skipped";
 
 export interface LoggedSet extends SetTemplate {
 	actualReps: number | null;
@@ -19,17 +19,17 @@ export interface LoggedSet extends SetTemplate {
 	actualRPE: RPERange | null;
 	setResultType: SetResultType | null;
 	note: string | null;
+	completedAt: Date;
 }
 
 export interface LoggedSetSeries extends Omit<SetSeriesTemplate, 'setTemplates'> {
 	setSeriesTemplateId: AutomergeDocumentId<SetSeriesTemplate> | null;
-	position: number;
 	sets: LoggedSet[];
 }
 
 export interface TrainingSessionTranslation {
 	locale: Locale;
-	name: string;
+	title: string;
 	description: string | null;
 }
 

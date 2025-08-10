@@ -9,13 +9,13 @@
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
-	import EditWorkoutTemplate from '$lib/components/workout/edit/EditWorkoutTemplate.svelte';
+	import EditTrainingSessionTemplate from '$lib/components/training_session/edit/EditTrainingSessionTemplate.svelte';
 
 	let { data }: Props = $props();
 </script>
 
 <svelte:head>
-	<title>{m.workout_templates_add_title()}</title>
+	<title>{m.training_session_templates_add_title()}</title>
 </svelte:head>
 
 <div class="container mx-auto p-4">
@@ -25,11 +25,11 @@
 				<a class="btn icon sm" href={`${base}/workout-templates`}>
 					<ArrowLeft />
 				</a>
-				<h3 class="m-0 ms-2">{m.workout_templates_add_title()}</h3>
+				<h3 class="m-0 ms-2">{m.training_session_templates_add_title()}</h3>
 			</div>
 		</div>
 		<div class="flex flex-col">
-			<EditWorkoutTemplate />
+			<EditTrainingSessionTemplate />
 		</div>
 	</div>
 </div>

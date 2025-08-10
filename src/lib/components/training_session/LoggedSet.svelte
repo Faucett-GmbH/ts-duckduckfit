@@ -1,8 +1,8 @@
 <script lang="ts" module>
-	export interface AttemptedSetProps {
+	export interface LoggedSetProps {
 		exerciseByGuid: { [guid: string]: Exercise };
-		setGroup: AttemptedSetGroup;
-		set: AttemptedSet;
+		setSeries: LoggedSetSeries;
+		set: LoggedSet;
 		index: number;
 		activeSetDuration: number;
 		isDragging?: boolean;
@@ -13,7 +13,7 @@
 		onDragOver: EventHandler<DragEvent>;
 		active?: boolean;
 		onSetActive: () => void;
-		update: (updateFn: (set: AttemptedSet) => AttemptedSet, debounce?: boolean) => void;
+		update: (updateFn: (set: LoggedSet) => LoggedSet, debounce?: boolean) => void;
 		copySet: () => Promise<void>;
 		deleteSet: () => Promise<void>;
 	}
@@ -25,11 +25,15 @@
 	import { debounce } from '@aicacia/debounce';
 	import Dropdown from '../Dropdown.svelte';
 	import SetTypeComponent from './SetType.svelte';
-	import WorkoutSetInput, { type WorkoutSetInputParams } from './WorkoutSetInput.svelte';
+	import WorkoutSetInput, { type WorkoutSetInputParams } from './TrainingSessionSetInput.svelte';
 	import Modal from '../Modal.svelte';
 	import { getRealSetPosition } from './util';
-	import type { AttemptedSet, AttemptedSetGroup, SetStatusType } from '$lib/state/workouts.svelte';
-	import type { SetType } from '$lib/state/workoutTemplates.svelte';
+	import type {
+		LoggedSet,
+		LoggedSetSeries,
+		SetResultType
+	} from '$lib/state/trainingSessions.svelte';
+	import type { SetType } from '$lib/state/trainingSessionTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { findTranslation } from '$lib/util';
@@ -38,7 +42,7 @@
 
 	let {
 		exerciseByGuid = $bindable(),
-		setGroup,
+		setSeries,
 		set,
 		index,
 		activeSetDuration = $bindable(),
@@ -53,7 +57,7 @@
 		update,
 		copySet,
 		deleteSet
-	}: AttemptedSetProps = $props();
+	}: LoggedSetProps = $props();
 
 	let draggable = $state(false);
 	let setExercise = $derived(exerciseByGuid[set.exerciseGuid]);
@@ -66,7 +70,7 @@
 		draggable = false;
 	}
 
-	let position = $derived(getRealSetPosition(setGroup.sets, set, index));
+	let position = $derived(getRealSetPosition(setSeries.sets, set, index));
 
 	let menuOpen = $state(false);
 	function onCopySet() {
@@ -95,32 +99,27 @@
 		};
 	}
 
-	let statusOpen = $state(false);
-	function createOnStatus(status: SetStatusType | null) {
+	let setResultTypeOpen = $state(false);
+	function createOnSetResultType(setResultType: SetResultType | null) {
 		return () => {
 			update((set) => {
-				const newSet = { ...set, status } as AttemptedSet;
-				if (status == null) {
-					newSet.startedAt = new Date();
+				const newSet = { ...set, setResultType } as LoggedSet;
+				if (setResultType == null) {
 					newSet.completedAt = null as never;
 					activeSetDuration = 0;
 				} else {
 					newSet.completedAt = new Date();
-					if (active) {
-						newSet.durationInSeconds = activeSetDuration;
-						newSet.attemptedTimeInSeconds = activeSetDuration;
-					}
 				}
 				return newSet;
 			});
-			statusOpen = false;
+			setResultTypeOpen = false;
 			menuOpen;
 		};
 	}
-	function onWorkoutSetInput(params: WorkoutSetInputParams) {
+	function onTrainingSessionSetInput(params: WorkoutSetInputParams) {
 		update((set) => ({ ...set, ...params }));
 	}
-	let setNoteTranslation = $derived(findTranslation(set.notes));
+	let setNoteTranslation = $derived(findTranslation(set.note));
 	let notesElement = $state<HTMLTextAreaElement>();
 	function onNoteUpdate() {
 		update((set) => {
@@ -207,8 +206,8 @@
 				{/snippet}
 				<button
 					class="btn ghost text-left text-nowrap"
-					class:active={set.setType === 'working'}
-					onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
+					class:active={set.setType === 'working_set'}
+					onclick={createOnSetType('working_set')}>{m.workouts_working_set_title()}</button
 				>
 				<button
 					class="btn ghost text-left text-nowrap"

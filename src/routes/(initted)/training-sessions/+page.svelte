@@ -9,8 +9,8 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
-	import { getWorkouts, type Workout } from '$lib/state/workouts.svelte';
-	import WorkoutComponent from '$lib/components/workout/Workout.svelte';
+	import { getTrainingSessions, type TrainingSession } from '$lib/state/trainingSessions.svelte';
+	import TrainingSessionComponent from '$lib/components/training_session/TrainingSession.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { getExerciseByGuid } from '$lib/state/exercises.svelte';
@@ -18,14 +18,18 @@
 
 	let offset = $state(0);
 	let limit = $state(10);
-	let workouts = $state<[key: AutomergeDocumentId<Workout>, value: Workout][]>([]);
+	let trainingSessions = $state<
+		[key: AutomergeDocumentId<TrainingSession>, value: TrainingSession][]
+	>([]);
 	let exerciseByGuid = $state<{ [exerciseGuid: string]: Exercise }>({});
 
 	$effect(() => {
-		getWorkouts(offset, limit).then(async (newWorkouts) => {
-			workouts.push(...newWorkouts);
-			const exercisGuids = newWorkouts.flatMap(([_, workout]) =>
-				workout.setGroups.flatMap((setGroup) => setGroup.sets.map((set) => set.exerciseGuid))
+		getTrainingSessions(offset, limit).then(async (newTrainingSessions) => {
+			trainingSessions.push(...newTrainingSessions);
+			const exercisGuids = trainingSessions.flatMap(([_, trainingSession]) =>
+				trainingSession.setSeries.flatMap((setSeries) =>
+					setSeries.sets.map((set) => set.exerciseGuid)
+				)
 			);
 			const uniqueExercisGuids = [...new Set(exercisGuids)];
 			for (const exercise of await Promise.all(
@@ -38,11 +42,14 @@
 		});
 	});
 
-	function createOnDelete(workoutId: AutomergeDocumentId<Workout>, workout: Workout) {
+	function createOnDelete(
+		trainingSessionId: AutomergeDocumentId<TrainingSession>,
+		trainingSession: TrainingSession
+	) {
 		return async () => {
-			const index = workouts.findIndex(([id]) => id === workoutId);
+			const index = trainingSessions.findIndex(([id]) => id === trainingSessionId);
 			if (index !== -1) {
-				workouts.splice(index, 1);
+				trainingSessions.splice(index, 1);
 			}
 		};
 	}
@@ -65,15 +72,15 @@
 			</div>
 			<hr />
 			<div class="flex flex-col">
-				{#each workouts as [workoutId, workout] (workoutId)}
+				{#each trainingSessions as [trainingSessionId, trainingSession] (trainingSessionId)}
 					<div class="mb-4 flex flex-grow flex-col">
 						<div class="flex flex-shrink flex-col">
-							<WorkoutComponent {workoutId} {workout} bind:exerciseByGuid />
-							{#if workout.completedAt === null}
+							<TrainingSessionComponent {trainingSessionId} {trainingSession} bind:exerciseByGuid />
+							{#if trainingSession.finishedAt === null}
 								<div class="mt-2 flex flex-row justify-center">
 									<a
 										class="btn primary flex flex-row justify-center max-sm:w-full"
-										href={`${base}/workouts/${workoutId}/workout`}
+										href={`${base}/training-sessions/${trainingSessionId}/training-session`}
 									>
 										{m.workouts_workout_continue()}
 										<ChevronRight />

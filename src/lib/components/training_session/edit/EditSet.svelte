@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	export interface SetParams extends AttemptedSet {
+	export interface SetParams extends LoggedSet {
 		id: string;
 	}
 
@@ -7,7 +7,7 @@
 		set: SetParams;
 		exerciseByGuid: { [guid: string]: Exercise };
 		position: number;
-		showStatus?: boolean;
+		showSetResultType?: boolean;
 		showExercise?: boolean;
 		showDelete?: boolean;
 		canMove?: boolean;
@@ -30,10 +30,12 @@
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import SetTypeComponent from '../SetType.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import WorkoutSetInput, { type WorkoutSetInputParams } from '../WorkoutSetInput.svelte';
+	import TrainingSessionSetInput, {
+		type TrainingSessionSetInputParams
+	} from '../TrainingSessionSetInput.svelte';
 	import ExerciseSetInput, { type ExerciseSetInputParams } from '../ExerciseSetInput.svelte';
-	import type { AttemptedSet, SetStatusType } from '$lib/state/workouts.svelte';
-	import type { SetType } from '$lib/state/workoutTemplates.svelte';
+	import type { LoggedSet, SetResultType } from '$lib/state/trainingSessions.svelte';
+	import type { SetType } from '$lib/state/trainingSessionTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { m } from '$lib/paraglide/messages';
 	import { findTranslation } from '$lib/util';
@@ -87,7 +89,7 @@
 	function onExerciseSetInput(params: ExerciseSetInputParams) {
 		oninput?.({ ...set, ...params });
 	}
-	function onWorkoutSetInput(params: WorkoutSetInputParams) {
+	function onTrainingSessionSetInput(params: TrainingSessionSetInputParams) {
 		oninput?.({ ...set, ...params });
 	}
 
@@ -101,11 +103,10 @@
 	}
 
 	let statusOpen = $state(false);
-	function createOnStatus(status: SetStatusType | null) {
+	function createOnSetResultType(setResultType: SetResultType | null) {
 		return () => {
-			const newSet = { ...set, status } as SetParams;
-			if (status == null) {
-				newSet.startedAt = new Date();
+			const newSet = { ...set, setResultType } as SetParams;
+			if (setResultType == null) {
 				newSet.completedAt = null as never;
 			} else {
 				newSet.completedAt = new Date();
@@ -143,13 +144,13 @@
 			{/snippet}
 			<button
 				class="btn ghost text-left text-nowrap"
-				class:active={set.setType === 'working'}
-				onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
+				class:active={set.setType === 'working_set'}
+				onclick={createOnSetType('working_set')}>{m.training_sessions_working_set_title()}</button
 			>
 			<button
 				class="btn ghost text-left text-nowrap"
 				class:active={set.setType === 'warmup'}
-				onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
+				onclick={createOnSetType('warmup')}>{m.training_sessions_warmup_title()}</button
 			>
 			<!-- <button
 				class="btn ghost text-nowrap text-left"
@@ -165,7 +166,7 @@
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-between">
 			<div class="flex flex-grow flex-row flex-wrap items-start justify-between">
 				<div class="flex flex-shrink flex-col">
-					<p class="m-0 text-xs">{m.workouts_set_expected()}</p>
+					<p class="m-0 text-xs">{m.training_sessions_set_expected()}</p>
 					{#if exercise}
 						<ExerciseSetInput
 							setInput={set}
@@ -179,7 +180,7 @@
 					{/if}
 				</div>
 				<div class="flex flex-shrink flex-col">
-					<p class="m-0 text-xs">{m.workouts_set_actual()}</p>
+					<p class="m-0 text-xs">{m.training_sessions_actual()}</p>
 					{#if exercise}
 						<WorkoutSetInput
 							setInput={set}

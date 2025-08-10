@@ -31,7 +31,7 @@
 	import { onMount } from 'svelte';
 	import EditSetTemplate from './edit/EditSetTemplate.svelte';
 	import { m } from '$lib/paraglide/messages';
-	import type { SetTemplate } from '$lib/state/workoutTemplates.svelte';
+	import type { SetTemplate } from '$lib/state/trainingSessionTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 
 	let {
@@ -114,7 +114,7 @@
 			} else {
 				newSetTemplates[i] = {
 					id: unsafeId(),
-					setType: 'working',
+					setType: 'working_set',
 					exerciseGuid: exercise.guid
 				} as SetTemplate;
 			}

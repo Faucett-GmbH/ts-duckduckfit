@@ -1,14 +1,14 @@
 <script lang="ts" module>
 	import { create, test, enforce, only } from 'vest';
 
-	export type SetGroupParams = {
+	export type SetSeriesParams = {
 		id: string;
-		setGroupType: SetGroupType;
+		setSeriesType: SetSeriesType;
 		sets: Array<SetParams>;
 	};
 
-	export interface EditSetGroupProps {
-		setGroup: SetGroupParams;
+	export interface EditSetSeriesProps {
+		setSeries: SetSeriesParams;
 		exerciseByGuid: { [guid: string]: Exercise };
 		index: number;
 		valid?: boolean | undefined;
@@ -19,20 +19,20 @@
 		onDragLeave(e: DragEvent): void;
 		onDragOver(e: DragEvent): void;
 		open?: boolean;
-		oninput?(params: SetGroupParams): void;
-		ondelete?(params: SetGroupParams): void;
+		oninput?(params: SetSeriesParams): void;
+		ondelete?(params: SetSeriesParams): void;
 		onvalid?(valid: boolean): void;
 	}
 
 	const createSuite = () =>
-		create((data: Partial<SetGroupParams> = {}, fields: Set<string>) => {
+		create((data: Partial<SetSeriesParams> = {}, fields: Set<string>) => {
 			if (!fields.size) {
 				return;
 			}
 			only(Array.from(fields));
 
-			test('setGroupType', m.errors_message_required(), () => {
-				enforce(data.setGroupType).isNotBlank();
+			test('setSeriesType', m.errors_message_required(), () => {
+				enforce(data.setSeriesType).isNotBlank();
 			});
 			test('sets', m.errors_message_required(), () => {
 				enforce(data.sets?.length).greaterThan(0);
@@ -54,16 +54,16 @@
 	import Grip from 'lucide-svelte/icons/grip';
 	import { getId, unsafeId } from '$lib/util';
 	import Dropdown from '$lib/components/Dropdown.svelte';
-	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
+	import SetTypeComponent from '$lib/components/training_session/SetType.svelte';
 	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import { createExercisesByGuid, getRealSetPosition, getUniqueExercises } from '../util';
-	import type { SetGroupType, SetType } from '$lib/state/workoutTemplates.svelte';
+	import type { SetSeriesType, SetType } from '$lib/state/trainingSessionTemplates.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 
 	let {
-		setGroup = $bindable(),
+		setSeries = $bindable(),
 		exerciseByGuid = $bindable(),
 		index,
 		valid = $bindable(undefined),
@@ -77,7 +77,7 @@
 		oninput,
 		ondelete,
 		onvalid
-	}: EditSetGroupProps = $props();
+	}: EditSetSeriesProps = $props();
 
 	let draggable = $state(false);
 
@@ -94,7 +94,7 @@
 
 	async function onDeleteInternal() {
 		openDelete = false;
-		ondelete?.(setGroup);
+		ondelete?.(setSeries);
 	}
 	let openDelete = $state(false);
 	function onOpenDelete() {
@@ -103,19 +103,19 @@
 
 	let setsValid: (boolean | undefined)[] = [];
 
-	let exercises = $state(getUniqueExercises(setGroup.sets, exerciseByGuid));
-	function setSetGroupType(setGroupType: SetGroupType) {
-		if (setGroup.setGroupType !== setGroupType) {
-			setGroup = { ...setGroup, setGroupType };
-			oninput?.(setGroup);
-			fields.add('setGroupType');
+	let exercises = $state(getUniqueExercises(setSeries.sets, exerciseByGuid));
+	function setSetSeriesType(setSeriesType: SetSeriesType) {
+		if (setSeries.setSeriesType !== setSeriesType) {
+			setSeries = { ...setSeries, setSeriesType };
+			oninput?.(setSeries);
+			fields.add('setSeriesType');
 			validate();
 		}
 	}
 
-	const fields = new Set<keyof SetGroupParams>();
+	const fields = new Set<keyof SetSeriesParams>();
 	const validate = debounce(() => {
-		suite(setGroup, fields).done((r) => {
+		suite(setSeries, fields).done((r) => {
 			result = r;
 			const newValid = result.isValid() && isSetsValid();
 			if (newValid !== valid) {
@@ -127,8 +127,8 @@
 	}, 300);
 
 	function validateAll() {
-		for (const field of Object.keys(setGroup)) {
-			fields.add(field as keyof SetGroupParams);
+		for (const field of Object.keys(setSeries)) {
+			fields.add(field as keyof SetSeriesParams);
 		}
 		validate();
 		validate.flush();
@@ -138,11 +138,11 @@
 	let shouldAddSets = $state(false);
 	function onExercisesChange(newExercises: Exercise[]) {
 		const newExerciseByGuid = createExercisesByGuid(newExercises);
-		setGroup = {
-			...setGroup,
-			sets: setGroup.sets.filter((set) => !!newExerciseByGuid[set.exerciseGuid])
+		setSeries = {
+			...setSeries,
+			sets: setSeries.sets.filter((set) => !!newExerciseByGuid[set.exerciseGuid])
 		};
-		oninput?.(setGroup);
+		oninput?.(setSeries);
 		exercises = newExercises;
 		exerciseByGuid = Object.assign(exerciseByGuid, newExerciseByGuid);
 		fields.add('sets');
@@ -150,33 +150,33 @@
 	}
 	function createOnSetChange(index: number) {
 		return (newSet: SetParams) => {
-			const sets = setGroup.sets.slice();
+			const sets = setSeries.sets.slice();
 			sets[index] = newSet;
-			setGroup = {
-				...setGroup,
+			setSeries = {
+				...setSeries,
 				sets
 			};
-			oninput?.(setGroup);
+			oninput?.(setSeries);
 			fields.add('sets');
 			validate();
 		};
 	}
 	function createOnSetDelete(index: number) {
 		return (_deletedSet: SetParams) => {
-			const sets = setGroup.sets.slice();
+			const sets = setSeries.sets.slice();
 			sets.splice(index, 1);
-			setGroup = {
-				...setGroup,
+			setSeries = {
+				...setSeries,
 				sets
 			};
-			oninput?.(setGroup);
+			oninput?.(setSeries);
 			fields.add('sets');
 			validate();
 		};
 	}
 	function createOnSetValid(index: number) {
 		return (setValid: boolean) => {
-			const newSetsValid = setsValid.slice(0, setGroup.sets.length);
+			const newSetsValid = setsValid.slice(0, setSeries.sets.length);
 			newSetsValid[index] = setValid;
 			setsValid = newSetsValid;
 			const newValid = result.isValid() && isSetsValid();
@@ -191,19 +191,19 @@
 	}
 	function onAddSet(e?: Event) {
 		e?.stopPropagation();
-		const sets = setGroup.sets.slice();
+		const sets = setSeries.sets.slice();
 		for (const exercise of exercises) {
 			sets.push({
 				id: unsafeId(),
 				exerciseId: exercise.guid,
-				setType: setGroup.sets.length === 0 ? 'warmup' : 'working'
+				setType: setSeries.sets.length === 0 ? 'warmup' : 'working_set'
 			} as never as SetParams);
 		}
-		setGroup = {
-			...setGroup,
+		setSeries = {
+			...setSeries,
 			sets
 		};
-		oninput?.(setGroup);
+		oninput?.(setSeries);
 		fields.add('sets');
 		validate();
 	}
@@ -218,9 +218,9 @@
 		};
 	}
 	function onSetAllRestAfterInSeconds() {
-		setGroup = {
-			...setGroup,
-			sets: setGroup.sets.map((s) =>
+		setSeries = {
+			...setSeries,
+			sets: setSeries.sets.map((s) =>
 				s.setType === restAfterInSecondsSetType
 					? {
 							...s,
@@ -229,17 +229,17 @@
 					: s
 			)
 		};
-		oninput?.(setGroup);
+		oninput?.(setSeries);
 		fields.add('sets');
 		validate();
 	}
 
 	function onMoveSet(fromIndex: number, toIndex: number) {
-		const newSets = setGroup.sets.slice();
-		const set = setGroup.sets[fromIndex];
+		const newSets = setSeries.sets.slice();
+		const set = setSeries.sets[fromIndex];
 		newSets.splice(fromIndex, 1);
 		newSets.splice(toIndex, 0, set);
-		setGroup = { ...setGroup, sets: newSets };
+		setSeries = { ...setSeries, sets: newSets };
 	}
 
 	onMount(() => {
@@ -247,18 +247,18 @@
 	});
 	$effect(() => {
 		if (exercises.length === 1) {
-			setSetGroupType('straight');
+			setSetSeriesType('standard');
 		} else if (exercises.length === 2) {
-			setSetGroupType('superset');
+			setSetSeriesType('superset');
 		} else if (exercises.length > 2) {
-			setSetGroupType('circuit');
+			setSetSeriesType('circuit');
 		}
 	});
 	let suite = $derived(createSuite());
 	let result = $derived(suite.get());
 	$effect(() => {
 		if (!shouldAddSets && exerciseSelectorOpen) {
-			shouldAddSets = setGroup.sets.length === 0;
+			shouldAddSets = setSeries.sets.length === 0;
 		}
 	});
 	$effect(() => {
@@ -316,15 +316,15 @@
 	</div>
 
 	<div class="mb-2" class:hidden={!open}>
-		<label for="exercise-selector">{m.workouts_new_exercises_label()}</label>
+		<label for="exercise-selector">{m.training_sessions_new_exercises_label()}</label>
 		<ExerciseSelector
-			id={`exercise-selector-${setGroup.id}`}
+			id={`exercise-selector-${setSeries.id}`}
 			bind:open={exerciseSelectorOpen}
 			oninput={onExercisesChange}
 			{exercises}
 		/>
 	</div>
-	{#if setGroup.sets.length}
+	{#if setSeries.sets.length}
 		<div class="mb-2 flex flex-row items-end" class:hidden={!open}>
 			<div class="me-1 flex flex-shrink flex-col items-center justify-center">
 				<Dropdown

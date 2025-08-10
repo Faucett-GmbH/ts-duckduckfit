@@ -1,7 +1,7 @@
 <script lang="ts" module>
-	export interface WorkoutProps {
-		workoutId: AutomergeDocumentId<Workout>;
-		workout: Workout;
+	export interface TrainingSessionProps {
+		trainingSessionId: AutomergeDocumentId<TrainingSession>;
+		trainingSession: TrainingSession;
 		exerciseByGuid: { [exerciseGuid: string]: Exercise };
 		editReferrer?: string | undefined;
 	}
@@ -17,20 +17,20 @@
 	import { handleError } from '$lib/error';
 	import { invalidateAll } from '$app/navigation';
 	import { getRealSetPosition } from './util';
-	import { deleteWorkout, type Workout } from '$lib/state/workouts.svelte';
+	import { deleteTrainingSession, type TrainingSession } from '$lib/state/trainingSessions.svelte';
 	import type { AutomergeDocumentId } from '$lib/repo';
 	import { findTranslation } from '$lib/util';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { m } from '$lib/paraglide/messages';
 
 	let {
-		workoutId,
-		workout,
+		trainingSessionId,
+		trainingSession,
 		exerciseByGuid = $bindable(),
 		editReferrer = undefined
-	}: WorkoutProps = $props();
+	}: TrainingSessionProps = $props();
 
-	const translation = $derived(findTranslation(workout.translations));
+	const translation = $derived(findTranslation(trainingSession.translations));
 
 	let deleteOpen = $state(false);
 	function onOpenDelete() {
@@ -39,7 +39,7 @@
 
 	async function onDeleteInternal() {
 		try {
-			await deleteWorkout(workoutId);
+			await deleteTrainingSession(trainingSessionId);
 			deleteOpen = false;
 			await invalidateAll();
 		} catch (error) {
@@ -50,44 +50,44 @@
 
 <div class="flex flex-row items-center justify-between">
 	<div class="flex flex-row flex-wrap items-end">
-		<h3 class="m-0 me-2">{translation.name}</h3>
-		<p class="m-0">{workout.startedAt.toLocaleString()}</p>
+		<h3 class="m-0 me-2">{translation.title}</h3>
+		<p class="m-0">{trainingSession.startedAt.toLocaleString()}</p>
 	</div>
 	<div class="flex flex-row">
 		<button class="btn danger icon me-2" onclick={onOpenDelete}><Trash /></button>
 		<a
 			class="btn primary icon"
-			href={`${base}/workouts/${workoutId}/edit${editReferrer ? `?referrer=${encodeURIComponent(editReferrer)}` : ''}`}
+			href={`${base}/training-sessions/${trainingSessionId}/edit${editReferrer ? `?referrer=${encodeURIComponent(editReferrer)}` : ''}`}
 			><Pencil /></a
 		>
 	</div>
 </div>
 <div class="flex flex-col">
-	{#each workout.setGroups as setGroup (setGroup.id)}
+	{#each trainingSession.setSeries as setSeries (setSeries.id)}
 		<div class="mb-4 flex flex-col">
 			<div class="mb-2 flex flex-row">
 				<div
 					class="badge"
-					class:primary={setGroup.setGroupType === 'straight'}
-					class:swamp-green={setGroup.setGroupType === 'circuit'}
-					class:winter-hazel={setGroup.setGroupType === 'superset'}
+					class:primary={setSeries.setSeriesType === 'standard'}
+					class:swamp-green={setSeries.setSeriesType === 'circuit'}
+					class:winter-hazel={setSeries.setSeriesType === 'superset'}
 				>
-					{setGroup.setGroupType}
+					{setSeries.setSeriesType}
 				</div>
 			</div>
 			<div class="flex flex-row">
 				<div
 					class="me-2 flex w-2 flex-shrink flex-col rounded-lg border"
-					class:bg-pear-300={setGroup.setGroupType === 'straight'}
-					class:bg-swamp-green-300={setGroup.setGroupType === 'circuit'}
-					class:bg-winter-hazel-300={setGroup.setGroupType === 'superset'}
-					class:border-pear-500={setGroup.setGroupType === 'straight'}
-					class:border-swamp-green-500={setGroup.setGroupType === 'circuit'}
-					class:border-winter-hazel-500={setGroup.setGroupType === 'superset'}
+					class:bg-pear-300={setSeries.setSeriesType === 'standard'}
+					class:bg-swamp-green-300={setSeries.setSeriesType === 'circuit'}
+					class:bg-winter-hazel-300={setSeries.setSeriesType === 'superset'}
+					class:border-pear-500={setSeries.setSeriesType === 'standard'}
+					class:border-swamp-green-500={setSeries.setSeriesType === 'circuit'}
+					class:border-winter-hazel-500={setSeries.setSeriesType === 'superset'}
 				></div>
 				<div class="flex flex-grow flex-col rounded-lg">
-					{#each setGroup.sets as set, index (set.id)}
-						{@const position = getRealSetPosition(setGroup.sets, set, index)}
+					{#each setSeries.sets as set, index (set.id)}
+						{@const position = getRealSetPosition(setSeries.sets, set, index)}
 						{@const exercise = exerciseByGuid[set.exerciseGuid]}
 						{@const translation = findTranslation(exercise?.translations ?? [])}
 						<div
@@ -114,18 +114,18 @@
 									<div class="ms-2 flex flex-shrink flex-col justify-center">
 										<div
 											class="badge icon m-w-6 m-h-6 font-h h-6 w-6 leading-4"
-											class:light={!set.status}
-											class:success={set.status === 'success'}
-											class:danger={set.status === 'failed'}
-											title={set.status === 'success'
+											class:light={!set.setResultType}
+											class:success={set.setResultType === 'completed'}
+											class:danger={set.setResultType === 'failed'}
+											title={set.setResultType === 'completed'
 												? m.workouts_set_success_title()
-												: set.status === 'failed'
+												: set.setResultType === 'failed'
 													? m.workouts_set_failed_title()
 													: m.workouts_set_incomplete_title()}
 										>
-											{#if set.status === 'success'}
+											{#if set.setResultType === 'completed'}
 												{m.workouts_set_success_letter()}
-											{:else if set.status === 'failed'}
+											{:else if set.setResultType === 'failed'}
 												{m.workouts_set_failed_letter()}
 											{:else}
 												{m.workouts_set_incomplete_letter()}
@@ -144,9 +144,9 @@
 
 <Modal bind:open={deleteOpen}>
 	{#snippet title()}
-		<h5>{m.workouts_delete_title(translation)}</h5>
+		<h5>{m.training_sessions_delete_title(translation)}</h5>
 	{/snippet}
-	<p>{m.workouts_delete_body()}</p>
+	<p>{m.training_sessions_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteInternal}>
 			{m.workouts_delete_submit()}

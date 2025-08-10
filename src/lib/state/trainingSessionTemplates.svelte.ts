@@ -45,7 +45,6 @@ export interface TrainingSessionTemplateTranslation {
 }
 
 export interface TrainingSessionTemplate {
-	id: string;
 	translations: TrainingSessionTemplateTranslation[];
 	setSeriesTemplates: SetSeriesTemplate[];
 	updatedAt: Date;
