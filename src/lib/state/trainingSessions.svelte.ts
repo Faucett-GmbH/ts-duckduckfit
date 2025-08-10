@@ -87,7 +87,7 @@ export async function getTrainingSessions(
 	);
 }
 
-export async function getWorkoutById(
+export async function getTrainingSessionById(
 	trainingSessionId: AutomergeDocumentId<TrainingSession>
 ): Promise<TrainingSession | null> {
 	const trainingSessionDocHandle = await findDocument(trainingSessionId);
@@ -97,69 +97,69 @@ export async function getWorkoutById(
 	return trainingSessionDocHandle.doc() || null;
 }
 
-export async function getActiveWorkoutByWorkoutTemplateId(
-	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>
-): Promise<[key: AutomergeDocumentId<Workout>, value: Workout] | null> {
-	const workouts = (await userDocument.current!.workouts()).doc();
-	const workoutId = workouts.workoutsByWorkoutTemplateId[workoutTemplateId];
-	if (workoutId) {
-		const workout = await getWorkoutById(workoutId);
-		if (workout && workout.completedAt == null) {
-			return [workoutId, workout];
+export async function getActiveTrainingSessionByTrainingSessionTemplateId(
+	trainingSessionTemplateId: AutomergeDocumentId<TrainingSessionTemplate>
+): Promise<[key: AutomergeDocumentId<TrainingSession>, value: TrainingSession] | null> {
+	const trainingSessions = (await userDocument.current!.trainingSessions()).doc();
+	const trainingSessionId = trainingSessions.trainingSessionsByTrainingSessionTemplateId[trainingSessionTemplateId];
+	if (trainingSessionId) {
+		const trainingSession = await getTrainingSessionById(trainingSessionId);
+		if (trainingSession && trainingSession.finishedAt == null) {
+			return [trainingSessionId, trainingSession];
 		}
 	}
 	return null;
 }
 
-export async function deleteWorkout(workoutId: AutomergeDocumentId<Workout>) {
-	const workouts = await userDocument.current!.workouts();
-	workouts.change((wts) => {
-		delete wts.workoutsById[workoutId];
+export async function deleteTrainingSession(trainingSessionId: AutomergeDocumentId<TrainingSession>) {
+	const trainingSessions = await userDocument.current!.trainingSessions();
+	trainingSessions.change((ts) => {
+		delete ts.trainingSessionsById[trainingSessionId];
 	});
-	deleteDocument(workoutId);
+	deleteDocument(trainingSessionId);
 }
 
-export async function upsertWorkout(
-	workoutUpdates: Workout,
-	workoutId?: AutomergeDocumentId<Workout>
+export async function upsertTrainingSession(
+	trainingSessionUpdates: TrainingSession,
+	trainingSessionId?: AutomergeDocumentId<TrainingSession>
 ) {
-	const workouts = await userDocument.current!.workouts();
-	let workoutDocument: AutomergeDocHandle<Workout>;
-	if (!workoutId) {
-		workoutDocument = createDocument<Workout>(workoutUpdates);
-		workoutId = workoutDocument.documentId as AutomergeDocumentId<Workout>;
-		const documentId = workoutId;
-		workouts.change((wts) => {
-			wts.workoutsById[documentId] = true;
-			if (workoutUpdates.workoutTemplateId) {
-				wts.workoutsByWorkoutTemplateId[workoutUpdates.workoutTemplateId] = documentId;
+	const trainingSessions = await userDocument.current!.trainingSessions();
+	let trainingSessionDocument: AutomergeDocHandle<TrainingSession>;
+	if (!trainingSessionId) {
+		trainingSessionDocument = createDocument<TrainingSession>(trainingSessionUpdates);
+		trainingSessionId = trainingSessionDocument.documentId as AutomergeDocumentId<TrainingSession>;
+		const docId = trainingSessionId;
+		trainingSessions.change((ts) => {
+			ts.trainingSessionsById[docId] = true;
+			if (trainingSessionUpdates.trainingSessionTemplateId) {
+				ts.trainingSessionsByTrainingSessionTemplateId[trainingSessionUpdates.trainingSessionTemplateId] = docId;
 			}
 		});
 	} else {
-		workoutDocument = await findDocument(workoutId);
-		const previousWorkoutTemplateId = workoutDocument.doc().workoutTemplateId;
-		workoutDocument.change((workout) => {
+		trainingSessionDocument = await findDocument(trainingSessionId);
+		const previousTrainingSessionTemplateId = trainingSessionDocument.doc().trainingSessionTemplateId;
+		trainingSessionDocument.change((trainingSession) => {
 			let updated = false;
-			if (getAndApplyChanges(workout, workoutUpdates, (value) => value.id ?? value.locale)) {
+			if (getAndApplyChanges(trainingSession, trainingSessionUpdates, (value) => value.id ?? value.locale)) {
 				updated = true;
 			}
 			if (updated) {
 				// eslint-disable-next-line svelte/prefer-svelte-reactivity
-				workout.updatedAt = new Date();
+				trainingSession.updatedAt = new Date();
 			}
 		});
-		if (previousWorkoutTemplateId !== workoutUpdates.workoutTemplateId) {
-			const workoutTemplateId = workoutUpdates.workoutTemplateId;
-			const documentId = workoutId;
-			workouts.change((wts) => {
-				if (workoutTemplateId) {
-					wts.workoutsByWorkoutTemplateId[workoutTemplateId] = documentId;
+		if (previousTrainingSessionTemplateId !== trainingSessionUpdates.trainingSessionTemplateId) {
+			const trainingSessionTemplateId = trainingSessionUpdates.trainingSessionTemplateId;
+			const documentId = trainingSessionTemplateId;
+			trainingSessions.change((ts) => {
+				if (trainingSessionTemplateId) {
+					ts.trainingSessionsByTrainingSessionTemplateId[trainingSessionTemplateId] = documentId;
 				}
-				if (previousWorkoutTemplateId) {
-					delete wts.workoutsByWorkoutTemplateId[previousWorkoutTemplateId];
+				if (previousTrainingSessionTemplateId) {
+					delete ts.trainingSessionsByTrainingSessionTemplateId[previousTrainingSessionTemplateId];
 				}
 			});
 		}
 	}
-	return workoutId;
+	return trainingSessionId;
 }

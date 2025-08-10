@@ -14,7 +14,7 @@ import { initSync, syncConfig, type Sync } from './sync.svelte';
 import { PUBLIC_URL } from '$env/static/public';
 import { exercisesConfig, type Exercises } from './exercises.svelte';
 import { settingsConfig, type Settings } from './settings.svelte';
-import { workoutsConfig, type Workouts } from './trainingSessions.svelte';
+import { trainingSessionsConfig, type TrainingSessions } from './trainingSessions.svelte';
 
 export interface UserDocument {
 	version: number;
@@ -22,7 +22,7 @@ export interface UserDocument {
 	user: AutomergeDocumentId<User>;
 	sync: AutomergeDocumentId<Sync>;
 	trainingSessionTemplates: AutomergeDocumentId<TrainingSessionTemplates>;
-	trainingSessions: AutomergeDocumentId<Workouts>;
+	trainingSessions: AutomergeDocumentId<TrainingSessions>;
 	exercises: AutomergeDocumentId<Exercises>;
 	updatedAt: Date;
 	createdAt: Date;
@@ -38,7 +38,7 @@ export const userDocumentConfig = {
 				userDocument.user = createDocument<User>({ version: 0 }, repo).documentId;
 				userDocument.sync = createDocument<Sync>({ version: 0 }, repo).documentId;
 				userDocument.trainingSessionTemplates = createDocument<TrainingSessionTemplates>({ version: 0 }, repo).documentId;
-				userDocument.trainingSessions = createDocument<Workouts>({ version: 0 }, repo).documentId;
+				userDocument.trainingSessions = createDocument<TrainingSessions>({ version: 0 }, repo).documentId;
 				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
 				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				userDocument.updatedAt = new Date();
@@ -59,7 +59,7 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	await initDocument(await findDocument(userDocument.user), userConfig);
 	await initDocument(await findDocument(userDocument.sync), syncConfig);
 	await initDocument(await findDocument(userDocument.trainingSessionTemplates), trainingSessionTemplatesConfig);
-	await initDocument(await findDocument(userDocument.trainingSessions), workoutsConfig);
+	await initDocument(await findDocument(userDocument.trainingSessions), trainingSessionsConfig);
 	await initDocument(await findDocument(userDocument.exercises), exercisesConfig);
 }
 
