@@ -12,17 +12,17 @@
 	import { onMount, tick } from 'svelte';
 	import Sortable from '$lib/components/Sortable.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { createWorkoutSession } from '$lib/state/workoutSession.svelte';
+	import { createTrainingSession } from '$lib/state/trainingSession.svelte';
 	import type { PageProps } from './$types';
-	import type { AttemptedSet } from '$lib/state/workouts.svelte';
+	import type { LoggedSet } from '$lib/state/trainingSessions.svelte';
 	import { handleError } from '$lib/error';
 	import { page } from '$app/state';
 	import { m } from '$lib/paraglide/messages';
-	import AttemptedSetGroup from '$lib/components/workout/AttemptedSetGroup.svelte';
+	import LoggedSetSeriesComponent from '$lib/components/training_session/LoggedSetSeries.svelte';
 
 	let { data }: PageProps = $props();
 
-	const workoutSession = createWorkoutSession(data.workout, data.workoutId);
+	const workoutSession = createTrainingSession(data.workout, data.workoutId);
 
 	let initted = $state(false);
 	let startedFirst = $state(false);

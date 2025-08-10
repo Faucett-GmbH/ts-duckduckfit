@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-	import EditWorkoutTemplate from '$lib/components/workout/edit/EditWorkoutTemplate.svelte';
+	import EditTrainingSessionTemplateComponent from '$lib/components/training_session/edit/EditTrainingSessionTemplate.svelte';
 	import { base } from '$app/paths';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageData } from './$types';
@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{translation?.name}</title>
+	<title>{translation?.title}</title>
 </svelte:head>
 
 <div class="flex flex-grow flex-col overflow-x-hidden overflow-y-auto">
@@ -34,10 +34,10 @@
 			</div>
 			<div class="flex flex-grow flex-col">
 				<div class="card flex flex-shrink flex-col">
-					<EditWorkoutTemplate
+					<EditTrainingSessionTemplateComponent
 						bind:exerciseByGuid={data.exerciseByGuid}
-						workoutTemplateId={data.workoutTemplateId}
-						workoutTemplate={data.workoutTemplate}
+						trainingSessionTemplateId={data.workoutTemplateId}
+						trainingSessionTemplate={data.workoutTemplate}
 					/>
 				</div>
 			</div>

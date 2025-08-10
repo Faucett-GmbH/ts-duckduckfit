@@ -1,23 +1,23 @@
-import type { SetParams } from '$lib/components/workout/edit/EditSet.svelte';
+import type { SetParams } from '$lib/components/training_session/edit/EditSet.svelte';
 import { debounce } from '@aicacia/debounce';
 import {
-	upsertWorkout,
-	type AttemptedSet,
-	type AttemptedSetGroup,
-	type Workout
-} from './workouts.svelte';
+	upsertTrainingSession,
+	type LoggedSet,
+	type LoggedSetSeries,
+	type TrainingSession
+} from './trainingSessions.svelte';
 import type { AutomergeDocumentId } from '$lib/repo';
 
-export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<Workout>) {
-	let workout = $state(w);
-	let duration = $state(w.durationInSeconds || 0);
+export function createTrainingSession(ts: TrainingSession, trainingSessionId: AutomergeDocumentId<TrainingSession>) {
+	let trainingSession = $state(ts);
+	let duration = $state(ts.durationInSeconds || 0);
 	let restTimer = $state(0);
 	let paused = $state(false);
-	const done = $derived.by(() => workout.setGroups.every((sg) => sg.sets.every((s) => s.status)));
-	const initialIndexes = getNext(w, 0, 0);
-	let setGroupIndex = $state(initialIndexes?.[0] || 0);
+	const done = $derived.by(() => ts.setSeries.every((sg) => sg.sets.every((s) => s.setResultType)));
+	const initialIndexes = getNext(ts, 0, 0);
+	let setSeriesIndex = $state(initialIndexes?.[0] || 0);
 	let setIndex = $state(initialIndexes?.[1] || 0);
-	const setGroup = $derived.by(() => workout.setGroups[setGroupIndex]);
+	const setGroup = $derived.by(() => trainingSession.setSeries[setSeriesIndex]);
 	const set = $derived.by(() => setGroup.sets[setIndex]);
 	// svelte-ignore state_referenced_locally
 	let activeSetDuration = $state(set.durationInSeconds || 0);
@@ -25,7 +25,7 @@ export function createWorkoutSession(w: Workout, workoutId: AutomergeDocumentId<
 		d: duration.toString(),
 		p: paused.toString(),
 		r: restTimer.toString(),
-		sg: setGroupIndex.toString(),
+		sg: setSeriesIndex.toString(),
 		s: setIndex.toString()
 	}));
 

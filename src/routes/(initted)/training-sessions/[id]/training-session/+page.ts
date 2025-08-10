@@ -1,4 +1,4 @@
-import { getWorkoutById, type Workout } from '$lib/state/workouts.svelte';
+import { getWorkoutById, type Workout } from '$lib/state/trainingSessions.svelte';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import type { AutomergeDocumentId } from '$lib/repo';

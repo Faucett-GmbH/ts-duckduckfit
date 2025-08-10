@@ -4,7 +4,7 @@
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageProps } from './$types';
 	import { m } from '$lib/paraglide/messages';
-	import EditWorkout from '$lib/components/workout/edit/EditWorkout.svelte';
+	import EditTrainingSessionComponent from '$lib/components/training_session/edit/EditTrainingSession.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -13,7 +13,7 @@
 </script>
 
 <svelte:head>
-	<title>{m.workouts_workout_edit_title()}: {workoutTranslation.name}</title>
+	<title>{m.training_sessions_training_session_edit_title()}: {workoutTranslation.name}</title>
 </svelte:head>
 
 <div class="flex flex-grow flex-col overflow-x-hidden overflow-y-auto">
@@ -27,9 +27,9 @@
 			</div>
 			<div class="flex flex-grow flex-col">
 				<div class="card flex flex-shrink flex-col">
-					<EditWorkout
-						workoutId={data.workoutId}
-						workout={data.workout}
+					<EditTrainingSessionComponent
+						trainingSessionId={data.workoutId}
+						trainingSession={data.workout}
 						bind:exerciseByGuid={data.exerciseByGuid}
 					/>
 				</div>

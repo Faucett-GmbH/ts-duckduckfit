@@ -1,25 +1,25 @@
 <script lang="ts" module>
 	import { create, test, enforce, only } from 'vest';
 
-	export type EditSetGroupTemplateProps = Omit<SortableItemProps<SetGroupTemplate>, 'item'> & {
+	export type EditSetSeriesTemplateProps = Omit<SortableItemProps<SetSeriesTemplate>, 'item'> & {
 		exerciseByGuid: { [guid: string]: Exercise };
-		setGroupTemplate: SetGroupTemplate;
+		setSeriesTemplate: SetSeriesTemplate;
 		valid?: boolean;
 		open?: boolean;
-		oninput(params: SetGroupTemplate): void;
-		ondelete(params: SetGroupTemplate): void;
+		oninput(params: SetSeriesTemplate): void;
+		ondelete(params: SetSeriesTemplate): void;
 		onvalid(valid: boolean): void;
 	};
 
 	const createSuite = () =>
-		create((data: Partial<SetGroupTemplate> = {}, fields: Set<string>) => {
+		create((data: Partial<SetSeriesTemplate> = {}, fields: Set<string>) => {
 			if (!fields.size) {
 				return;
 			}
 			only(Array.from(fields));
 
-			test('setGroupType', m.errors_message_required(), () => {
-				enforce(data.setGroupType).isNotBlank();
+			test('setSeriesType', m.errors_message_required(), () => {
+				enforce(data.setSeriesType).isNotBlank();
 			});
 			test('setTemplates', m.errors_message_required(), () => {
 				enforce(data.setTemplates?.length).greaterThan(0);
@@ -42,22 +42,22 @@
 	import { getId, unsafeId } from '$lib/util';
 	import MeasurementInput from '$lib/components/inputs/MeasurementInput.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
-	import SetTypeComponent from '$lib/components/workout/SetType.svelte';
+	import SetTypeComponent from '$lib/components/training_session/SetType.svelte';
 	import Sortable, { type SortableItemProps } from '$lib/components/Sortable.svelte';
 	import { createExercisesByGuid, getRealSetPosition } from '../util';
 	import { m } from '$lib/paraglide/messages';
 	import type {
-		SetGroupTemplate,
-		SetGroupType,
+		SetSeriesTemplate,
+		SetSeriesType,
 		SetTemplate,
 		SetType
-	} from '$lib/state/workoutTemplates.svelte';
+	} from '$lib/state/trainingSessionTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import type { AutomergeDocumentId } from '$lib/repo';
 
 	let {
 		exerciseByGuid = $bindable(),
-		setGroupTemplate = $bindable(),
+		setSeriesTemplate = $bindable(),
 		index,
 		valid = $bindable(),
 		open = $bindable(true),
@@ -70,7 +70,7 @@
 		oninput,
 		ondelete,
 		onvalid
-	}: EditSetGroupTemplateProps = $props();
+	}: EditSetSeriesTemplateProps = $props();
 
 	let draggable = $state(false);
 
@@ -88,7 +88,7 @@
 
 	async function onDeleteInternal() {
 		openDelete = false;
-		ondelete(setGroupTemplate);
+		ondelete(setSeriesTemplate);
 	}
 	let openDelete = $state(false);
 	function onOpenDelete(e: Event) {
@@ -100,7 +100,7 @@
 
 	let exercises = $state(
 		[
-			...new Set(setGroupTemplate.setTemplates.map((setTemplate) => setTemplate.exerciseGuid))
+			...new Set(setSeriesTemplate.setTemplates.map((setTemplate) => setTemplate.exerciseGuid))
 		].reduce((exercises, exerciseGuid) => {
 			const exercise = exerciseByGuid[exerciseGuid];
 			if (exercise) {
@@ -111,18 +111,18 @@
 	);
 	$effect(() => {
 		if (exercises.length === 1) {
-			setSetGroupType('straight');
+			setSetSeriesType('standard');
 		} else if (exercises.length === 2) {
-			setSetGroupType('superset');
+			setSetSeriesType('superset');
 		} else if (exercises.length > 2) {
-			setSetGroupType('circuit');
+			setSetSeriesType('circuit');
 		}
 	});
-	function setSetGroupType(setGroupType: SetGroupType) {
-		if (setGroupTemplate.setGroupType !== setGroupType) {
-			setGroupTemplate = { ...setGroupTemplate, setGroupType };
-			oninput(setGroupTemplate);
-			fields.add('setGroupType');
+	function setSetSeriesType(setSeriesType: SetSeriesType) {
+		if (setSeriesTemplate.setSeriesType !== setSeriesType) {
+			setSeriesTemplate = { ...setSeriesTemplate, setSeriesType };
+			oninput(setSeriesTemplate);
+			fields.add('setSeriesType');
 			validate();
 		}
 	}
@@ -130,9 +130,9 @@
 	const suite = createSuite();
 	let result = $state(suite.get());
 
-	const fields = new Set<keyof SetGroupTemplate>();
+	const fields = new Set<keyof SetSeriesTemplate>();
 	const validate = debounce(() => {
-		suite(setGroupTemplate, fields).done((r) => {
+		suite(setSeriesTemplate, fields).done((r) => {
 			result = r;
 			const newValid = result.isValid() && isSetTemplatesValid();
 			if (newValid !== valid) {
@@ -144,8 +144,8 @@
 	}, 300);
 
 	function validateAll() {
-		for (const field of Object.keys(setGroupTemplate)) {
-			fields.add(field as keyof SetGroupTemplate);
+		for (const field of Object.keys(setSeriesTemplate)) {
+			fields.add(field as keyof SetSeriesTemplate);
 		}
 		validate();
 		validate.flush();
@@ -155,7 +155,7 @@
 	let shouldAddSetTemplates = $state(false);
 	$effect(() => {
 		if (!shouldAddSetTemplates && exerciseSelectorOpen) {
-			shouldAddSetTemplates = setGroupTemplate.setTemplates.length === 0;
+			shouldAddSetTemplates = setSeriesTemplate.setTemplates.length === 0;
 		}
 	});
 	$effect(() => {
@@ -166,47 +166,50 @@
 	});
 	function onExercisesChange(newExercies: Exercise[]) {
 		const newExerciseByGuid = createExercisesByGuid(newExercies);
-		setGroupTemplate = {
-			...setGroupTemplate,
-			setTemplates: setGroupTemplate.setTemplates.filter(
+		setSeriesTemplate = {
+			...setSeriesTemplate,
+			setTemplates: setSeriesTemplate.setTemplates.filter(
 				(setTemplate) => !!newExerciseByGuid[setTemplate.exerciseGuid]
 			)
 		};
 		exerciseByGuid = { ...exerciseByGuid, ...newExerciseByGuid };
-		oninput(setGroupTemplate);
+		oninput(setSeriesTemplate);
 		exercises = newExercies;
 		fields.add('setTemplates');
 		validate();
 	}
 	function createOnSetTemplateChange(index: number) {
 		return (params: SetTemplate) => {
-			const setTemplates = setGroupTemplate.setTemplates.slice();
+			const setTemplates = setSeriesTemplate.setTemplates.slice();
 			setTemplates[index] = params;
-			setGroupTemplate = {
-				...setGroupTemplate,
+			setSeriesTemplate = {
+				...setSeriesTemplate,
 				setTemplates
 			};
-			oninput(setGroupTemplate);
+			oninput(setSeriesTemplate);
 			fields.add('setTemplates');
 			validate();
 		};
 	}
 	function createOnSetTemplateDelete(index: number) {
 		return (_params: SetTemplate) => {
-			const setTemplates = setGroupTemplate.setTemplates.slice();
+			const setTemplates = setSeriesTemplate.setTemplates.slice();
 			setTemplates.splice(index, 1);
-			setGroupTemplate = {
-				...setGroupTemplate,
+			setSeriesTemplate = {
+				...setSeriesTemplate,
 				setTemplates
 			};
-			oninput(setGroupTemplate);
+			oninput(setSeriesTemplate);
 			fields.add('setTemplates');
 			validate();
 		};
 	}
 	function createOnSetTemplateValid(index: number) {
 		return (setTemplateValid: boolean) => {
-			const newSetTemplatesValid = setTemplatesValid.slice(0, setGroupTemplate.setTemplates.length);
+			const newSetTemplatesValid = setTemplatesValid.slice(
+				0,
+				setSeriesTemplate.setTemplates.length
+			);
 			newSetTemplatesValid[index] = setTemplateValid;
 			setTemplatesValid = newSetTemplatesValid;
 			const newValid = result.isValid() && isSetTemplatesValid();
@@ -221,19 +224,19 @@
 	}
 	function onAddSet(e?: Event) {
 		e?.stopPropagation();
-		const setTemplates = setGroupTemplate.setTemplates.slice();
+		const setTemplates = setSeriesTemplate.setTemplates.slice();
 		for (const exercise of exercises) {
 			setTemplates.push({
 				id: unsafeId(),
 				exerciseGuid: exercise.guid,
-				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
+				setType: setSeriesTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
 			} as never);
 		}
-		setGroupTemplate = {
-			...setGroupTemplate,
+		setSeriesTemplate = {
+			...setSeriesTemplate,
 			setTemplates
 		};
-		oninput(setGroupTemplate);
+		oninput(setSeriesTemplate);
 		fields.add('setTemplates');
 		validate();
 	}
@@ -248,9 +251,9 @@
 		};
 	}
 	function onSetAllRestAfterInSeconds() {
-		setGroupTemplate = {
-			...setGroupTemplate,
-			setTemplates: setGroupTemplate.setTemplates.map((st) =>
+		setSeriesTemplate = {
+			...setSeriesTemplate,
+			setTemplates: setSeriesTemplate.setTemplates.map((st) =>
 				st.setType === restAfterInSecondsSetType
 					? {
 							...st,
@@ -259,17 +262,17 @@
 					: st
 			)
 		};
-		oninput(setGroupTemplate);
+		oninput(setSeriesTemplate);
 		fields.add('setTemplates');
 		validate();
 	}
 
 	function onMoveSet(fromIndex: number, toIndex: number) {
-		const setTemplate = setGroupTemplate.setTemplates[fromIndex];
-		const newSetTemplates = setGroupTemplate.setTemplates.slice();
+		const setTemplate = setSeriesTemplate.setTemplates[fromIndex];
+		const newSetTemplates = setSeriesTemplate.setTemplates.slice();
 		newSetTemplates.splice(fromIndex, 1);
 		newSetTemplates.splice(toIndex, 0, setTemplate);
-		setGroupTemplate = { ...setGroupTemplate, setTemplates: newSetTemplates };
+		setSeriesTemplate = { ...setSeriesTemplate, setTemplates: newSetTemplates };
 	}
 
 	onMount(() => {
@@ -311,11 +314,11 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={index} />
+				<SetTypeComponent setType={'working_set'} position={index} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">
-			<h6 class="mb-0">{setGroupTemplate.setGroupType}</h6>
+			<h6 class="mb-0">{setSeriesTemplate.setSeriesType}</h6>
 		</div>
 		<div class="flex flex-col">
 			<button class="btn danger icon" onclick={onOpenDelete}>
@@ -325,15 +328,15 @@
 	</div>
 
 	<div class="mb-2" class:hidden={!open}>
-		<label for="exercise-selector">{m.workouts_new_exercises_label()}</label>
+		<label for="exercise-selector">{m.training_sessions_new_exercises_label()}</label>
 		<ExerciseSelector
-			id={`exercise-selector-${setGroupTemplate.id}`}
+			id={`exercise-selector-${setSeriesTemplate.id}`}
 			bind:open={exerciseSelectorOpen}
 			oninput={onExercisesChange}
 			{exercises}
 		/>
 	</div>
-	{#if setGroupTemplate.setTemplates.length}
+	{#if setSeriesTemplate.setTemplates.length}
 		<div class="mb-2 flex flex-row items-end" class:hidden={!open}>
 			<div class="mb-1 flex flex-shrink flex-col">
 				<div class="cursor-pointer">
