@@ -105,9 +105,9 @@
 		};
 	}
 	function createOnSetSeriesValid(index: number) {
-		return (setGroupValid: boolean) => {
+		return (ssValid: boolean) => {
 			const newSetSeriesValid = setSeriesValid.slice(0, trainingSession.setSeries.length);
-			newSetSeriesValid[index] = setGroupValid;
+			newSetSeriesValid[index] = ssValid;
 			setSeriesValid = newSetSeriesValid;
 			const newValid = result.isValid() && isSetSeriesValid();
 			if (valid !== newValid) {
@@ -226,7 +226,7 @@
 	</Sortable>
 </div>
 <div class="flex flex-row items-center justify-center">
-	<InputResults name="setGroups" {result} />
+	<InputResults name="setSeries" {result} />
 </div>
 <div class="flex flex-row justify-between">
 	<button class="btn success flex flex-row" onclick={onAddSetSeries}>

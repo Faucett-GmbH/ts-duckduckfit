@@ -60,7 +60,7 @@
 		}),
 		exerciseByGuid = $bindable({})
 	}: TrainingSessionTemplateProps = $props();
-	let setGroupTemplatesValid: Array<boolean | undefined> = [];
+	let setSeriesTemplatesValid: Array<boolean | undefined> = [];
 
 	let valid: boolean | undefined = $state();
 	let suite = $state(createSuite());
@@ -133,13 +133,13 @@
 		};
 	}
 	function createOnSetSeriesTemplateValid(index: number) {
-		return (setGroupTemplateValid: boolean) => {
-			const newSetGroupTemplatesValid = setGroupTemplatesValid.slice(
+		return (setSeriesTemplateValid: boolean) => {
+			const newSetSeriesTemplatesValid = setSeriesTemplatesValid.slice(
 				0,
 				trainingSessionTemplate.setSeriesTemplates.length
 			);
-			newSetGroupTemplatesValid[index] = setGroupTemplateValid;
-			setGroupTemplatesValid = newSetGroupTemplatesValid;
+			newSetSeriesTemplatesValid[index] = setSeriesTemplateValid;
+			setSeriesTemplatesValid = newSetSeriesTemplatesValid;
 			const newValid = result.isValid() && isSetSeriesTemplatesValid();
 			if (valid !== newValid) {
 				valid = newValid;
@@ -177,7 +177,7 @@
 		}
 	}
 	function isSetSeriesTemplatesValid() {
-		return setGroupTemplatesValid.every((valid) => valid === true);
+		return setSeriesTemplatesValid.every((valid) => valid === true);
 	}
 
 	function onAddSetSeries(e: Event) {
@@ -198,13 +198,13 @@
 	}
 
 	function onMoveSetSeries(fromIndex: number, toIndex: number) {
-		const setGroupTemplate = trainingSessionTemplate.setSeriesTemplates[fromIndex];
-		const newSetGroupTemplates = trainingSessionTemplate.setSeriesTemplates.slice();
-		newSetGroupTemplates.splice(fromIndex, 1);
-		newSetGroupTemplates.splice(toIndex, 0, setGroupTemplate);
+		const setSeriesTemplate = trainingSessionTemplate.setSeriesTemplates[fromIndex];
+		const newSetSeriesTemplates = trainingSessionTemplate.setSeriesTemplates.slice();
+		newSetSeriesTemplates.splice(fromIndex, 1);
+		newSetSeriesTemplates.splice(toIndex, 0, setSeriesTemplate);
 		trainingSessionTemplate = {
 			...trainingSessionTemplate,
-			setSeriesTemplates: newSetGroupTemplates
+			setSeriesTemplates: newSetSeriesTemplates
 		};
 	}
 
@@ -259,7 +259,7 @@
 	</Sortable>
 </div>
 <div class="flex flex-row items-center justify-center">
-	<InputResults name="setGroupTemplates" {result} />
+	<InputResults name="setSeriesTemplates" {result} />
 </div>
 <div class="flex flex-row justify-between">
 	<button class="btn success flex flex-row" onclick={onAddSetSeries}>

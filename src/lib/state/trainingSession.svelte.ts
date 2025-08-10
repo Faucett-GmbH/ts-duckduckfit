@@ -17,8 +17,8 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	const initialIndexes = getNext(ts, 0, 0);
 	let setSeriesIndex = $state(initialIndexes?.[0] || 0);
 	let setIndex = $state(initialIndexes?.[1] || 0);
-	const setGroup = $derived.by(() => trainingSession.setSeries[setSeriesIndex]);
-	const set = $derived.by(() => setGroup.sets[setIndex]);
+	const setSeries = $derived.by(() => trainingSession.setSeries[setSeriesIndex]);
+	const set = $derived.by(() => setSeries.sets[setIndex]);
 	// svelte-ignore state_referenced_locally
 	let activeSetDuration = $state(set.durationInSeconds || 0);
 	const urlSearchParams = $derived.by(() => ({
@@ -29,37 +29,37 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		s: setIndex.toString()
 	}));
 
-	function getNext(workout: Workout, setGroupIndex: number, setIndex: number) {
-		let setGroup = workout.setGroups[setGroupIndex];
-		let set = setGroup.sets[setIndex];
+	function getNext(trainingSession: TrainingSession, setSeriesIndex: number, setIndex: number) {
+		let setSeries = trainingSession.setSeries[setSeriesIndex];
+		let set = setSeries.sets[setIndex];
 		let shouldBreakOnEnd = false;
 		while (true) {
 			setIndex += 1;
-			if (setIndex >= setGroup.sets.length) {
-				setGroupIndex += 1;
-				if (setGroupIndex >= workout.setGroups.length) {
+			if (setIndex >= setSeries.sets.length) {
+				setSeriesIndex += 1;
+				if (setSeriesIndex >= trainingSession.setSeries.length) {
 					if (shouldBreakOnEnd) {
 						return;
 					}
 					shouldBreakOnEnd = true;
-					setGroupIndex = 0;
+					setSeriesIndex = 0;
 				}
 				setIndex = 0;
-				setGroup = workout.setGroups[setGroupIndex];
+				setSeries = trainingSession.setSeries[setSeriesIndex];
 			}
-			set = setGroup.sets[setIndex];
-			if (!set.status) {
+			set = setSeries.sets[setIndex];
+			if (!set.setResultType) {
 				break;
 			}
 		}
-		return [setGroupIndex, setIndex] as const;
+		return [setSeriesIndex, setIndex] as const;
 	}
 
 	function next() {
 		if (done) {
 			return false;
 		}
-		const result = getNext(workout, setGroupIndex, setIndex);
+		const result = getNext(trainingSession, setSeriesIndex, setIndex);
 		if (!result) {
 			return false;
 		}
@@ -70,20 +70,20 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	function fromURLSearchParams(params: URLSearchParams) {
 		duration = parseInt(params.get('d') ?? '0');
 		paused = params.get('p') === 'true';
-		setGroupIndex = parseInt(params.get('sg') ?? '0');
+		setSeriesIndex = parseInt(params.get('sg') ?? '0');
 		setIndex = parseInt(params.get('s') ?? '0');
 	}
 
-	function setSet(newSetGroupIndex: number, newSetIndex: number) {
-		setGroupIndex = newSetGroupIndex;
+	function setSet(newSetSeriesIndex: number, newSetIndex: number) {
+		setSeriesIndex = newSetSeriesIndex;
 		setIndex = newSetIndex;
 		activeSetDuration = set.durationInSeconds || 0;
 		restTimer = 0;
 		paused = false;
 	}
 
-	async function update(updateFn: (workout: Workout) => Workout, debounce = false) {
-		workout = updateFn(workout);
+	async function update(updateFn: (trainingSession: TrainingSession) => TrainingSession, debounce = false) {
+		trainingSession = updateFn(trainingSession);
 		if (debounce) {
 			debouncedUpdate();
 		} else {
@@ -92,39 +92,39 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	}
 
 	function internalUpdateSet(
-		setGroupIndex: number,
+		setSeriesIndex: number,
 		setIndex: number,
-		updateFn: (set: AttemptedSet) => AttemptedSet
+		updateFn: (set: LoggedSet) => LoggedSet
 	) {
-		const newSetGroups = workout.setGroups.slice();
-		const setGroup = newSetGroups[setGroupIndex];
-		const newSets = setGroup.sets.slice();
-		const set = setGroup.sets[setIndex];
+		const newSetSeriesList = trainingSession.setSeries.slice();
+		const setSeries = newSetSeriesList[setSeriesIndex];
+		const newSets = setSeries.sets.slice();
+		const set = setSeries.sets[setIndex];
 		const newSet = updateFn(set);
-		const newSetGroup = {
-			...setGroup,
+		const newSetSeries = {
+			...setSeries,
 			sets: newSets
 		};
 		newSets[setIndex] = newSet;
-		newSetGroups[setGroupIndex] = newSetGroup;
-		const updatedWorkout = {
-			...workout,
-			setGroups: newSetGroups
+		newSetSeriesList[setSeriesIndex] = newSetSeries;
+		const updatedTrainingSession = {
+			...trainingSession,
+			setSeries: newSetSeriesList
 		};
-		workout = updatedWorkout;
-		if (!set.status && newSet.status) {
+		trainingSession = updatedTrainingSession;
+		if (!set.setResultType && newSet.setResultType) {
 			restTimer = newSet.restAfterInSeconds || 0;
 		}
 		return newSet;
 	}
 
 	async function updateSet(
-		setGroupIndex: number,
+		setSeriesIndex: number,
 		setIndex: number,
-		updateFn: (set: AttemptedSet) => AttemptedSet,
+		updateFn: (set: LoggedSet) => LoggedSet,
 		debounce = false
 	) {
-		const set = internalUpdateSet(setGroupIndex, setIndex, updateFn);
+		const set = internalUpdateSet(setSeriesIndex, setIndex, updateFn);
 		if (debounce) {
 			debouncedUpdate();
 		} else {
@@ -186,7 +186,7 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		}
 	}
 
-	async function deleteSetGroup(groupIndex: number) {
+	async function deleteSetSeries(groupIndex: number) {
 		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
 		newSetGroups.splice(groupIndex, 1);
 		workout = {
@@ -201,7 +201,7 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		}
 	}
 
-	async function addSetGroup() {
+	async function addSetSeries() {
 		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
 		newSetGroups.push({ setGroupType: 'straight' } as AttemptedSetGroup);
 		workout = {
@@ -211,7 +211,7 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		await internalUpdate();
 	}
 
-	async function moveSetGroups(fromIndex: number, toIndex: number) {
+	async function moveSetSeries(fromIndex: number, toIndex: number) {
 		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
 		const setGroup = newSetGroups[fromIndex];
 		newSetGroups.splice(fromIndex, 1);
@@ -277,8 +277,8 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	}
 
 	return {
-		get workout() {
-			return workout;
+		get trainingSession() {
+			return trainingSession;
 		},
 		get duration() {
 			return duration;
@@ -307,14 +307,14 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		get done() {
 			return done;
 		},
-		get activeSetGroupIndex() {
-			return setGroupIndex;
+		get activeSetSeriesIndex() {
+			return setSeriesIndex;
 		},
 		get activeSetIndex() {
 			return setIndex;
 		},
-		get activeSetGroup() {
-			return setGroup;
+		get activeSetSeries() {
+			return setSeries;
 		},
 		get activeSet() {
 			return set;
@@ -331,9 +331,9 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		deleteSet,
 		copySet,
 		moveSets,
-		moveSetGroups,
-		addSetGroup,
-		deleteSetGroup,
+		moveSetSeries,
+		addSetSeries,
+		deleteSetSeries,
 		fromURLSearchParams
 	};
 }

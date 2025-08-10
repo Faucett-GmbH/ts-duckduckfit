@@ -140,12 +140,12 @@
 
 <Modal bind:open={openDelete}>
 	{#snippet title()}
-		<h5>{m.workouts_set_delete_title()}</h5>
+		<h5>{m.training_sessions_set_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_delete_body()}</p>
+	<p>{m.training_sessions_set_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteInternal}>
-			{m.workouts_set_delete_submit()}
+			{m.training_sessions_set_delete_submit()}
 		</button>
 	</div>
 </Modal>
