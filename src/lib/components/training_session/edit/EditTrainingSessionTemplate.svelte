@@ -27,7 +27,7 @@
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import InputResults from '$lib/components/InputResults.svelte';
 	import Plus from 'lucide-svelte/icons/plus';
-	import EditSetGroupTemplate from './EditSetGroupTemplate.svelte';
+	import EditSetSeriesTemplateComponent from './EditSetSeriesTemplate.svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
@@ -83,7 +83,7 @@
 			new Promise<boolean>((resolve) => {
 				suite(trainingSessionTemplate, Array.from(fields)).done((r) => {
 					result = r;
-					const newValid = result.isValid() && isSetGroupTemplatesValid();
+					const newValid = result.isValid() && isSetSeriesTemplatesValid();
 					if (valid !== newValid) {
 						valid = newValid;
 					}
@@ -140,7 +140,7 @@
 			);
 			newSetGroupTemplatesValid[index] = setGroupTemplateValid;
 			setGroupTemplatesValid = newSetGroupTemplatesValid;
-			const newValid = result.isValid() && isSetGroupTemplatesValid();
+			const newValid = result.isValid() && isSetSeriesTemplatesValid();
 			if (valid !== newValid) {
 				valid = newValid;
 			}
@@ -216,23 +216,23 @@
 </script>
 
 <div class="mb-2">
-	<label for="title">{m.training_sessions_name_label()}</label>
+	<label for="title">{m.training_sessions_title_label()}</label>
 	<input
-		class="w-full {cn('name')}"
+		class="w-full {cn('title')}"
 		type="text"
 		name="title"
-		placeholder={m.training_sessions_name_placeholder()}
+		placeholder={m.training_sessions_title_placeholder()}
 		value={trainingSessionTemplate.translations[0].title}
 		oninput={onTranslationChange}
 	/>
-	<InputResults name="name" {result} />
+	<InputResults name="title" {result} />
 </div>
 <div class="mb-2">
-	<label for="description">{m.workouts_description_label()}</label>
+	<label for="description">{m.training_sessions_description_label()}</label>
 	<textarea
 		class="w-full {cn('description')}"
 		name="description"
-		placeholder={m.workouts_description_placeholder()}
+		placeholder={m.training_sessions_description_placeholder()}
 		value={trainingSessionTemplate.translations[0].description || ''}
 		oninput={onTranslationChange}
 	></textarea>
@@ -240,15 +240,15 @@
 </div>
 <div role="list">
 	<Sortable
-		id={`set-group-templates`}
+		id={`set-series-templates`}
 		items={trainingSessionTemplate.setSeriesTemplates}
 		getKey={getId}
-		onMove={onMoveSetGroups}
+		onMove={onMoveSetSeries}
 	>
 		{#snippet children({ item, index, ...props })}
-			<EditSetGroupTemplate
+			<EditSetSeriesTemplateComponent
 				bind:exerciseByGuid
-				setGroupTemplate={item}
+				setSeriesTemplate={item}
 				{index}
 				{...props}
 				oninput={createOnSetSeriesTemplateChange(index)}
@@ -262,14 +262,14 @@
 	<InputResults name="setGroupTemplates" {result} />
 </div>
 <div class="flex flex-row justify-between">
-	<button class="btn success flex flex-row" onclick={onAddSetGroup}>
+	<button class="btn success flex flex-row" onclick={onAddSetSeries}>
 		<Plus />
-		{m.workouts_set_group_add()}
+		{m.training_sessions_set_series_add()}
 	</button>
 	<button class="btn primary flex flex-shrink" {disabled} onclick={onSubmit}>
 		{#if loading}<div class="mr-2 flex flex-row justify-center">
 				<div class="inline-block h-6 w-6 animate-spin"><LoaderCircle /></div>
 			</div>{/if}
-		{#if trainingSessionTemplateId}{m.workouts_edit_submit()}{:else}{m.workouts_new_submit()}{/if}
+		{#if trainingSessionTemplateId}{m.training_sessions_edit_submit()}{:else}{m.training_sessions_new_submit()}{/if}
 	</button>
 </div>

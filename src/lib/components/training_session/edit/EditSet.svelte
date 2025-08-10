@@ -44,7 +44,7 @@
 		set = $bindable(),
 		exerciseByGuid = $bindable(),
 		position,
-		showStatus = true,
+		showSetResultType = true,
 		showExercise = false,
 		showDelete = true,
 		canMove = true,
@@ -152,11 +152,6 @@
 				class:active={set.setType === 'warmup'}
 				onclick={createOnSetType('warmup')}>{m.training_sessions_warmup_title()}</button
 			>
-			<!-- <button
-				class="btn ghost text-nowrap text-left"
-				class:active={set.setType === SetType.BackoffSetType}
-				on:click={createOnSetType(SetType.BackoffSetType)}>{m.workouts_backoffTitle()}</button
-			> -->
 		</Dropdown>
 	</div>
 	<div
@@ -180,7 +175,7 @@
 					{/if}
 				</div>
 				<div class="flex flex-shrink flex-col">
-					<p class="m-0 text-xs">{m.training_sessions_actual()}</p>
+					<p class="m-0 text-xs">{m.training_sessions_set_actual()}</p>
 					{#if exercise}
 						<WorkoutSetInput
 							setInput={set}
@@ -192,44 +187,47 @@
 					{/if}
 				</div>
 			</div>
-			{#if showStatus}
+			{#if showSetResultType}
 				<div class="flex flex-shrink flex-col items-center justify-center">
 					<Dropdown position="top-right" anchorPosition="bottom-right" bind:open={statusOpen}>
 						{#snippet button()}
 							<button
 								class="btn icon m-w-6 m-h-6 font-h flex h-6 w-6 flex-row items-center justify-center leading-3"
-								class:light={!set.status}
-								class:success={set.status === 'success'}
-								class:danger={set.status === 'failed'}
-								title={set.status === 'success'
-									? m.workouts_set_success_title()
-									: set.status === 'failed'
-										? m.workouts_set_failed_title()
-										: m.workouts_set_incomplete_title()}
+								class:light={!set.setResultType}
+								class:success={set.setResultType === 'completed'}
+								class:danger={set.setResultType === 'failed'}
+								title={set.setResultType === 'completed'
+									? m.training_sessions_set_success_title()
+									: set.setResultType === 'failed'
+										? m.training_sessions_set_failed_title()
+										: m.training_sessions_set_incomplete_title()}
 							>
-								{#if set.status === 'success'}
-									{m.workouts_set_success_letter()}
-								{:else if set.status === 'failed'}
-									{m.workouts_set_failed_letter()}
+								{#if set.setResultType === 'completed'}
+									{m.training_sessions_set_success_letter()}
+								{:else if set.setResultType === 'failed'}
+									{m.training_sessions_set_failed_letter()}
 								{:else}
-									{m.workouts_set_incomplete_letter()}
+									{m.training_sessions_set_incomplete_letter()}
 								{/if}
 							</button>
 						{/snippet}
 						<button
 							class="btn ghost text-left text-nowrap"
-							class:active={set.status === 'success'}
-							onclick={createOnStatus('success')}>{m.workouts_set_success_title()}</button
+							class:active={set.setResultType === 'completed'}
+							onclick={createOnSetResultType('completed')}
+							>{m.training_sessions_set_success_title()}</button
 						>
 						<button
 							class="btn ghost text-left text-nowrap"
-							class:active={set.status === 'failed'}
-							onclick={createOnStatus('failed')}>{m.workouts_set_failed_title()}</button
+							class:active={set.setResultType === 'failed'}
+							onclick={createOnSetResultType('failed')}
+							>{m.training_sessions_set_failed_title()}</button
 						>
 						<button
 							class="btn ghost text-left text-nowrap"
-							class:active={!set.status}
-							onclick={createOnStatus(null)}>{m.workouts_set_incomplete_title()}</button
+							class:active={!set.setResultType}
+							onclick={createOnSetResultType(null)}
+							>{m.training_sessions_set_incomplete_title()}</button
 						>
 					</Dropdown>
 				</div>
@@ -253,12 +251,12 @@
 
 <Modal bind:open={openDelete}>
 	{#snippet title()}
-		<h5>{m.workouts_set_delete_title()}</h5>
+		<h5>{m.training_sessions_set_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_delete_body()}</p>
+	<p>{m.training_sessions_set_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteInternal}>
-			{m.workouts_set_delete_submit()}
+			{m.training_sessions_set_delete_submit()}
 		</button>
 	</div>
 </Modal>

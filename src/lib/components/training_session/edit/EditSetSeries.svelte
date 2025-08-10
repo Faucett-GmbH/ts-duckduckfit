@@ -302,11 +302,11 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={index} />
+				<SetTypeComponent setType={'working_set'} position={index} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">
-			<h6 class="mb-0">{setGroup.setGroupType}</h6>
+			<h6 class="mb-0">{setSeries.setSeriesType}</h6>
 		</div>
 		<div class="flex flex-col">
 			<button class="btn danger icon" onclick={onOpenDelete}>
@@ -372,7 +372,7 @@
 		</div>
 	{/if}
 	<div role="list" class:hidden={!open}>
-		<Sortable id={`sets-${setGroup.id}`} items={setGroup.sets} getKey={getId} onMove={onMoveSet}>
+		<Sortable id={`sets-${setSeries.id}`} items={setSeries.sets} getKey={getId} onMove={onMoveSet}>
 			{#snippet children({
 				isDragging,
 				isDraggingOver,
@@ -386,7 +386,7 @@
 				<EditSet
 					set={item}
 					{exerciseByGuid}
-					position={getRealSetPosition(setGroup.sets, item, index)}
+					position={getRealSetPosition(setSeries.sets, item, index)}
 					{isDragging}
 					{isDraggingOver}
 					{onDragStart}
@@ -394,7 +394,7 @@
 					{onDragLeave}
 					{onDragOver}
 					showExercise={exercises.length > 1}
-					canMove={setGroup.sets.length > 1}
+					canMove={setSeries.sets.length > 1}
 					oninput={createOnSetChange(index)}
 					ondelete={createOnSetDelete(index)}
 					onvalid={createOnSetValid(index)}
@@ -408,19 +408,19 @@
 	<div class="mt-2 flex flex-row justify-center" class:hidden={!open}>
 		<button class="btn success flex flex-row" disabled={exercises.length === 0} onclick={onAddSet}>
 			<Plus />
-			{m.workouts_set_add_title()}
+			{m.training_sessions_set_add_title()}
 		</button>
 	</div>
 </div>
 
 <Modal bind:open={openDelete}>
 	{#snippet title()}
-		<h5>{m.workouts_set_group_delete_title()}</h5>
+		<h5>{m.training_sessions_set_series_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_group_delete_body()}</p>
+	<p>{m.training_sessions_set_series_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteInternal}>
-			{m.workouts_set_group_delete_submit()}
+			{m.training_sessions_set_group_delete_submit()}
 		</button>
 	</div>
 </Modal>

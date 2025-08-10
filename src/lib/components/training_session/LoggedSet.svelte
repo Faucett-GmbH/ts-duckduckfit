@@ -25,7 +25,9 @@
 	import { debounce } from '@aicacia/debounce';
 	import Dropdown from '../Dropdown.svelte';
 	import SetTypeComponent from './SetType.svelte';
-	import WorkoutSetInput, { type WorkoutSetInputParams } from './TrainingSessionSetInput.svelte';
+	import WorkoutSetInput, {
+		type TrainingSessionSetInputParams
+	} from './TrainingSessionSetInput.svelte';
 	import Modal from '../Modal.svelte';
 	import { getRealSetPosition } from './util';
 	import type {
@@ -39,6 +41,7 @@
 	import { findTranslation } from '$lib/util';
 	import { getLocale } from '$lib/state/settings.svelte';
 	import type { EventHandler } from 'svelte/elements';
+	import TrainingSessionSetInput from './TrainingSessionSetInput.svelte';
 
 	let {
 		exerciseByGuid = $bindable(),
@@ -116,14 +119,14 @@
 			menuOpen;
 		};
 	}
-	function onTrainingSessionSetInput(params: WorkoutSetInputParams) {
+	function onTrainingSessionSetInput(params: TrainingSessionSetInputParams) {
 		update((set) => ({ ...set, ...params }));
 	}
 	let setNoteTranslation = $derived(findTranslation(set.note));
 	let notesElement = $state<HTMLTextAreaElement>();
 	function onNoteUpdate() {
 		update((set) => {
-			const translation = findTranslation(set.notes);
+			const translation = findTranslation(set.note);
 			if (translation) {
 				translation.note = notesElement?.value || '';
 			} else {
@@ -183,16 +186,16 @@
 					</button>
 				{/snippet}
 				<button class="btn ghost text-left text-nowrap" onclick={onCopySet}
-					>{m.workouts_set_duplicate()}</button
+					>{m.training_sessions_set_duplicate()}</button
 				>
 				{#if active}
 					<button class="btn ghost text-left text-nowrap" onclick={onResetTimer}
-						>{m.workouts_set_reset_timer()}</button
+						>{m.training_sessions_set_reset_timer()}</button
 					>
 				{/if}
 				<hr class="my-1" />
 				<button class="btn ghost text-left text-nowrap" onclick={onOpenDeleteSet}
-					>{m.workouts_set_delete_title()}</button
+					>{m.training_sessions_set_delete_title()}</button
 				>
 			</Dropdown>
 			<Dropdown
@@ -207,61 +210,63 @@
 				<button
 					class="btn ghost text-left text-nowrap"
 					class:active={set.setType === 'working_set'}
-					onclick={createOnSetType('working_set')}>{m.workouts_working_set_title()}</button
+					onclick={createOnSetType('working_set')}>{m.training_sessions_working_set_title()}</button
 				>
 				<button
 					class="btn ghost text-left text-nowrap"
 					class:active={set.setType === 'warmup'}
-					onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
+					onclick={createOnSetType('warmup')}>{m.training_sessions_warmup_title()}</button
 				>
-				<!-- <button
-            class="btn ghost text-nowrap text-left"
-            class:active={set.setType === SetType.BackoffSetType}
-            on:click={createOnSetType(SetType.BackoffSetType)}>{m.workouts_backoff_title()}</button
-          > -->
 			</Dropdown>
 		</div>
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-end">
 			{#if setExercise}
-				<WorkoutSetInput setInput={set} exercise={setExercise} oninput={onWorkoutSetInput} />
+				<WorkoutSetInput
+					setInput={set}
+					exercise={setExercise}
+					oninput={onTrainingSessionSetInput}
+				/>
 			{/if}
 			<div class="flex flex-col justify-center">
 				<Dropdown position="top-right" anchorPosition="bottom-right" bind:open={statusOpen}>
 					{#snippet button()}
 						<button
 							class="btn icon m-w-6 m-h-6 font-h flex h-6 w-6 flex-row items-center justify-center leading-3"
-							class:light={!set.status}
-							class:success={set.status === 'success'}
-							class:danger={set.status === 'failed'}
-							title={set.status === 'success'
-								? m.workouts_set_success_title()
-								: set.status === 'failed'
-									? m.workouts_set_failed_title()
-									: m.workouts_set_incomplete_title()}
+							class:light={!set.setResultType}
+							class:success={set.setResultType === 'completed'}
+							class:danger={set.setResultType === 'failed'}
+							title={set.setResultType === 'completed'
+								? m.training_sessions_set_success_title()
+								: set.setResultType === 'failed'
+									? m.training_sessions_set_failed_title()
+									: m.training_sessions_set_incomplete_title()}
 						>
-							{#if set.status === 'success'}
-								{m.workouts_set_success_letter()}
-							{:else if set.status === 'failed'}
-								{m.workouts_set_failed_letter()}
+							{#if set.setResultType === 'completed'}
+								{m.training_sessions_set_success_letter()}
+							{:else if set.setResultType === 'failed'}
+								{m.training_sessions_set_failed_letter()}
 							{:else}
-								{m.workouts_set_incomplete_letter()}
+								{m.training_sessions_set_incomplete_letter()}
 							{/if}
 						</button>
 					{/snippet}
 					<button
 						class="btn ghost text-left text-nowrap"
-						class:active={set.status === 'success'}
-						onclick={createOnStatus('success')}>{m.workouts_set_success_title()}</button
+						class:active={set.setResultType === 'completed'}
+						onclick={createOnSetResultType('completed')}
+						>{m.training_sessions_set_success_title()}</button
 					>
 					<button
 						class="btn ghost text-left text-nowrap"
-						class:active={set.status === 'failed'}
-						onclick={createOnStatus('failed')}>{m.workouts_set_failed_title()}</button
+						class:active={set.setResultType === 'failed'}
+						onclick={createOnSetResultType('failed')}
+						>{m.training_sessions_set_failed_title()}</button
 					>
 					<button
 						class="btn ghost text-left text-nowrap"
-						class:active={!set.status}
-						onclick={createOnStatus(null)}>{m.workouts_set_incomplete_title()}</button
+						class:active={!set.setResultType}
+						onclick={createOnSetResultType(null)}
+						>{m.training_sessions_set_incomplete_title()}</button
 					>
 				</Dropdown>
 			</div>
@@ -269,18 +274,18 @@
 	</div>
 	<div
 		class="mt-1 flex flex-grow flex-row items-center justify-start"
-		class:hidden={setGroup.setGroupType === 'straight'}
+		class:hidden={setSeries.setSeriesType === 'standard'}
 	>
 		{#if setExerciseTranslation}
 			<div class="badge sm light">{setExerciseTranslation.name}</div>
 		{/if}
 	</div>
-	{#if active && set.status}
+	{#if active && set.setResultType}
 		<div class="mt-2 flex flex-col">
 			<!-- svelte-ignore a11y_autofocus -->
 			<textarea
 				bind:this={notesElement}
-				placeholder={m.workouts_set_notes_placeholder()}
+				placeholder={m.training_sessions_set_notes_placeholder()}
 				value={setNoteTranslation?.note ?? ''}
 				maxlength="255"
 				oninput={debouncedOnNoteUpdate}
@@ -291,12 +296,12 @@
 
 <Modal bind:open={openDeleteSet}>
 	{#snippet title()}
-		<h5>{m.workouts_set_delete_title()}</h5>
+		<h5>{m.training_sessions_set_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_delete_body()}</p>
+	<p>{m.training_sessions_set_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteSet}>
-			{m.workouts_set_delete_submit()}
+			{m.training_sessions_set_delete_submit()}
 		</button>
 	</div>
 </Modal>

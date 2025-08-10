@@ -84,7 +84,7 @@
 
 	function onMoveSets(fromIndex: number, toIndex: number) {
 		try {
-			return moveSets(setGroupIndex, fromIndex, toIndex);
+			return moveSets(setSeriesIndex, fromIndex, toIndex);
 		} catch (error) {
 			handleError(error);
 		}
@@ -108,7 +108,7 @@
 		return deleteSetSeries(setSeriesIndex);
 	}
 
-	let isActiveSetGroup = $derived(activeSetSeriesIndex === setSeriesIndex);
+	let isActiveSetSeries = $derived(activeSetSeriesIndex === setSeriesIndex);
 
 	let addSetsOpen = $state(false);
 	let addSetsValid = $state(false);
@@ -145,12 +145,9 @@
 					(setTemplate) =>
 						({
 							...setTemplate,
-							attemptedDistanceInMeters: setTemplate.distanceInMeters,
-							attemptedReps:
-								setTemplate.reps || setTemplate.repRangeLow || setTemplate.repRangeHigh,
-							attemptedRepsInReserve: setTemplate.repsInReserve,
-							attemptedTimeInSeconds: setTemplate.timeInSeconds,
-							attemptedWeightInKilograms: setTemplate.weightInKilograms
+							actualReps: setTemplate.targetReps,
+							actualRPE: setTemplate.targetRPE,
+							actualWeight: setTemplate.targetWeight
 						}) as SetParams
 				)
 			);
@@ -243,7 +240,7 @@
 					{onDragEnd}
 					{onDragLeave}
 					{onDragOver}
-					active={isActiveSetGroup && activeSetIndex === index}
+					active={isActiveSetSeries && activeSetIndex === index}
 					onSetActive={createOnSelectSet(setSeriesIndex, index)}
 					update={createUpdate(setSeriesIndex, index)}
 					copySet={createCopySet(setSeriesIndex, index)}

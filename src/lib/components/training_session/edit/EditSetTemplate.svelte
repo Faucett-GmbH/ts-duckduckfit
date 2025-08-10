@@ -106,17 +106,12 @@
 			<button
 				class="btn ghost text-left text-nowrap"
 				class:active={setTemplate.setType === 'working'}
-				onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
+				onclick={createOnSetType('working')}>{m.training_sessions_working_set_title()}</button
 			>
 			<button
 				class="btn ghost text-left text-nowrap"
 				class:active={setTemplate.setType === 'warmup'}
-				onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
-			>
-			<button
-				class="btn ghost text-left text-nowrap"
-				class:active={setTemplate.setType === 'backoff'}
-				onclick={createOnSetType('backoff')}>{m.workouts_backoff_title()}</button
+				onclick={createOnSetType('warmup')}>{m.training_sessions_warmup_title()}</button
 			>
 		</Dropdown>
 	</div>

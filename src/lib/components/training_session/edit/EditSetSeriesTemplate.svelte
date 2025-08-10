@@ -352,19 +352,13 @@
 							class="btn ghost text-left text-nowrap"
 							class:active={restAfterInSecondsSetType === 'working'}
 							onclick={createOnRestAfterInSecondsSetType('working')}
-							>{m.workouts_working_set_title()}</button
+							>{m.training_sessions_working_set_title()}</button
 						>
 						<button
 							class="btn ghost text-left text-nowrap"
 							class:active={restAfterInSecondsSetType === 'warmup'}
 							onclick={createOnRestAfterInSecondsSetType('warmup')}
-							>{m.workouts_warmup_title()}</button
-						>
-						<button
-							class="btn ghost text-left text-nowrap"
-							class:active={restAfterInSecondsSetType === 'backoff'}
-							onclick={createOnRestAfterInSecondsSetType('backoff')}
-							>{m.workouts_backoff_title()}</button
+							>{m.training_sessions_warmup_title()}</button
 						>
 					</Dropdown>
 				</div>
@@ -383,11 +377,9 @@
 			<div class="me-1 flex flex-shrink flex-col">
 				<button class="btn secondary text-sm" onclick={onSetAllRestAfterInSeconds}>
 					{#if restAfterInSecondsSetType === 'working'}
-						{m.workouts_working_set_rest_timers_update()}
+						{m.training_sessions_working_set_rest_timers_update()}
 					{:else if restAfterInSecondsSetType === 'warmup'}
-						{m.workouts_warmup_rest_timers_update()}
-					{:else}
-						{m.workouts_backoff_rest_timers_update()}
+						{m.training_sessions_warmup_rest_timers_update()}
 					{/if}
 				</button>
 			</div>
@@ -396,20 +388,20 @@
 	{/if}
 	<div role="list" class:hidden={!open}>
 		<Sortable
-			id={`set-templates-${setGroupTemplate.id}`}
-			items={setGroupTemplate.setTemplates}
+			id={`set-templates-${setSeriesTemplate.id}`}
+			items={setSeriesTemplate.setTemplates}
 			getKey={getId}
 			onMove={onMoveSet}
 		>
 			{#snippet children({ item, index, ...props })}
 				<EditSetTemplate
 					id={item.id}
-					position={getRealSetPosition(setGroupTemplate.setTemplates, item, index)}
+					position={getRealSetPosition(setSeriesTemplate.setTemplates, item, index)}
 					setTemplate={item}
 					exercise={exerciseByGuid[item.exerciseGuid]}
 					{...props}
 					showExercise={exercises.length > 1}
-					canMove={setGroupTemplate.setTemplates.length > 1}
+					canMove={setSeriesTemplate.setTemplates.length > 1}
 					oninput={createOnSetTemplateChange(index)}
 					ondelete={createOnSetTemplateDelete(index)}
 					onvalid={createOnSetTemplateValid(index)}
@@ -423,19 +415,19 @@
 	<div class="mt-2 flex flex-row justify-center" class:hidden={!open}>
 		<button class="btn success flex flex-row" disabled={exercises.length === 0} onclick={onAddSet}>
 			<Plus />
-			{m.workouts_set_add_title()}
+			{m.training_sessions_set_add_title()}
 		</button>
 	</div>
 </div>
 
 <Modal bind:open={openDelete}>
 	{#snippet title()}
-		<h5>{m.workouts_set_group_delete_title()}</h5>
+		<h5>{m.training_sessions_set_series_delete_title()}</h5>
 	{/snippet}
-	<p>{m.workouts_set_group_delete_body()}</p>
+	<p>{m.training_sessions_set_series_delete_body()}</p>
 	<div class="flex flex-row justify-end">
 		<button class="btn danger" onclick={onDeleteInternal}>
-			{m.workouts_set_group_delete_submit()}
+			{m.training_sessions_set_series_delete_submit()}
 		</button>
 	</div>
 </Modal>
