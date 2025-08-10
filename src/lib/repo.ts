@@ -2,9 +2,9 @@ import wasmUrl from '@automerge/automerge/automerge.wasm?url';
 import { next as Automerge, type ChangeFn, type Doc } from '@automerge/automerge/slim';
 import { Repo, type DocHandle, type DocumentId } from '@automerge/automerge-repo/slim';
 import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb';
-import { WebSocketClientAdapter } from '@automerge/automerge-repo-network-websocket';
 import { lazy } from '$lib/lazy';
 // import { getWebRTCClientAdapter } from './sync';
+import { WebSocketClientAdapter } from './sync/WebSocketClientAdapter';
 
 export type AutomergeDocumentId<T> = DocumentId & { _type: T };
 export type AutomergeDocument<T extends AutomergeDocumentId<never>> =

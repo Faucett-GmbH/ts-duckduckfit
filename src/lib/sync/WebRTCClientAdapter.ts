@@ -116,13 +116,13 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			console.error(`failed to join`, error);
 		});
 
+		this.#forceReady();
+
 		this.emit('peer-candidate', {
-			peerId: peerId,
+			peerId: 'self',
 			peerMetadata: peerMetadata,
 			deviceId: await getDeviceId()
 		} as never);
-
-		this.#forceReady();
 	}
 
 	async #join() {
@@ -147,8 +147,19 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 	}
 
 	async send(message: Message) {
-		if (message.senderId === this.peerId && message.targetId === this.peerId) {
-			this.receive(await getDeviceId(), new Uint8Array(toArrayBuffer(encode(message))));
+		if (message.targetId === 'self') {
+			this.receive(
+				await getDeviceId(),
+				new Uint8Array(
+					toArrayBuffer(
+						encode({
+							...message,
+							senderId: 'self',
+							targetId: this.peerId!
+						} as Message)
+					)
+				)
+			);
 			return;
 		}
 		await Promise.all(
@@ -156,11 +167,14 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 				try {
 					const peer = this.#remotePeers.get(deviceId);
 					if (peer) {
-						const messageWithSender: Message = {
-							...message,
-							senderId: this.peerId!
-						};
-						peer.send(toArrayBuffer(encode(messageWithSender)));
+						peer.send(
+							toArrayBuffer(
+								encode({
+									...message,
+									senderId: this.peerId!
+								} as Message)
+							)
+						);
 					}
 				} catch (error) {
 					console.error(`send error ${deviceId}`, error);

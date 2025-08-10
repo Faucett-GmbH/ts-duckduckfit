@@ -142,8 +142,6 @@ export const userDocument = {
 async function initUserDocument() {
 	const repo = getRepo();
 
-	await getWebRTCClientAdapter().whenReady();
-
 	if (currentUserDocumentId.value == null) {
 		const userDocument = createDocument<UserDocument>({ version: 0 }, repo);
 		await userDocument.whenReady();
