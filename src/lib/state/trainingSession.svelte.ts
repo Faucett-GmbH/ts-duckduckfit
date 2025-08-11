@@ -134,68 +134,75 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	}
 
 	async function internalUpdate() {
-		await upsertWorkout(workout, workoutId);
+		await upsertTrainingSession(trainingSession, trainingSessionId);
 	}
 	const debouncedUpdate = debounce(internalUpdate, 1000);
 
-	async function createSets(setGroupIndex: number, newSets: SetParams[]) {
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
-		const setGroup = workout.setGroups[setGroupIndex];
-		const sets = [...setGroup.sets, ...newSets];
+	async function createSets(setSeriesIndex: number, newSets: SetParams[]) {
+		const newSetSeries = trainingSession.setSeries.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
+		const setSeries = trainingSession.setSeries[setSeriesIndex];
+		const sets = [...setSeries.sets, ...newSets];
 		const exercises = new Set<string>();
+
 		for (const set of sets) {
 			exercises.add(set.exerciseGuid);
 		}
-		let setGroupType = setGroup.setGroupType;
+		let setSeriesType = setSeries.setSeriesType;
 		switch (exercises.size) {
 			case 1:
-				setGroupType = 'straight';
+				setSeriesType = 'standard';
 				break;
 			case 2:
-				setGroupType = 'superset';
+				setSeriesType = 'superset';
 				break;
 			default:
-				setGroupType = 'circuit';
+				setSeriesType = 'circuit';
 				break;
 		}
-		newSetGroups[setGroupIndex] = {
-			id: setGroup.id,
-			setGroupType,
+		newSetSeries[setSeriesIndex] = {
+			id: setSeries.id,
+			setSeriesType,
 			sets
-		} as AttemptedSetGroup;
+		} as LoggedSetSeries;
+
 		await internalUpdate();
 	}
 
-	async function moveSets(setGroupIndex: number, fromIndex: number, toIndex: number) {
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
-		const setGroup = workout.setGroups[setGroupIndex];
-		const newSets = setGroup.sets.slice();
+	async function moveSets(newSetSeriesIndex: number, fromIndex: number, toIndex: number) {
+		const newSetSeries = trainingSession.setSeries.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
+		const setSeries = trainingSession.setSeries[newSetSeriesIndex];
+		const newSets = setSeries.sets.slice();
 		const set = newSets[fromIndex];
+
 		newSets.splice(fromIndex, 1);
 		newSets.splice(toIndex, 0, set);
-		newSetGroups[setGroupIndex] = {
-			id: setGroup.id,
+
+		newSetSeries[setSeriesIndex] = {
+			id: setSeries.id,
 			sets: newSets
-		} as AttemptedSetGroup;
-		workout = { ...workout, setGroups: newSetGroups };
+		} as LoggedSetSeries;
+
+		trainingSession = { ...trainingSession, setSeries: newSetSeries };
+
 		await internalUpdate();
-		if (setGroupIndex === setGroupIndex) {
+
+		if (newSetSeriesIndex === setSeriesIndex) {
 			if (fromIndex === setIndex) {
 				setIndex = toIndex;
 			}
 		}
 	}
 
-	async function deleteSetSeries(groupIndex: number) {
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
-		newSetGroups.splice(groupIndex, 1);
-		workout = {
-			...workout,
-			setGroups: newSetGroups
+	async function deleteSetSeries(seriesIndex: number) {
+		const newSetSeries = trainingSession.setSeries.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
+		newSetSeries.splice(seriesIndex, 1);
+		trainingSession = {
+			...trainingSession,
+			setSeries: newSetSeries
 		};
 		await internalUpdate();
-		if (groupIndex === setGroupIndex) {
-			setGroupIndex = 0;
+		if (seriesIndex === setSeriesIndex) {
+			setSeriesIndex = 0;
 			setIndex = 0;
 			next();
 		}
@@ -212,7 +219,7 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	}
 
 	async function moveSetSeries(fromIndex: number, toIndex: number) {
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
+		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
 		const setGroup = newSetGroups[fromIndex];
 		newSetGroups.splice(fromIndex, 1);
 		newSetGroups.splice(toIndex, 0, setGroup);
@@ -226,7 +233,7 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 	async function deleteSet(setGroupIndex: number, setIndex: number) {
 		const activeSetGroupIndex = setGroupIndex;
 		const activeSetIndex = setIndex;
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
+		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
 		const setGroup = workout.setGroups[setGroupIndex];
 		const newSets = setGroup.sets.slice();
 		newSets.splice(setIndex, 1);
@@ -247,11 +254,11 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 		}
 	}
 
-	async function copySet(setGroupIndex: number, setIndex: number) {
-		const newSetGroups = workout.setGroups.map((sg) => ({ id: sg.id }) as AttemptedSetGroup);
-		const setGroup = workout.setGroups[setGroupIndex];
-		const newSets = setGroup.sets.slice();
-		const set = setGroup.sets[setIndex];
+	async function copySet(setSeriesIndex: number, setIndex: number) {
+		const newSetSeriesList = trainingSession.setSeries.map((sg) => ({ id: sg.id }) as LoggedSetSeries);
+		const setSeries = trainingSession.setSeries[setSeriesIndex];
+		const newSets = setSeries.sets.slice();
+		const set = setSeries.sets[setIndex];
 		const newSet = {
 			...set,
 			id: undefined,
@@ -259,21 +266,23 @@ export function createTrainingSession(ts: TrainingSession, trainingSessionId: Au
 			completedAt: undefined,
 			status: undefined
 		};
+
 		newSets.splice(setIndex + 1, 0, newSet as never);
-		const newSetGroup = {
-			id: setGroup.id,
+
+		const newSetSeriesItem = {
+			id: setSeries.id,
 			sets: newSets
 		};
-		newSetGroups[setGroupIndex] = newSetGroup as never;
-		workout = {
-			...workout,
-			setGroups: newSetGroups
+		newSetSeriesList[setSeriesIndex] = newSetSeriesItem as never;
+		trainingSession = {
+			...trainingSession,
+			setSeries: newSetSeriesList
 		};
 		await internalUpdate();
 	}
 
-	function updateActiveSet(updateFn: (set: AttemptedSet) => AttemptedSet) {
-		return updateSet(setGroupIndex, setIndex, updateFn);
+	function updateActiveSet(updateFn: (set: LoggedSet) => LoggedSet) {
+		return updateSet(setSeriesIndex, setIndex, updateFn);
 	}
 
 	return {
