@@ -1,1 +1,0 @@
-import{r}from"../chunks/CR7fpbC1.js";import{b as t}from"../chunks/D53QGC2D.js";const o=!0,a=!1,s=async e=>(await e.parent(),r(302,`${t}/workouts`)),l=Object.freeze(Object.defineProperty({__proto__:null,load:s,prerender:o,ssr:a},Symbol.toStringTag,{value:"Module"}));export{l as universal};
