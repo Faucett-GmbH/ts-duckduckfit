@@ -114,7 +114,7 @@
 			} else {
 				newSetTemplates[i] = {
 					id: unsafeId(),
-					setType: 'working',
+					setType: 'working_set',
 					exerciseGuid: exercise.guid
 				} as SetTemplate;
 			}

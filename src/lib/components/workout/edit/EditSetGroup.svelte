@@ -196,7 +196,7 @@
 			sets.push({
 				id: unsafeId(),
 				exerciseId: exercise.guid,
-				setType: setGroup.sets.length === 0 ? 'warmup' : 'working'
+				setType: setGroup.sets.length === 0 ? 'warmup' : 'working_set'
 			} as never as SetParams);
 		}
 		setGroup = {
@@ -302,7 +302,7 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={index} />
+				<SetTypeComponent setType={'working_set'} position={index} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">
@@ -337,8 +337,8 @@
 					{/snippet}
 					<button
 						class="btn ghost text-left text-nowrap"
-						class:active={restAfterInSecondsSetType === 'working'}
-						onclick={createOnRestAfterInSecondsSetType('working')}
+						class:active={restAfterInSecondsSetType === 'working_set'}
+						onclick={createOnRestAfterInSecondsSetType('working_set')}
 						>{m.workouts_working_set_title()}</button
 					>
 					<button

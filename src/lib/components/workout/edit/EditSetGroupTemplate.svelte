@@ -226,7 +226,7 @@
 			setTemplates.push({
 				id: unsafeId(),
 				exerciseGuid: exercise.guid,
-				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working'
+				setType: setGroupTemplate.setTemplates.length === 0 ? 'warmup' : 'working_set'
 			} as never);
 		}
 		setGroupTemplate = {
@@ -311,7 +311,7 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={index} />
+				<SetTypeComponent setType={'working_set'} position={index} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">
@@ -347,8 +347,8 @@
 						{/snippet}
 						<button
 							class="btn ghost text-left text-nowrap"
-							class:active={restAfterInSecondsSetType === 'working'}
-							onclick={createOnRestAfterInSecondsSetType('working')}
+							class:active={restAfterInSecondsSetType === 'working_set'}
+							onclick={createOnRestAfterInSecondsSetType('working_set')}
 							>{m.workouts_working_set_title()}</button
 						>
 						<button
@@ -356,12 +356,6 @@
 							class:active={restAfterInSecondsSetType === 'warmup'}
 							onclick={createOnRestAfterInSecondsSetType('warmup')}
 							>{m.workouts_warmup_title()}</button
-						>
-						<button
-							class="btn ghost text-left text-nowrap"
-							class:active={restAfterInSecondsSetType === 'backoff'}
-							onclick={createOnRestAfterInSecondsSetType('backoff')}
-							>{m.workouts_backoff_title()}</button
 						>
 					</Dropdown>
 				</div>
@@ -379,12 +373,10 @@
 			</div>
 			<div class="me-1 flex flex-shrink flex-col">
 				<button class="btn secondary text-sm" onclick={onSetAllRestAfterInSeconds}>
-					{#if restAfterInSecondsSetType === 'working'}
+					{#if restAfterInSecondsSetType === 'working_set'}
 						{m.workouts_working_set_rest_timers_update()}
 					{:else if restAfterInSecondsSetType === 'warmup'}
 						{m.workouts_warmup_rest_timers_update()}
-					{:else}
-						{m.workouts_backoff_rest_timers_update()}
 					{/if}
 				</button>
 			</div>

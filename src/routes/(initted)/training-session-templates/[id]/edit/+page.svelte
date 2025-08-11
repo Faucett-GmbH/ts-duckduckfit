@@ -9,14 +9,13 @@
 	import { base } from '$app/paths';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import type { PageData } from './$types';
-	import { getLocale } from '$lib/state/settings.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import { findTranslation } from '$lib/util';
+	import { training_session_templates_path } from '$lib/domain/training_session_templates/urlPaths';
 
 	let { data }: Props = $props();
 
 	let translation = $derived(findTranslation(data.workoutTemplate.translations));
-	let backUrl = $derived(data.referrer || `${base}/${getLocale()}/workout-templates`);
 </script>
 
 <svelte:head>
@@ -27,7 +26,7 @@
 	<div class="flex w-full flex-grow flex-col sm:container sm:mx-auto">
 		<div class="mt-4 mb-16">
 			<div class="flex flex-shrink flex-row">
-				<a class="flex flex-shrink flex-row" href={backUrl}>
+				<a class="flex flex-shrink flex-row" href={training_session_templates_path()}>
 					<ChevronLeft />
 					{m.workouts_back()}
 				</a>

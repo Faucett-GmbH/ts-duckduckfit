@@ -198,7 +198,7 @@
 				</button>
 			</div>
 			<div class="flex flex-col justify-center">
-				<SetTypeComponent setType={'working'} position={setGroupIndex + 1} />
+				<SetTypeComponent setType={'working_set'} position={setGroupIndex + 1} />
 			</div>
 		</div>
 		<div class="ms-2 flex flex-grow flex-row flex-wrap items-center justify-between">

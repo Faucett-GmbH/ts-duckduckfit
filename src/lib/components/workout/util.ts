@@ -6,13 +6,13 @@ export function getRealSetPosition<S extends { setType: SetType }>(
 	set: S,
 	index: number = sets.length
 ) {
-	if (set.setType !== 'working') {
+	if (set.setType !== 'working_set') {
 		return -1;
 	}
 	let realIndex = 0;
 	for (let i = 0; i < index; i++) {
 		const set = sets[i];
-		if (set.setType === 'working') {
+		if (set.setType === 'working_set') {
 			realIndex += 1;
 		}
 	}

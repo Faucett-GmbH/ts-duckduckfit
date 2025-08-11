@@ -207,19 +207,14 @@
 				{/snippet}
 				<button
 					class="btn ghost text-left text-nowrap"
-					class:active={set.setType === 'working'}
-					onclick={createOnSetType('working')}>{m.workouts_working_set_title()}</button
+					class:active={set.setType === 'working_set'}
+					onclick={createOnSetType('working_set')}>{m.workouts_working_set_title()}</button
 				>
 				<button
 					class="btn ghost text-left text-nowrap"
 					class:active={set.setType === 'warmup'}
 					onclick={createOnSetType('warmup')}>{m.workouts_warmup_title()}</button
 				>
-				<!-- <button
-            class="btn ghost text-nowrap text-left"
-            class:active={set.setType === SetType.BackoffSetType}
-            on:click={createOnSetType(SetType.BackoffSetType)}>{m.workouts_backoff_title()}</button
-          > -->
 			</Dropdown>
 		</div>
 		<div class="flex flex-grow flex-row flex-wrap items-center justify-end">

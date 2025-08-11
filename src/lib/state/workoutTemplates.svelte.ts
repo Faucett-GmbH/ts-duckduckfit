@@ -11,7 +11,7 @@ import { userDocument } from './userDocument.svelte';
 import { getAndApplyChanges } from '$lib/diff';
 
 export type SetGroupType = 'straight' | 'superset' | 'circuit';
-export type SetType = 'warmup' | 'working' | 'backoff';
+export type SetType = 'warmup' | 'working_set';
 
 export interface SetTemplate {
 	id: string;
@@ -83,7 +83,8 @@ export async function getWorkoutTemplates(
 export async function getWorkoutTemplateById(
 	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>
 ): Promise<WorkoutTemplate | null> {
-	const workoutTemplateDocHandle = await findDocument(workoutTemplateId);
+	const repo = getRepo()
+	const workoutTemplateDocHandle = await findDocument(workoutTemplateId, repo);
 	if (!workoutTemplateDocHandle) {
 		return null;
 	}
@@ -93,28 +94,30 @@ export async function getWorkoutTemplateById(
 export async function deleteWorkoutTemplate(
 	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>
 ) {
+	const repo = getRepo()
 	const workoutTemplates = await userDocument.current!.workoutTemplates();
 	workoutTemplates.change((wts) => {
 		delete wts.workoutTemplatesById[workoutTemplateId];
 	});
-	deleteDocument(workoutTemplateId);
+	deleteDocument(workoutTemplateId, repo);
 }
 
 export async function upsertWorkoutTemplate(
 	workoutTemplateUpdates: WorkoutTemplate,
 	workoutTemplateId?: AutomergeDocumentId<WorkoutTemplate>
 ) {
+	const repo = getRepo()
 	const workoutTemplates = await userDocument.current!.workoutTemplates();
 	let workoutTemplateDocument: AutomergeDocHandle<WorkoutTemplate>;
 	if (!workoutTemplateId) {
-		workoutTemplateDocument = createDocument<WorkoutTemplate>(workoutTemplateUpdates);
+		workoutTemplateDocument = createDocument<WorkoutTemplate>(workoutTemplateUpdates, repo);
 		workoutTemplateId = workoutTemplateDocument.documentId as AutomergeDocumentId<WorkoutTemplate>;
 		const documentId = workoutTemplateId;
 		workoutTemplates.change((wts) => {
 			wts.workoutTemplatesById[documentId] = true;
 		});
 	} else {
-		workoutTemplateDocument = await findDocument(workoutTemplateId);
+		workoutTemplateDocument = await findDocument(workoutTemplateId, repo);
 		workoutTemplateDocument.change((workoutTemplate) => {
 			let updated = false;
 			if (

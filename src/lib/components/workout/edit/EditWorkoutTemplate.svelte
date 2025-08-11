@@ -29,7 +29,6 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import EditSetGroupTemplate from './EditSetGroupTemplate.svelte';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { getId, unsafeId } from '$lib/util';
 	import Sortable from '$lib/components/Sortable.svelte';
@@ -43,6 +42,7 @@
 	} from '$lib/state/workoutTemplates.svelte';
 	import type { Exercise } from '$lib/state/exerciseTypes';
 	import { getLocale } from '$lib/state/settings.svelte';
+	import { training_session_templates_path } from '$lib/domain/training_session_templates/urlPaths';
 
 	let {
 		workoutTemplateId,
@@ -166,7 +166,7 @@
 					},
 					workoutTemplateId
 				);
-				await goto(`${base}/workout-templates`);
+				await goto(training_session_templates_path());
 			}
 		} catch (error) {
 			await handleError(error);
