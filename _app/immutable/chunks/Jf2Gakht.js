@@ -1,0 +1,1 @@
+const t=()=>"/training-session-templates",n=()=>"/training-session-templates/add",a=s=>`/training-session-templates/${s}/edit`,e=s=>`/training-session-templates/${s}/start`;export{n as a,a as e,e as s,t};
