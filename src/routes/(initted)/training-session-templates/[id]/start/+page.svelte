@@ -31,11 +31,15 @@
 	import { findTranslation } from '$lib/util';
 	import { upsertWorkout, type Workout } from '$lib/state/workouts.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
+	import {
+		start_training_session_from_training_session_template_path,
+		training_session_templates_path
+	} from '$lib/domain/training_session_templates/urlPaths';
 
 	let { data }: Props = $props();
 
 	async function onDelete() {
-		await goto(`${base}/workout-templates`);
+		await goto(training_session_templates_path());
 	}
 
 	let firstSet = $derived(data.workoutTemplate.setGroupTemplates[0]?.setTemplates[0]);
@@ -98,7 +102,7 @@
 	<div class="flex w-full flex-grow flex-col sm:container sm:mx-auto">
 		<div class="mt-4 mb-16">
 			<div class="flex flex-shrink flex-row">
-				<a class="flex flex-shrink flex-row" href={`${base}/workout-templates`}>
+				<a class="flex flex-shrink flex-row" href={training_session_templates_path()}>
 					<ChevronLeft />
 					{m.workouts_back()}
 				</a>
@@ -109,7 +113,9 @@
 						workoutTemplateId={data.workoutTemplateId}
 						workoutTemplate={data.workoutTemplate}
 						bind:exerciseByGuid={data.exerciseByGuid}
-						editReferrer={`${base}/workout-templates/${data.workoutTemplateId}/start`}
+						editReferrer={start_training_session_from_training_session_template_path(
+							data.workoutTemplateId
+						)}
 						{onDelete}
 					/>
 					<div class="mt-2 flex flex-row justify-center">

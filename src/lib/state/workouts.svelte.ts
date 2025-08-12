@@ -92,7 +92,8 @@ export async function getWorkouts(
 export async function getWorkoutById(
 	workoutId: AutomergeDocumentId<Workout>
 ): Promise<Workout | null> {
-	const workoutDocHandle = await findDocument(workoutId);
+	const repo = getRepo();
+	const workoutDocHandle = await findDocument(workoutId, repo);
 	if (!workoutDocHandle) {
 		return null;
 	}
@@ -114,11 +115,12 @@ export async function getActiveWorkoutByWorkoutTemplateId(
 }
 
 export async function deleteWorkout(workoutId: AutomergeDocumentId<Workout>) {
+	const repo = getRepo()
 	const workouts = await userDocument.current!.workouts();
 	workouts.change((wts) => {
 		delete wts.workoutsById[workoutId];
 	});
-	deleteDocument(workoutId);
+	deleteDocument(workoutId, repo);
 }
 
 export async function upsertWorkout(
@@ -127,8 +129,9 @@ export async function upsertWorkout(
 ) {
 	const workouts = await userDocument.current!.workouts();
 	let workoutDocument: AutomergeDocHandle<Workout>;
+	const repo = getRepo()
 	if (!workoutId) {
-		workoutDocument = createDocument<Workout>(workoutUpdates);
+		workoutDocument = createDocument<Workout>(workoutUpdates, repo);
 		workoutId = workoutDocument.documentId as AutomergeDocumentId<Workout>;
 		const documentId = workoutId;
 		workouts.change((wts) => {
@@ -138,7 +141,7 @@ export async function upsertWorkout(
 			}
 		});
 	} else {
-		workoutDocument = await findDocument(workoutId);
+		workoutDocument = await findDocument(workoutId, repo);
 		const previousWorkoutTemplateId = workoutDocument.doc().workoutTemplateId;
 		workoutDocument.change((workout) => {
 			let updated = false;

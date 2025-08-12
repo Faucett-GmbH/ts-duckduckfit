@@ -6,11 +6,11 @@
 	import { Settings } from 'lucide-svelte';
 	import Dumbbell from 'lucide-svelte/icons/dumbbell';
 	import Repeat from 'lucide-svelte/icons/repeat';
-	import Weight from 'lucide-svelte/icons/weight';
 	import Menu from 'lucide-svelte/icons/menu';
 	import { navigating, page } from '$app/state';
 	import Logo from './Logo.svelte';
 	import logoHorizontalWEBP from '$lib/assets/logo-horizontal.webp';
+	import { training_session_templates_path } from '$lib/domain/training_session_templates/urlPaths';
 
 	let open = $state(false);
 	function onGoto() {
@@ -59,10 +59,10 @@
 				</a>
 
 				<a
-					href={`${base}/training-session-templates`}
+					href={training_session_templates_path()}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
-						'bg-black/10': page.route.id === '/(initted)/training-session-templates'
+						'bg-black/10': page.route.id === training_session_templates_path()
 					}}
 					onclick={onGoto}
 				>
