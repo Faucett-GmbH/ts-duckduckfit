@@ -34,7 +34,7 @@
 	import {
 		start_training_session_from_training_session_template_path,
 		training_session_templates_path
-	} from '$lib/domain/training_session_templates/urlPaths';
+	} from '$lib/domain/TrainingSessionTemplates/urlPaths';
 
 	let { data }: Props = $props();
 

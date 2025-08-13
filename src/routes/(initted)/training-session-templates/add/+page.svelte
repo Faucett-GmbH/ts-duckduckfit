@@ -10,7 +10,7 @@
 	import type { PageData } from './$types';
 	import { base } from '$app/paths';
 	import EditWorkoutTemplate from '$lib/components/workout/edit/EditWorkoutTemplate.svelte';
-	import { training_session_templates_path } from '$lib/domain/training_session_templates/urlPaths';
+	import { training_session_templates_path } from '$lib/domain/TrainingSessionTemplates/urlPaths';
 
 	let { data }: Props = $props();
 </script>

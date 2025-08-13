@@ -18,7 +18,7 @@
 	import {
 		add_training_session_templates_path,
 		start_training_session_from_training_session_template_path
-	} from '$lib/domain/training_session_templates/urlPaths';
+	} from '$lib/domain/TrainingSessionTemplates/urlPaths';
 
 	let offset = $state(0);
 	let limit = $state(10);
