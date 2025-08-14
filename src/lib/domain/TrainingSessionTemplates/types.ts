@@ -1,7 +1,10 @@
 import type { Locale } from "$lib/paraglide/runtime";
 
 // stubs for now
-type Exercise = {}
+export type Exercise = {
+  guid: string;
+  name: string;
+}
 
 export type SetType = "warm_up" | "working_set";
 
@@ -29,6 +32,7 @@ export type ExerciseBlockTemplate = {
 
 
 export type SetTemplate = {
+  id: string;
   exerciseGuid: string;
   position: number
   setType: SetType
@@ -36,5 +40,5 @@ export type SetTemplate = {
   targetWeight: number
   targetRPE: number
 
-  notes: NoteTranslation[];
+  notes: string
 }

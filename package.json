@@ -74,7 +74,8 @@
 		"svelte-portal": "^2.2.1",
 		"ua-parser-js": "^2.0.4",
 		"uuid": "^11.1.0",
-		"vest": "^5.4.6"
+		"vest": "^5.4.6",
+		"zod": "^4.0.17"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
