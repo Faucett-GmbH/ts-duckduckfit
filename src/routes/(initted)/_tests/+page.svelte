@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NumericField from '$lib/domain/Core/Components/NumericField.svelte';
-	import SetTemplateComponent from '$lib/domain/TrainingSessionTemplates/Components/SetTemplate.svelte';
+	import SetTemplateRow from '$lib/domain/TrainingSessionTemplates/Components/SetTemplateRow.svelte';
 	import type { SetTemplate, Exercise } from '$lib/domain/TrainingSessionTemplates/types';
 
 	let exerciseGuids = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
@@ -30,4 +30,30 @@
 </script>
 
 <NumericField bind:value={x} min={0} max={500} step={0.25} />
-<SetTemplateComponent bind:value={st} {exercises} />
+<table>
+	<thead>
+		<tr>
+			<th>
+				<span>#</span>
+			</th>
+			<th>
+				<span>Set Type</span>
+			</th>
+			<th>
+				<span>Weight</span>
+			</th>
+			<th>
+				<span>Reps</span>
+			</th>
+			<th>
+				<span>RPE</span>
+			</th>
+			<th>
+				<span>Notes</span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<SetTemplateRow bind:value={st} {exercises} position={1} />
+	</tbody>
+</table>
