@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NumericField from '$lib/domain/Core/Components/NumericField.svelte';
 	import SetTemplateComponent from '$lib/domain/TrainingSessionTemplates/Components/SetTemplate.svelte';
 	import type { SetTemplate, Exercise } from '$lib/domain/TrainingSessionTemplates/types';
 
@@ -24,6 +25,9 @@
 	$effect(() => {
 		console.log(st);
 	});
+
+	let x = 100;
 </script>
 
+<NumericField bind:value={x} min={0} max={500} step={0.25} />
 <SetTemplateComponent bind:value={st} {exercises} />
