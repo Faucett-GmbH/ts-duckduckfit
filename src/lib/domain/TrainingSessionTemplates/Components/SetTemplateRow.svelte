@@ -3,6 +3,7 @@
 		exercises: Exercise[];
 		value: SetTemplate;
 		position: number;
+		onSave?: (v: SetTemplate) => void;
 	}
 </script>
 
@@ -11,10 +12,20 @@
 	import { Settings2 } from 'lucide-svelte';
 
 	import type { SetType, SetTemplate, Exercise } from '../types';
+	import Modal from '$lib/components/Modal.svelte';
+	import { setTemplateSchema } from '../schemas';
 
-	let { exercises, value = $bindable(), position }: SetTemplateProps = $props();
+	let { exercises, value = $bindable(), position, onSave }: SetTemplateProps = $props();
 
-	function onEditNotes() {}
+	let editNoteOpen = $state(false);
+
+	function onCloseNoteEdit() {
+		editNoteOpen = false;
+	}
+
+	function onEditNotes() {
+		editNoteOpen = true;
+	}
 </script>
 
 <tr data-component="SetTemplateRow" class="bg-white">
@@ -43,10 +54,38 @@
 
 	<!-- Details -->
 	<td class="notes px-2 py-1">
-		<button onclick={onEditNotes}>
+		<button onclick={onEditNotes} class="cursor">
 			<span>
 				<Settings2 />
 			</span>
 		</button>
 	</td>
 </tr>
+
+<Modal bind:open={editNoteOpen} onClose={onCloseNoteEdit}>
+	{#snippet title()}
+		<div class="text-center">
+			<h5>
+				<span>Attributes</span>
+			</h5>
+		</div>
+	{/snippet}
+	<div class="flex flex-grow flex-col">
+		<div class="mb-4 flex flex-row">
+			<div class="w-16">
+				<label for="rpe">RPE</label>
+			</div>
+			<div class="w-full">
+				<NumericField id="rpe" bind:value={value.targetRPE} min={1} max={10} step={1} />
+			</div>
+		</div>
+		<div class="flex flex-row">
+			<div class=" w-16">
+				<label for="notes">Notes</label>
+			</div>
+			<div class="w-full">
+				<textarea id="notes" class="w-full" bind:value={value.notes}></textarea>
+			</div>
+		</div>
+	</div>
+</Modal>

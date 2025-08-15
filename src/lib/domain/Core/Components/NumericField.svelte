@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	export interface NumericFieldProps {
+		id?: string;
 		value: number | null;
 		min?: number | undefined;
 		max?: number | undefined;
@@ -11,6 +12,11 @@
 		readonly?: boolean;
 		required?: boolean;
 
+		describedBy?: string;
+		invalid?: boolean;
+
+		inputClass?: string | undefined;
+
 		// -------- callbacks --------
 		onInput?: (v: number | null) => void;
 		onChange?: (v: number | null) => void;
@@ -21,6 +27,7 @@
 
 <script lang="ts">
 	let {
+		id,
 		value = $bindable<number | null>(null),
 		min,
 		max,
