@@ -1,1 +1,0 @@
-import{g as n,e as o,u as s,h as g,i as u}from"./B2AM1jDV.js";function h(e){let r=n(o(e.doc()));function a(t){u(r,t.doc,!0)}return e.addListener("change",a),s(()=>()=>e.removeListener("change",a)),{get doc(){return g(r)},get docHandle(){return e},change(t){e.change(t)}}}export{h as a};
