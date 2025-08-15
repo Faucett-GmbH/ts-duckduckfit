@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	import NumericField from '$lib/domain/Core/Components/NumericField.svelte';
-	import { NotebookPen } from 'lucide-svelte';
+	import { Settings2 } from 'lucide-svelte';
 
 	import type { SetType, SetTemplate, Exercise } from '../types';
 
@@ -41,16 +41,11 @@
 		<NumericField bind:value={value.targetReps} min={0} step={1} />
 	</td>
 
-	<!-- Target RPE -->
-	<td class="targetRPE px-2 py-1">
-		<NumericField bind:value={value.targetRPE} min={0} max={10} step={1} />
-	</td>
-
-	<!-- Notes: model input via icon click -->
+	<!-- Details -->
 	<td class="notes px-2 py-1">
 		<button onclick={onEditNotes}>
 			<span>
-				<NotebookPen />
+				<Settings2 />
 			</span>
 		</button>
 	</td>

@@ -46,10 +46,7 @@
 				<span>Reps</span>
 			</th>
 			<th>
-				<span>RPE</span>
-			</th>
-			<th>
-				<span>Notes</span>
+				<span>Details</span>
 			</th>
 		</tr>
 	</thead>
