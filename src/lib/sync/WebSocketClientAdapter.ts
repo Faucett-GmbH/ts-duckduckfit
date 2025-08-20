@@ -1,4 +1,4 @@
-import { cbor } from '@automerge/automerge-repo/slim';
+import { cbor } from '@automerge/automerge-repo';
 import {
 	WebSocketClientAdapter as AutomergeWebSocketClientAdapter,
 	type FromClientMessage,

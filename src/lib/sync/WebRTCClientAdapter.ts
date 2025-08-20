@@ -3,7 +3,7 @@ import {
 	type Message,
 	type PeerId,
 	type PeerMetadata
-} from '@automerge/automerge-repo/slim';
+} from '@automerge/automerge-repo';
 import type { KeepAliveWebSocket } from '@aicacia/keepalivewebsocket';
 import EventEmitter from 'eventemitter3';
 import type { P2pMessage } from './websocket';
@@ -116,13 +116,13 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			console.error(`failed to join`, error);
 		});
 
-		this.#forceReady();
-
 		this.emit('peer-candidate', {
 			peerId: 'self',
 			peerMetadata: peerMetadata,
 			deviceId: await getDeviceId()
 		} as never);
+
+		this.#forceReady();
 	}
 
 	async #join() {
@@ -239,7 +239,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 	};
 
 	#createPeer = async (deviceId: string) => {
-		console.assert(this.peerId, 'peerId is not set');
+		console.assert(this.peerId != null, 'peerId is not set');
 
 		this.#remotePeers.get(deviceId)?.close();
 
@@ -315,7 +315,7 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 						if (!peer.isInitiator()) {
 							await peer.init();
 							peer.once('connect', () => {
-								console.assert(this.peerId, 'peerId is not set');
+								console.assert(this.peerId != null, 'peerId is not set');
 								peer.send(
 									toArrayBuffer(
 										encode({

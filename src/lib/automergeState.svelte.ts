@@ -1,4 +1,4 @@
-import type { DocHandleChangePayload } from '@automerge/automerge-repo/slim';
+import type { DocHandleChangePayload } from '@automerge/automerge-repo';
 import type { AutomergeDocHandle } from './repo';
 
 export type AutomergeState<T> = ReturnType<typeof automergeDocHandleState<T>>;

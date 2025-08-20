@@ -1,4 +1,4 @@
-import type { DocHandleChangePayload } from '@automerge/automerge-repo/slim';
+import type { DocHandleChangePayload } from '@automerge/automerge-repo';
 import type { AutomergeDocHandle } from '$lib/repo';
 import { v7 } from 'uuid';
 import { getDeviceId, getDeviceName } from './fingerprintjs.svelte';

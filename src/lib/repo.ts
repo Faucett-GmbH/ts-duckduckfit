@@ -1,6 +1,5 @@
-import wasmUrl from '@automerge/automerge/automerge.wasm?url';
-import { next as Automerge, type ChangeFn, type Doc } from '@automerge/automerge/slim';
-import { Repo, type DocHandle, type DocumentId } from '@automerge/automerge-repo/slim';
+import type { ChangeFn, Doc } from '@automerge/automerge';
+import { Repo, type DocHandle, type DocumentId } from '@automerge/automerge-repo';
 import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb';
 import { lazy } from '$lib/lazy';
 // import { getWebRTCClientAdapter } from './sync';
@@ -12,8 +11,6 @@ export type AutomergeDocument<T extends AutomergeDocumentId<never>> =
 export type AutomergeDocHandle<T> = DocHandle<T> & {
 	documentId: AutomergeDocumentId<T>;
 };
-
-export const initAutomerge = lazy(async () => await Automerge.initializeWasm(wasmUrl));
 
 export const getRepo = lazy(
 	() =>

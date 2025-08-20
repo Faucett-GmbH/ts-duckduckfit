@@ -3,6 +3,7 @@ import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
+import vitePluginWasm from 'vite-plugin-wasm';
 import { networkInterfaces } from 'node:os';
 import { readFileSync } from 'node:fs';
 
@@ -24,8 +25,8 @@ export default defineConfig(async ({ mode }) => {
 		clearScreen: false,
 		resolve: process.env.VITEST
 			? {
-				conditions: ['browser']
-			}
+					conditions: ['browser']
+				}
 			: undefined,
 		test: {
 			environment: 'jsdom'
@@ -36,10 +37,10 @@ export default defineConfig(async ({ mode }) => {
 			strictPort: true,
 			hmr: host
 				? {
-					protocol: 'ws',
-					host,
-					port: 5183
-				}
+						protocol: 'ws',
+						host,
+						port: 5183
+					}
 				: undefined,
 			watch: {
 				ignored: ['**/src-tauri/**']
@@ -47,6 +48,7 @@ export default defineConfig(async ({ mode }) => {
 		},
 		envPrefix: ['VITE_', 'TAURI_'],
 		plugins: [
+			vitePluginWasm(),
 			tailwindcss(),
 			sveltekit(),
 			devtoolsJson(),
