@@ -60,7 +60,6 @@
 		"@aicacia/string-fuzzy_equals": "^0.1.4",
 		"@automerge/automerge": "^3.1.1",
 		"@automerge/automerge-repo": "^2.2.0",
-		"@automerge/automerge-repo-network-websocket": "^2.2.0",
 		"@automerge/automerge-repo-storage-indexeddb": "^2.2.0",
 		"@fingerprintjs/fingerprintjs": "^4.6.2",
 		"@svelte-plugins/datepicker": "^1.0.11",

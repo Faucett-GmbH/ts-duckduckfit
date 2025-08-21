@@ -70,6 +70,7 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	);
 	await initDocument(await findDocument(userDocument.workouts, repo), workoutsConfig);
 	await initDocument(await findDocument(userDocument.exercises, repo), exercisesConfig);
+	await repo.flush();
 }
 
 export class CurrentUserDocument {

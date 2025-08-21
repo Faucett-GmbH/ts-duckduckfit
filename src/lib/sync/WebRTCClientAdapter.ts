@@ -116,12 +116,6 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 			console.error(`failed to join`, error);
 		});
 
-		this.emit('peer-candidate', {
-			peerId: 'self',
-			peerMetadata: peerMetadata,
-			deviceId: await getDeviceId()
-		} as never);
-
 		this.#forceReady();
 	}
 
@@ -147,21 +141,6 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 	}
 
 	async send(message: Message) {
-		if (message.targetId === 'self') {
-			this.receive(
-				await getDeviceId(),
-				new Uint8Array(
-					toArrayBuffer(
-						encode({
-							...message,
-							senderId: 'self',
-							targetId: this.peerId!
-						} as Message)
-					)
-				)
-			);
-			return;
-		}
 		await Promise.all(
 			[...this.#deviceIds.values()].map(async (deviceId) => {
 				try {
@@ -225,6 +204,9 @@ export class WebRTCClientAdapter extends NetworkAdapter {
 				break;
 			}
 			default: {
+				if (!syncMessage.data) {
+					break;
+				}
 				this.emit('message', syncMessage as Message);
 				break;
 			}

@@ -2,8 +2,7 @@ import type { ChangeFn, Doc } from '@automerge/automerge';
 import { Repo, type DocHandle, type DocumentId } from '@automerge/automerge-repo';
 import { IndexedDBStorageAdapter } from '@automerge/automerge-repo-storage-indexeddb';
 import { lazy } from '$lib/lazy';
-// import { getWebRTCClientAdapter } from './sync';
-import { WebSocketClientAdapter } from './sync/WebSocketClientAdapter';
+import { getWebRTCClientAdapter } from './sync';
 
 export type AutomergeDocumentId<T> = DocumentId & { _type: T };
 export type AutomergeDocument<T extends AutomergeDocumentId<never>> =
@@ -15,8 +14,7 @@ export type AutomergeDocHandle<T> = DocHandle<T> & {
 export const getRepo = lazy(
 	() =>
 		new Repo({
-			// network: [getWebRTCClientAdapter()],
-			network: [new WebSocketClientAdapter('wss://sync.automerge.org')],
+			network: [getWebRTCClientAdapter()],
 			storage: new IndexedDBStorageAdapter('duckduckfit', 'automerge')
 		})
 );

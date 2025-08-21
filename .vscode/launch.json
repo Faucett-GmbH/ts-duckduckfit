@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "runtimeExecutable": "${env:CHROME_PATH}",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222"
+      ],
+      "request": "launch",
+      "name": "Launch Web",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
