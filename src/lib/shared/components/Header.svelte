@@ -8,6 +8,7 @@
 	import { navigating, page } from '$app/state';
 	import Logo from './Logo.svelte';
 	import logoHorizontalWEBP from '$lib/assets/logo-horizontal.webp';
+	import { settings_application_path } from '$lib/contexts/settings/routes';
 
 	let open = $state(false);
 	function onGoto() {
@@ -42,7 +43,7 @@
 					</button>
 				{/snippet}
 				<a
-					href={resolve('/settings/application')}
+					href={settings_application_path()}
 					class={{
 						'default flex cursor-pointer flex-row justify-between p-2 hover:bg-gray-200 dark:hover:bg-gray-600': true,
 						'bg-black/10': page.route.id?.startsWith('/(initted)/settings')
