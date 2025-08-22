@@ -5,7 +5,6 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:duckduckfit.com</string>
-		<string>applinks:faucett-gmbh.github.io</string>
 	</array>
 </dict>
 </plist>

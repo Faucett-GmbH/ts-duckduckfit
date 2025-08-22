@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "duckduckfit_ui.fullname" . }}
-  labels: {{- include "duckduckfit_ui.labels" . | nindent 4 }}
+  name: {{ include "duckduckfit.fullname" . }}
+  labels: {{- include "duckduckfit.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "duckduckfit_ui.fullname" . }}
+    name: {{ include "duckduckfit.fullname" . }}
   minReplicas: {{ .Values.replicas.min }}
   maxReplicas: {{ .Values.replicas.max }}
   behavior:

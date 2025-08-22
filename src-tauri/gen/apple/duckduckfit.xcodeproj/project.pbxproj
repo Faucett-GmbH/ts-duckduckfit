@@ -29,7 +29,7 @@
 		3115A8A7F3A0834C387A3074 /* bindings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bindings.h; sourceTree = "<group>"; };
 		3D54665A70913E253D7ED5A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4CF6C25C4781DE78FEDB4019 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		56BB0D7FA8AC4D7C75A6DB66 /* duckduckfit_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = duckduckfit_iOS.entitlements; sourceTree = "<group>"; };
+		56BB0D7FA8AC4D7C75A6DB66 /* finances_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = finances_iOS.entitlements; sourceTree = "<group>"; };
 		6A197424C032D47460766C13 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
 		6A77917121F7A7C7956BE9BF /* main.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.rs; sourceTree = "<group>"; };
 		9781DB0D65AC1934D4969D21 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -67,7 +67,7 @@
 				6A197424C032D47460766C13 /* assets */,
 				1F963634FE2323EC9C801144 /* Assets.xcassets */,
 				C9998F742651F062F366419A /* LaunchScreen.storyboard */,
-				50374EE8EBA0D23AE64984CE /* duckduckfit_iOS */,
+				50374EE8EBA0D23AE64984CE /* finances_iOS */,
 				CEE2B7C3D8C1834F31128FCA /* Externals */,
 				C4096DA1B3CCDD20DD020051 /* Sources */,
 				90076E5F496A593E1D0F445A /* src */,
@@ -76,13 +76,13 @@
 			);
 			sourceTree = "<group>";
 		};
-		50374EE8EBA0D23AE64984CE /* duckduckfit_iOS */ = {
+		50374EE8EBA0D23AE64984CE /* finances_iOS */ = {
 			isa = PBXGroup;
 			children = (
-				56BB0D7FA8AC4D7C75A6DB66 /* duckduckfit_iOS.entitlements */,
+				56BB0D7FA8AC4D7C75A6DB66 /* finances_iOS.entitlements */,
 				3D54665A70913E253D7ED5A9 /* Info.plist */,
 			);
-			path = duckduckfit_iOS;
+			path = finances_iOS;
 			sourceTree = "<group>";
 		};
 		5402AB1FB0AE446B1631967B /* Frameworks */ = {
@@ -153,9 +153,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9D458881F57F72DBAAA3E81B /* duckduckfit_iOS */ = {
+		9D458881F57F72DBAAA3E81B /* finances_iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 61FDC267AC6D1E8411F674EE /* Build configuration list for PBXNativeTarget "duckduckfit_iOS" */;
+			buildConfigurationList = 61FDC267AC6D1E8411F674EE /* Build configuration list for PBXNativeTarget "finances_iOS" */;
 			buildPhases = (
 				76030756CECC2C43DF729917 /* Build Rust Code */,
 				4F3115DFF6D7C73F40AB81FD /* Sources */,
@@ -166,8 +166,8 @@
 			);
 			dependencies = (
 			);
-			name = duckduckfit_iOS;
-			productName = duckduckfit_iOS;
+			name = finances_iOS;
+			productName = finances_iOS;
 			productReference = A97CBB9E0F9A93FBAB735944 /* duckduckfit.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -192,7 +192,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9D458881F57F72DBAAA3E81B /* duckduckfit_iOS */,
+				9D458881F57F72DBAAA3E81B /* finances_iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -256,7 +256,7 @@
 					"arm64-sim",
 				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = duckduckfit_iOS/duckduckfit_iOS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = finances_iOS/finances_iOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 6YH4KS632P;
 				ENABLE_BITCODE = NO;
@@ -266,7 +266,7 @@
 					"$(inherited)",
 					"\".\"",
 				);
-				INFOPLIST_FILE = duckduckfit_iOS/Info.plist;
+				INFOPLIST_FILE = finances_iOS/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -366,7 +366,7 @@
 					"arm64-sim",
 				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = duckduckfit_iOS/duckduckfit_iOS.entitlements;
+				CODE_SIGN_ENTITLEMENTS = finances_iOS/finances_iOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 6YH4KS632P;
 				ENABLE_BITCODE = NO;
@@ -376,7 +376,7 @@
 					"$(inherited)",
 					"\".\"",
 				);
-				INFOPLIST_FILE = duckduckfit_iOS/Info.plist;
+				INFOPLIST_FILE = finances_iOS/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -486,7 +486,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = debug;
 		};
-		61FDC267AC6D1E8411F674EE /* Build configuration list for PBXNativeTarget "duckduckfit_iOS" */ = {
+		61FDC267AC6D1E8411F674EE /* Build configuration list for PBXNativeTarget "finances_iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4532E45602A3DCB63BF8E40 /* debug */,

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "duckduckfit_ui.fullname" . }}
+  name: {{ include "duckduckfit.fullname" . }}
   labels:
-    {{- include "duckduckfit_ui.labels" . | nindent 4 }}
+    {{- include "duckduckfit.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "duckduckfit_ui.selectorLabels" . | nindent 6 }}
+      {{- include "duckduckfit.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         checksum/config-environment: {{ include (print $.Template.BasePath "/config-environment.yaml") . | sha256sum }}
         image/hash: {{ .Values.image.hash }}
       labels:
-        {{- include "duckduckfit_ui.selectorLabels" . | nindent 8 }}
+        {{- include "duckduckfit.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
@@ -27,7 +27,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ include "duckduckfit_ui.fullname" . }}-environment
+                name: {{ include "duckduckfit.fullname" . }}-environment
           ports:
             - name: http
               containerPort: 80

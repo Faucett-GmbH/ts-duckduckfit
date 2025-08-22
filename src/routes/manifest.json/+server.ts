@@ -1,4 +1,5 @@
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
+import icon256x256 from '$lib/assets/icon256x256.png';
 import { json } from '@sveltejs/kit';
 
 export const prerender = true;
@@ -12,14 +13,14 @@ export async function GET() {
 		manifest_version: 3,
 		icons: [
 			{
-				src: `${base}/icon256x256.png`,
+				src: icon256x256,
 				sizes: '256x256',
 				type: 'image/png'
 			}
 		],
-		id: `${base}/?source=pwa`,
-		start_url: `${base}/?source=pwa`,
-		scope: `${base}/`,
+		id: `${resolve('/')}?source=pwa`,
+		start_url: `${resolve('/')}?source=pwa`,
+		scope: resolve('/'),
 		display: 'standalone',
 		background_color: 'white',
 		theme_color: 'white'

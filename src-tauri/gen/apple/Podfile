@@ -1,13 +1,13 @@
 # Uncomment the next line to define a global platform for your project
 
-target 'duckduckfit_iOS' do
+target 'finances_iOS' do
 platform :ios, '13.0'
-  # Pods for duckduckfit_iOS
+  # Pods for finances_iOS
 end
 
-target 'duckduckfit_macOS' do
+target 'finances_macOS' do
 platform :osx, '11.0'
-  # Pods for duckduckfit_macOS
+  # Pods for finances_macOS
 end
 
 # Delete the deployment target for iOS and macOS, causing it to be inherited from the Podfile

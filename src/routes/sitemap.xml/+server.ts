@@ -9,10 +9,10 @@ const xmlHeader = `<?xml version="1.0" encoding="UTF-8" ?>
   xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
   xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
 >`;
-const xmlFooter = `</urlset>`;
+const xmlFooter = '</urlset>';
 
 export async function GET() {
-	return new Response(`${xmlHeader}\n${xmlFooter}`, {
+	return new Response(`${xmlHeader}${xmlFooter}`, {
 		headers: {
 			'Content-Type': 'application/xml'
 		}

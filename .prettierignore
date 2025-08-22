@@ -7,8 +7,3 @@ bun.lockb
 
 # Miscellaneous
 /static/
-/helm/
-
-# src-tauri
-/src-tauri/gen
-/src-tauri/target

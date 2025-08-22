@@ -7,7 +7,7 @@
 		"frontendDist": "../build",
 		"devUrl": "http://localhost:5173",
 		"beforeDevCommand": "pnpm dev",
-		"beforeBuildCommand": "PUBLIC_URL=https://faucett-gmbh.github.io/ts-duckduckfit PUBLIC_P2P_API_URL=https://p2p.aicacia.com PUBLIC_P2P_WS_URL=wss://p2p.aicacia.com NODE_ENV=production pnpm build",
+		"beforeBuildCommand": "PUBLIC_URL=https://faucett-gmbh.github.io/ts-duckduckfit NODE_ENV=production pnpm build",
 		"removeUnusedCommands": true
 	},
 	"app": {
@@ -40,15 +40,15 @@
 		"deep-link": {
 			"mobile": [
 				{
-					"host": "duckduckfit.com"
+					"host": "finances.com"
 				},
 				{
-					"host": "faucett-gmbh.github.io"
+					"host": "finances.github.io"
 				}
 			],
 			"desktop": {
 				"schemes": [
-					"duckduckfit"
+					"finances"
 				]
 			}
 		}

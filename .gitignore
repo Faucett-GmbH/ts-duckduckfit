@@ -19,14 +19,9 @@ Thumbs.db
 !.env.example
 !.env.test
 
-# Relics
-tmp/
-.DS_Store
-
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Paraglide
 src/lib/paraglide
-project.inlang/cache

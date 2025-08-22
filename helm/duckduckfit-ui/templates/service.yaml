@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: { { include "duckduckfit_ui.fullname" . } }
-  labels: { { - include "duckduckfit_ui.labels" . | nindent 4 } }
+  name: { { include "duckduckfit.fullname" . } }
+  labels: { { - include "duckduckfit.labels" . | nindent 4 } }
 spec:
   type: ClusterIP
   ports:
@@ -10,4 +10,4 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  selector: { { - include "duckduckfit_ui.selectorLabels" . | nindent 4 } }
+  selector: { { - include "duckduckfit.selectorLabels" . | nindent 4 } }

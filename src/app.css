@@ -103,7 +103,7 @@
 	[role='textbox'],
 	select,
 	textarea {
-		@apply rounded-lg border border-gray-600 bg-gray-50 px-3 py-1 text-base text-gray-950 placeholder-gray-600 outline-none focus:outline-none dark:bg-gray-900 dark:text-white;
+		@apply rounded border border-gray-600 bg-gray-50 px-3 py-1 text-base text-gray-950 placeholder-gray-600 outline-none focus:outline-none dark:bg-gray-900 dark:text-white;
 	}
 	select {
 		-webkit-appearance: none;
@@ -204,7 +204,7 @@
 
 @layer components {
 	.btn {
-		@apply cursor-pointer rounded-lg border border-gray-600 px-3 py-1 text-center text-base font-bold no-underline transition-all duration-150 ease-linear outline-none focus:outline-none;
+		@apply cursor-pointer rounded border border-gray-600 px-3 py-1 text-center text-base font-bold no-underline transition-all duration-150 ease-linear outline-none focus:outline-none;
 	}
 	.btn[disabled] {
 		@apply cursor-not-allowed opacity-50;
@@ -315,9 +315,9 @@
 	}
 
 	.card {
-		@apply rounded-lg bg-gray-100 p-4 dark:bg-gray-800;
+		@apply rounded bg-white p-4 dark:bg-gray-800;
 	}
 	.card.secondary {
-		@apply rounded-lg bg-white p-4 dark:bg-gray-950;
+		@apply rounded bg-gray-100 p-4 dark:bg-gray-950;
 	}
 }

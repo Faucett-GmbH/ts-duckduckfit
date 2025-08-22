@@ -1,13 +1,12 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import devtoolsJson from 'vite-plugin-devtools-json';
-import { defineConfig, loadEnv, type UserConfig } from 'vite';
-import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig, loadEnv, type UserConfig } from 'vite';
 import vitePluginWasm from 'vite-plugin-wasm';
 import { networkInterfaces } from 'node:os';
 import { readFileSync } from 'node:fs';
 
-// https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
 	const isProd = mode === 'production' || !process.env.TAURI_ENV_DEBUG;
 
@@ -22,15 +21,8 @@ export default defineConfig(async ({ mode }) => {
 	};
 
 	const config: UserConfig = {
-		clearScreen: false,
-		resolve: process.env.VITEST
-			? {
-					conditions: ['browser']
-				}
-			: undefined,
-		test: {
-			environment: 'jsdom'
-		},
+		define,
+		envPrefix: ['VITE_', 'TAURI_'],
 		server: {
 			host: '0.0.0.0',
 			port: 5173,
@@ -46,7 +38,6 @@ export default defineConfig(async ({ mode }) => {
 				ignored: ['**/src-tauri/**']
 			}
 		},
-		envPrefix: ['VITE_', 'TAURI_'],
 		plugins: [
 			vitePluginWasm(),
 			tailwindcss(),
@@ -66,7 +57,25 @@ export default defineConfig(async ({ mode }) => {
 			minify: isProd ? 'esbuild' : false,
 			sourcemap: !isProd
 		},
-		define
+		resolve: process.env.VITEST
+			? {
+					conditions: ['browser']
+				}
+			: undefined,
+		test: {
+			expect: { requireAssertions: true },
+			projects: [
+				{
+					extends: './vite.config.ts',
+					test: {
+						name: 'server',
+						environment: 'node',
+						include: ['src/**/*.{test,spec}.{js,ts}'],
+						exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+					}
+				}
+			]
+		}
 	};
 
 	return config;

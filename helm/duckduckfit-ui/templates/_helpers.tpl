@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "duckduckfit_ui.name" -}}
+{{- define "duckduckfit.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "duckduckfit_ui.fullname" -}}
+{{- define "duckduckfit.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "duckduckfit_ui.chart" -}}
+{{- define "duckduckfit.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "duckduckfit_ui.labels" -}}
-helm.sh/chart: {{ include "duckduckfit_ui.chart" . }}
-{{ include "duckduckfit_ui.selectorLabels" . }}
+{{- define "duckduckfit.labels" -}}
+helm.sh/chart: {{ include "duckduckfit.chart" . }}
+{{ include "duckduckfit.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,7 +46,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "duckduckfit_ui.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "duckduckfit_ui.name" . }}
+{{- define "duckduckfit.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "duckduckfit.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
