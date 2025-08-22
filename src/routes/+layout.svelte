@@ -1,13 +1,16 @@
 <script lang="ts">
 	import '../app.css';
 
+	import AppSidebar from '$lib/ui/theme/AppSidebar.svelte';
+	import * as Sidebar from '$lib/ui/shadcn/components/ui/sidebar';
+	import SidebarInset from '$lib/ui/shadcn/components/ui/sidebar/sidebar-inset.svelte';
 	import favicon from '$lib/assets/favicon.png';
 	import { onMount } from 'svelte';
 	import type { LayoutProps } from './$types';
 	import { resolve } from '$app/paths';
-	import Header from '$lib/shared/components/Header.svelte';
-	import Notifications from '$lib/shared/components/Notifications.svelte';
 	import { getTheme } from '$lib/repo/settings.svelte';
+	import Notifications from '$lib/shared/components/Notifications.svelte';
+	import AppHeader from '$lib/ui/theme/AppHeader.svelte';
 
 	let { children }: LayoutProps = $props();
 
@@ -29,6 +32,16 @@
 	<link rel="manifest" crossorigin="use-credentials" href={resolve('/manifest.json')} />
 </svelte:head>
 
-<Header />
-{@render children()}
-<Notifications />
+<div class="[--header-height:calc(--spacing(14))]">
+	<Sidebar.Provider class="flex flex-col">
+		<div class="flex flex-1">
+			<AppSidebar />
+			<SidebarInset>
+				<AppHeader />
+				<main>
+					{@render children?.()}
+				</main>
+			</SidebarInset>
+		</div>
+	</Sidebar.Provider>
+</div>
