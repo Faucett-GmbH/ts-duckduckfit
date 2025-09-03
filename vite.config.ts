@@ -29,10 +29,10 @@ export default defineConfig(async ({ mode }) => {
 			strictPort: true,
 			hmr: host
 				? {
-						protocol: 'ws',
-						host,
-						port: 5183
-					}
+					protocol: 'ws',
+					host,
+					port: 5183
+				}
 				: undefined,
 			watch: {
 				ignored: ['**/src-tauri/**']
@@ -59,8 +59,8 @@ export default defineConfig(async ({ mode }) => {
 		},
 		resolve: process.env.VITEST
 			? {
-					conditions: ['browser']
-				}
+				conditions: ['browser']
+			}
 			: undefined,
 		test: {
 			expect: { requireAssertions: true },
@@ -70,7 +70,7 @@ export default defineConfig(async ({ mode }) => {
 					test: {
 						name: 'server',
 						environment: 'node',
-						include: ['src/**/*.{test,spec}.{js,ts}'],
+						include: ['tests/**/*.{test,spec}.{js,ts}'],
 						exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 					}
 				}

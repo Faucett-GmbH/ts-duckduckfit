@@ -64,5 +64,8 @@
 			"cbor-extract",
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"ulid": "^3.0.1"
 	}
 }

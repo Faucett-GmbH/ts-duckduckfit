@@ -7,6 +7,10 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
+		alias: {
+			'$domain': 'src/lib/domain',
+			'$kernel': 'src/lib/kernel'
+		},
 		adapter: adapter({
 			fallback: 'index.html',
 			precompress: true,
