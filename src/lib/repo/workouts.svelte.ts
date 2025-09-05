@@ -1,0 +1,170 @@
+import type { Locale } from '$lib/paraglide/runtime';
+import {
+	createDocument,
+	deleteDocument,
+	findDocument,
+	getRepo,
+	type AutomergeDocumentId,
+	type AutomergeDocHandle
+} from '$lib/repo';
+import { updateDifferences } from '$lib/shared/util/diff';
+import { userDocument } from './userDocument.svelte';
+import type { SetGroupTemplate, SetTemplate, WorkoutTemplate } from './workoutTemplates.svelte';
+
+export type SetStatusType = 'success' | 'failed';
+
+export interface AttemptedSet extends SetTemplate {
+	attemptedDistanceInMeters: number | null;
+	attemptedRateOfPerceivedExertion: number | null;
+	attemptedReps: number | null;
+	attemptedRepsInReserve: number | null;
+	attemptedTimeInSeconds: number | null;
+	attemptedWeightInKilograms: number | null;
+	durationInSeconds: number | null;
+	status: SetStatusType | null;
+	notes: WorkoutNote[];
+	startedAt: Date | null;
+	completedAt: Date | null;
+}
+
+export interface AttemptedSetGroup extends Omit<SetGroupTemplate, 'setTemplates'> {
+	sets: AttemptedSet[];
+}
+
+export interface WorkoutTranslation {
+	name: string;
+	locale: Locale;
+	description: string | null;
+}
+
+export interface WorkoutNote {
+	locale: Locale;
+	note: string;
+}
+
+export interface Workout {
+	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate> | null;
+	translations: WorkoutTranslation[];
+	notes: WorkoutNote[];
+	setGroups: AttemptedSetGroup[];
+	durationInSeconds: number | null;
+	startedAt: Date;
+	completedAt: Date | null;
+	updatedAt: Date;
+	createdAt: Date;
+}
+
+export interface Workouts {
+	version: number;
+	workoutsById: Record<AutomergeDocumentId<Workout>, boolean>;
+	workoutsByWorkoutTemplateId: Record<
+		AutomergeDocumentId<WorkoutTemplate>,
+		AutomergeDocumentId<Workout>
+	>;
+}
+
+export const workoutsConfig = {
+	migrations: {
+		1: () => (workouts: Workouts) => {
+			workouts.workoutsById = {};
+			workouts.workoutsByWorkoutTemplateId = {};
+		}
+	}
+};
+
+export async function getWorkouts(
+	offset: number,
+	limit: number
+): Promise<[key: AutomergeDocumentId<Workout>, value: Workout][]> {
+	const workouts = (await userDocument.workouts()).doc();
+	const startOffset = offset * limit;
+	const endOffset = startOffset + limit - 1;
+	const workoutIds = Object.keys(workouts.workoutsById).slice(
+		startOffset,
+		endOffset
+	) as AutomergeDocumentId<Workout>[];
+	const repo = getRepo();
+	return await Promise.all(
+		workoutIds.map(async (id) => [id, (await findDocument(id, repo)).doc()])
+	);
+}
+
+export async function getWorkoutById(
+	workoutId: AutomergeDocumentId<Workout>
+): Promise<Workout | null> {
+	const repo = getRepo();
+	const workoutDocHandle = await findDocument(workoutId, repo);
+	if (!workoutDocHandle) {
+		return null;
+	}
+	return workoutDocHandle.doc();
+}
+
+export async function getActiveWorkoutByWorkoutTemplateId(
+	workoutTemplateId: AutomergeDocumentId<WorkoutTemplate>
+): Promise<[key: AutomergeDocumentId<Workout>, value: Workout] | null> {
+	const workouts = (await userDocument.workouts()).doc();
+	const workoutId = workouts.workoutsByWorkoutTemplateId[workoutTemplateId];
+	if (workoutId) {
+		const workout = await getWorkoutById(workoutId);
+		if (workout && workout.completedAt == null) {
+			return [workoutId, workout];
+		}
+	}
+	return null;
+}
+
+export async function deleteWorkout(workoutId: AutomergeDocumentId<Workout>) {
+	const repo = getRepo();
+	const workouts = await userDocument.workouts();
+	workouts.change((wts) => {
+		delete wts.workoutsById[workoutId];
+	});
+	deleteDocument(workoutId, repo);
+}
+
+export async function upsertWorkout(
+	workoutUpdates: Workout,
+	workoutId?: AutomergeDocumentId<Workout>
+) {
+	const workouts = await userDocument.workouts();
+	let workoutDocument: AutomergeDocHandle<Workout>;
+	const repo = getRepo();
+	if (!workoutId) {
+		workoutDocument = createDocument<Workout>(workoutUpdates, repo);
+		workoutId = workoutDocument.documentId as AutomergeDocumentId<Workout>;
+		const documentId = workoutId;
+		workouts.change((wts) => {
+			wts.workoutsById[documentId] = true;
+			if (workoutUpdates.workoutTemplateId) {
+				wts.workoutsByWorkoutTemplateId[workoutUpdates.workoutTemplateId] = documentId;
+			}
+		});
+	} else {
+		workoutDocument = await findDocument(workoutId, repo);
+		const previousWorkoutTemplateId = workoutDocument.doc().workoutTemplateId;
+		workoutDocument.change((workout) => {
+			let updated = false;
+			if (updateDifferences(workout, workoutUpdates, (value) => value.id ?? value.locale)) {
+				updated = true;
+			}
+			if (updated) {
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				workout.updatedAt = new Date();
+			}
+		});
+		if (previousWorkoutTemplateId !== workoutUpdates.workoutTemplateId) {
+			const workoutTemplateId = workoutUpdates.workoutTemplateId;
+			const documentId = workoutId;
+			workouts.change((wts) => {
+				if (workoutTemplateId) {
+					wts.workoutsByWorkoutTemplateId[workoutTemplateId] = documentId;
+				}
+				if (previousWorkoutTemplateId) {
+					delete wts.workoutsByWorkoutTemplateId[previousWorkoutTemplateId];
+				}
+			});
+		}
+	}
+	return workoutId;
+}

@@ -1,13 +1,15 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!",
 	"settings_title": "Settings",
-	"application_settings_theme_mode": "Theme",
-	"application_settings_language": "Language",
-	"errors_message_application": "if it presists please contact support",
-	"errors_name_application": "Application",
 	"application_settings_title": "Settings",
+	"application_settings_language": "Language",
 	"application_settings_measurement_system": "Measurement System",
+	"application_settings_theme_mode": "Theme",
 	"imperial_system": "Imperial",
-	"metric_system": "Metric"
+	"metric_system": "Metric",
+	"errors_name_application": "Application",
+	"errors_message_application": "if it presists please contact support",
+	"errors_message_failed_to_update_exercises": "failed to update exercises",
+	"errors_message_must_be_less_than": "must be less than {value}",
+	"errors_message_required": "Required"
 }

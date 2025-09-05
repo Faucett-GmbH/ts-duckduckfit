@@ -8,11 +8,17 @@ import {
 	type AutomergeDocHandle
 } from '$lib/repo';
 import { settingsConfig, type Settings } from './settings.svelte';
+import { workoutTemplatesConfig, type WorkoutTemplates } from './workoutTemplates.svelte';
 import { InternalError } from '$lib/shared/util/error';
+import { workoutsConfig, type Workouts } from './workouts.svelte';
+import { exercisesConfig, type Exercises } from './exercises.svelte';
 
 export interface UserDocument {
 	version: number;
 	settings: AutomergeDocumentId<Settings>;
+	exercises: AutomergeDocumentId<Exercises>;
+	workouts: AutomergeDocumentId<Workouts>;
+	workoutTemplates: AutomergeDocumentId<WorkoutTemplates>;
 }
 
 export const userDocumentConfig = {
@@ -22,6 +28,12 @@ export const userDocumentConfig = {
 
 			return (userDocument: UserDocument) => {
 				userDocument.settings = createDocument<Settings>({ version: 0 }, repo).documentId;
+				userDocument.exercises = createDocument<Exercises>({ version: 0 }, repo).documentId;
+				userDocument.workouts = createDocument<Workouts>({ version: 0 }, repo).documentId;
+				userDocument.workoutTemplates = createDocument<WorkoutTemplates>(
+					{ version: 0 },
+					repo
+				).documentId;
 			};
 		}
 	}
@@ -58,6 +70,12 @@ async function initAllDocuments(userDocumentHandle: AutomergeDocHandle<UserDocum
 	}
 	const repo = getRepo();
 	await initDocument(await findDocument(userDocument.settings, repo), settingsConfig);
+	await initDocument(await findDocument(userDocument.exercises, repo), exercisesConfig);
+	await initDocument(await findDocument(userDocument.workouts, repo), workoutsConfig);
+	await initDocument(
+		await findDocument(userDocument.workoutTemplates, repo),
+		workoutTemplatesConfig
+	);
 	await repo.flush();
 }
 
@@ -69,5 +87,14 @@ export const userDocument = {
 	},
 	async settings() {
 		return findDocument((await userDocumentDoc).settings, getRepo());
+	},
+	async exercises() {
+		return findDocument((await userDocumentDoc).exercises, getRepo());
+	},
+	async workouts() {
+		return findDocument((await userDocumentDoc).workouts, getRepo());
+	},
+	async workoutTemplates() {
+		return findDocument((await userDocumentDoc).workoutTemplates, getRepo());
 	}
 };

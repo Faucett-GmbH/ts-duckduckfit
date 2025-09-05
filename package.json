@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "npm run paraglide:build && vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -14,13 +14,15 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
+		"paraglide:build": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide ",
 		"tauri": "tauri",
 		"desktop": "tauri dev",
 		"desktop:build": "tauri build",
 		"android": "pnpm tauri android dev --open",
 		"android:build": "pnpm tauri android build",
 		"ios": "pnpm tauri ios dev --open",
-		"ios:build": "pnpm tauri ios build"
+		"ios:build": "pnpm tauri ios build",
+		"postinstall": "svelte-kit sync && npm run paraglide:build"
 	},
 	"devDependencies": {
 		"@aicacia/debounce": "^0.1.25",
@@ -64,5 +66,10 @@
 			"cbor-extract",
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"@aicacia/string-fuzzy_equals": "^0.1.4",
+		"@zip.js/zip.js": "^2.7.72",
+		"vest": "^5.4.6"
 	}
 }
