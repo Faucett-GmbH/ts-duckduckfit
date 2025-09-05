@@ -1,1 +1,0 @@
-import"../chunks/DsnmJJEf.js";import{f as l,D as d,b as n,d as a,g as r}from"../chunks/DKyuKv9V.js";var c=l('<div class="flex grow flex-col items-center"><div class="container flex flex-col p-8"><!></div></div>');function f(i,s){var e=c(),o=a(e),t=a(o);d(t,()=>s.children),r(o),r(e),n(i,e)}export{f as component};

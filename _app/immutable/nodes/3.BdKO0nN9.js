@@ -1,0 +1,1 @@
+import{r}from"../chunks/J5U7qho4.js";import{R as o}from"../chunks/CmvMZC_O.js";function n(e,t){throw new o(e,t.toString())}const a=async e=>(await e.parent(),n(302,r("/settings/application"))),c=Object.freeze(Object.defineProperty({__proto__:null,load:a},Symbol.toStringTag,{value:"Module"}));export{c as universal};
